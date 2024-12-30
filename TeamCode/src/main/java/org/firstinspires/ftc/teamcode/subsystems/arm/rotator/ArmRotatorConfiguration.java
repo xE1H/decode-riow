@@ -48,10 +48,4 @@ public class ArmRotatorConfiguration {
         SECOND_BASKET,
         FIRST_BASKET
     }
-
-    public enum ArmState {
-        IN_ROBOT,
-        INTAKE,
-        DEPOSIT
-    }
 }

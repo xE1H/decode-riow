@@ -12,4 +12,8 @@ public class SetSlideExtension extends InstantCommand {
     public SetSlideExtension(ArmSlideConfiguration.TargetPosition extension) {
         super(() -> VLRSubsystem.getInstance(ArmSlideSubsystem.class).setTargetPosition(extension));
     }
+
+    public SetSlideExtension(double extension) {
+        super(() -> VLRSubsystem.getInstance(ArmSlideSubsystem.class).setTargetPosition(extension));
+    }
 }

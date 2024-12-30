@@ -8,10 +8,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
+import org.opencv.core.Mat;
 
 /**
  * This is the StraightBackAndForth autonomous OpMode. It runs the robot in a specified distance
@@ -32,7 +34,7 @@ public class StraightBackAndForth extends OpMode {
     private Telemetry telemetryA;
 
     public static double DISTANCE = 10;
-
+    public static int ANGLE = 180;
     private boolean forward = true;
 
     private Follower follower;
@@ -48,11 +50,11 @@ public class StraightBackAndForth extends OpMode {
     public void init() {
         follower = new Follower(hardwareMap);
         follower.setMaxPower(0.6);
-
+        follower.setStartingPose(new Pose(0,0, Math.toRadians(ANGLE)));
         forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(DISTANCE,0, Point.CARTESIAN)));
-        forwards.setConstantHeadingInterpolation(0);
+        forwards.setConstantHeadingInterpolation(Math.toRadians(ANGLE));
         backwards = new Path(new BezierLine(new Point(DISTANCE,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
-        backwards.setConstantHeadingInterpolation(0);
+        backwards.setConstantHeadingInterpolation(Math.toRadians(ANGLE));
 
         follower.followPath(forwards);
 

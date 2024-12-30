@@ -8,12 +8,12 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
-import org.firstinspires.ftc.teamcode.auto.pedroCommands.HoldPoint;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
 @Config
 @Photon

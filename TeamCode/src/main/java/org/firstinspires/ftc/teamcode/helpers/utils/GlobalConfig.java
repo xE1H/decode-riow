@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.auto.pedroPathing.tuning.FollowerConstants
 
 @Config
 public class GlobalConfig {
-    public static boolean DEBUG_MODE = true;
+    public static boolean DEBUG_MODE = false;
     public static boolean PRINT_MOTOR_CURRENT = false;
 
     /**
@@ -18,7 +18,21 @@ public class GlobalConfig {
 
     public static void setIsInvertedMotors(boolean isInverted) {
         INVERTED_MOTORS = isInverted;
+        setIsInvertedEncoders(isInverted);
+        setIsInvertedOffsets(isInverted);
         FollowerConstants.updateConstants();
+    }
+
+    public static boolean INVERTED_ENCODERS = false;
+
+    public static void setIsInvertedEncoders(boolean isInverted){
+        INVERTED_ENCODERS = isInverted;
+    }
+
+    public static boolean INVERTED_OFFSETS = false;
+
+    public static void setIsInvertedOffsets(boolean isInverted){
+        INVERTED_OFFSETS = isInverted;
     }
 
 }

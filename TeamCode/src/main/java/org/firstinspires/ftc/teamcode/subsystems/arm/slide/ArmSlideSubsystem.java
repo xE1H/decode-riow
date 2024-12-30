@@ -51,7 +51,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
         Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
         motionProfile = new MotionProfile(telemetry, "SLIDE", ACCELERATION, DECELERATION_FAST, MAX_VELOCITY, CREEP, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, FEED_FORWARD_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, SINE);
-        motionProfile.enableTelemetry(true);
+        motionProfile.enableTelemetry(false);
     }
 
 
@@ -92,10 +92,6 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
         motionProfile.updateCoefficients(ACCELERATION, DECELERATION_FAST, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
         motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN);
-
-        if (getPosition() > HORIZONTAL_EXTENSION_LIMIT && armAngleDegrees < 90){
-            setTargetPosition(HORIZONTAL_EXTENSION_LIMIT);
-        }
 
         double power = filter.estimate(motionProfile.getPower(getPosition(), armAngleDegrees));
 

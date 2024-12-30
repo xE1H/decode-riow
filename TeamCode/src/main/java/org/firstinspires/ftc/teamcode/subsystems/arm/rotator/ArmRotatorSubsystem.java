@@ -21,7 +21,6 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     private ArmSlideSubsystem slideSubsystem;
 
     private RotatorState rotatorState;
-    private ArmState armState = ArmState.IN_ROBOT;
 
     private double encoderPosition = 0;
 
@@ -44,7 +43,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motionProfile = new MotionProfile(telemetry, "ARM", ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, COSINE);
-        motionProfile.enableTelemetry(true);
+        motionProfile.enableTelemetry(false);
 
         rotatorState = RotatorState.IN_ROBOT;
     }
@@ -99,13 +98,5 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
     public void setRotatorState(RotatorState state) {
         this.rotatorState = state;
-    }
-
-    public ArmState getArmState(){
-        return this.armState;
-    }
-
-    public void setArmState(ArmState armState){
-        this.armState = armState;
     }
 }

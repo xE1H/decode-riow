@@ -79,7 +79,7 @@ public class PinpointLocalizer extends Localizer {
         //If you have already tuned the TwoWheelLocalizer, you can simply use the forwardEncoderPose's y value and strafeEncoderPose's x values.
 
         double xOffset; double yOffset;
-        if(GlobalConfig.INVERTED_MOTORS){
+        if(GlobalConfig.INVERTED_OFFSETS){
             xOffset = 75;
             yOffset = -30;
         } else {
@@ -95,7 +95,7 @@ public class PinpointLocalizer extends Localizer {
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         //odo.setEncoderResolution(13.26291192);
         GoBildaPinpointDriver.EncoderDirection encoderDirection;
-        if(GlobalConfig.INVERTED_MOTORS){
+        if(GlobalConfig.INVERTED_ENCODERS){
             encoderDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
         } else {
             encoderDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;

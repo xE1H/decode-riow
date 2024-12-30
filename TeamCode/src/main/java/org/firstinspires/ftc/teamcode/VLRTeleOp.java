@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.controls.SecondaryDriverTeleOpControls;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
@@ -32,8 +33,6 @@ public class VLRTeleOp extends VLRLinearOpMode {
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
 
-        ArmRotatorSubsystem arm = VLRSubsystem.getInstance(ArmRotatorSubsystem.class);
-
         waitForStart();
 
         while (opModeIsActive()) {
@@ -41,7 +40,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
             secondaryDriver.update();
 
             if (GlobalConfig.DEBUG_MODE) {
-                telemetry.addData("current state", arm.getArmState());
+                telemetry.addData("current state", ArmState.get());
                 telemetry.update();
             }
         }
