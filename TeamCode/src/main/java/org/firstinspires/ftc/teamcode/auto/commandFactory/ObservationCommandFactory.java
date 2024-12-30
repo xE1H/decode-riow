@@ -1,10 +1,14 @@
-package org.firstinspires.ftc.teamcode.auto.pathFactory;
+package org.firstinspires.ftc.teamcode.auto.commandFactory;
+
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
+
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
-public class ObservationPathFactory {
+public class ObservationCommandFactory extends CommandFactory {
+    private boolean isBlueTeam;
+
     private Point startingPoint;
     private Point toSpecimenScore;
     /**
@@ -24,15 +28,19 @@ public class ObservationPathFactory {
     private Point sample3ToObservation;
 
 
-    public ObservationPathFactory(boolean isBlueTeam) {
+    public ObservationCommandFactory(boolean isBlueTeam) {
         initializePointsForBlueTeam();
+        this.isBlueTeam = isBlueTeam;
         if (!isBlueTeam) {
-            mirrorPointsToRedTeam();
+            Point[] allPoints = {startingPoint, toSpecimenScore, rotate, toAllSamplesControl1, toAllSamplesControl2, toAllSamples, toSample1Horizontal, sample1ToObservation, toSample1Vertical, toSample2Horizontal, sample2ToObservation, toSample2Vertical, toSample3Horizontal, sample3ToObservation};
+            mirrorPointsToRedTeam(
+                    allPoints
+            );
         }
     }
 
-
-    private void initializePointsForBlueTeam() {
+    @Override
+    public void initializePointsForBlueTeam() {
         startingPoint = new Point(9.6, 60);
         toSpecimenScore = new Point(28, 60);
         rotate = new Point(28.05, 60);
@@ -48,26 +56,17 @@ public class ObservationPathFactory {
         toSample3Horizontal = new Point(57, 3.5);
         sample3ToObservation = new Point(21, 3.5);
     }
-
-    private void mirrorPointsToRedTeam() {
-        Point[] allPoints = {startingPoint, toSpecimenScore, rotate, toAllSamplesControl1, toAllSamplesControl2, toAllSamples, toSample1Horizontal, sample1ToObservation, toSample1Vertical, toSample2Horizontal, sample2ToObservation, toSample2Vertical, toSample3Horizontal, sample3ToObservation};
-
-        for (Point point : allPoints) {
-            point.mirrorCartesianX();
-            point.mirrorCartesianY();
-        }
-    }
-
+    @Override
     public Point getStartingPoint() {
         return startingPoint;
     }
-
-    public SequentialCommandGroup getPathCommand() {
+    @Override
+    public SequentialCommandGroup getCommands() {
         return new SequentialCommandGroup(
                 new FollowPath(0, toSpecimenScore),
                 new FollowPath(0, -90, rotate),
                 new WaitCommand(500),
-                new FollowPath(false, toAllSamplesControl1, toAllSamplesControl2, toAllSamples),
+                new FollowPath(!isBlueTeam, toAllSamplesControl1, toAllSamplesControl2, toAllSamples),
                 new FollowPath(0, toSample1Horizontal),
                 new FollowPath(0, sample1ToObservation),
                 new FollowPath(0, toSample1Vertical),

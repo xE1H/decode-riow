@@ -8,10 +8,10 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmState_Deposit;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmState_InRobot;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmState_Intake;
-import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.MoveArmToDeposit;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.MoveArmInToRobot;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.MoveArmToIntake;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
@@ -42,15 +42,9 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
         slide = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         cs = CommandScheduler.getInstance();
 
-        // Define controls here
-//        add(new ButtonCtl(GamepadKeys.Button.A, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new ClawGrabFromSubmersibleCommand())));
-//        add(new ButtonCtl(GamepadKeys.Button.B, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new ArmExtensionCommand())));
-//        add(new ButtonCtl(GamepadKeys.Button.X, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new ClawAngleSubmersibleCommand())));
-//        add(new ButtonCtl(GamepadKeys.Button.Y, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new ArmDepositCommand())));
-
-        add(new ButtonCtl(CROSS, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new SetArmState_Intake())));
-        add(new ButtonCtl(SQUARE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new SetArmState_InRobot())));
-        add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new SetArmState_Deposit())));
+        add(new ButtonCtl(CROSS, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new MoveArmToIntake())));
+        add(new ButtonCtl(SQUARE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new MoveArmInToRobot())));
+        add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new MoveArmToDeposit())));
 
         add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.UP))));
         add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.DOWN))));
@@ -62,13 +56,13 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     }
 
     private void incrementClaw(double input) {
-        if (arm.getArmState() == ArmRotatorConfiguration.ArmState.INTAKE) {
+        if (ArmState.get() == ArmState.State.INTAKE) {
             claw.setTwistIncrement(input * 0.08);
         }
     }
 
     private void incrementSlidePosition(double input) {
-        if (arm.getArmState() == ArmRotatorConfiguration.ArmState.INTAKE) {
+        if (ArmState.get() == ArmState.State.INTAKE) {
             slide.incrementTargetPosition(input * 0.2);
         }
     }
