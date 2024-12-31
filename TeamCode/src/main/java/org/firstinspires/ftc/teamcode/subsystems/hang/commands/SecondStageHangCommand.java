@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.MoveArmInToRobot;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.ResetMaxSlideVelocity;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetMaxSlideVelocity;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
@@ -30,6 +31,7 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
                 new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 60),
                 new SetSlideExtension(0.85),
                 new WaitUntilCommand(()-> VLRSubsystem.getInstance(ArmSlideSubsystem.class).reachedTargetPosition()),
+                new SetArmState(ArmState.State.SECOND_STAGE_HANG),
                 new WaitUntilCommand(gamepadCondition),
                 new SetMaxSlideVelocity(200),
                 new SetSlideExtension(0.75),
