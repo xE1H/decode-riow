@@ -21,5 +21,9 @@ public class BlueNetAuto extends VLRLinearOpMode {
         runner.initialize(hardwareMap);
         waitForStart();
         runner.run();
+
+        while (opModeIsActive()) {
+            // This is a placeholder to keep the opmode running
+        }
     }
 }

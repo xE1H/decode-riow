@@ -21,6 +21,10 @@ public class RedNetAuto extends VLRLinearOpMode {
         runner.initialize(hardwareMap);
         waitForStart();
         runner.run();
+
+        while(opModeIsActive()){
+            //
+        }
     }
 
 }
