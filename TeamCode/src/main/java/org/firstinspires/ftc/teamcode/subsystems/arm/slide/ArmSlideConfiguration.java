@@ -10,8 +10,8 @@ public class ArmSlideConfiguration {
     public static String ENCODER_NAME = "MotorRightFront";
 
     public static double ACCELERATION = 22000;
-    public static double DECELERATION_FAST = 10000;
-    public static double MAX_VELOCITY = 1700;
+    public static double DECELERATION = 9000;
+    public static double MAX_VELOCITY_NOMINAL = 1500;
     public static double FEEDBACK_PROPORTIONAL_GAIN = 0.02;
     public static double FEEDBACK_INTEGRAL_GAIN = 0.0001;
     public static double FEEDBACK_DERIVATIVE_GAIN = 0.0004;

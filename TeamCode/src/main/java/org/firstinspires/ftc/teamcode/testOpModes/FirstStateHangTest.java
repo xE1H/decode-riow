@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 
 
 @Photon
-@TeleOp(name = "HangTest")
-public class HangTest extends VLRLinearOpMode {
+@TeleOp(name = "FirstStageHangTest")
+public class FirstStateHangTest extends VLRLinearOpMode {
 
     @Override
     public void run() {

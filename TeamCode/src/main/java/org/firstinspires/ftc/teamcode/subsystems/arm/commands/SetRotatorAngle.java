@@ -11,7 +11,7 @@ public class SetRotatorAngle extends InstantCommand {
         super(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).setTargetAngle(angle));
     }
 
-    public SetRotatorAngle(double extension) {
-        super(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).setTargetPosition(extension));
+    public SetRotatorAngle(double degrees) {
+        super(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).setTargetPosition(degrees));
     }
 }

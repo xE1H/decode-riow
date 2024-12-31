@@ -57,7 +57,8 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     }
 
     public void setTargetPosition(double angleDegrees) {
-        slideSubsystem.setTargetPosition(angleDegrees);
+        motionProfile.setCurrentTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
+
     }
 
     public double getAngleDegrees() {
