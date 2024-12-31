@@ -73,7 +73,12 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     }
 
     public double getPosition() {
+        if(GlobalConfig.INVERTED_ENCODERS){
+            return encoderPosition;
+        }
+
         return -encoderPosition;
+
     }
 
     public double getTargetPosition() {
@@ -123,11 +128,10 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
             //extensionMotor2.setPower(power);
         }
 
-        if (GlobalConfig.PRINT_MOTOR_CURRENT){
             Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
             telemetry.addData("motor0 Current", extensionMotor0.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("motor1 Current", extensionMotor1.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("motor2 Current", extensionMotor2.getCurrent(CurrentUnit.AMPS));
-        }
+
     }
 }
