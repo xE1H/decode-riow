@@ -18,7 +18,7 @@ public class MoveArmToDeposit extends CustomConditionalCommand {
                 new SequentialCommandGroup(
                         new CustomConditionalCommand(
                                 new MoveArmInToRobot(),
-                                () -> ArmState.get() == ArmState.State.INTAKE
+                                () -> (ArmState.get() == ArmState.State.INTAKE || ArmState.get() == ArmState.State.SECOND_STAGE_HANG)
                         ),
 
                         new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.DEPOSIT),

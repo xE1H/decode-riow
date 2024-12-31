@@ -23,7 +23,7 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
         addCommands(
                 new CustomConditionalCommand(
                         new MoveArmInToRobot(),
-                        () -> ArmState.get() == ArmState.State.INTAKE
+                        () -> (ArmState.get() == ArmState.State.INTAKE || ArmState.get() == ArmState.State.DEPOSIT)
                 ),
 
                 new SetClawAngle(ClawConfiguration.TargetAngle.UP),
