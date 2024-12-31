@@ -45,13 +45,17 @@ public class FollowPath extends CommandBase {
 
     public FollowPath(double startHeading, double endHeading, Point point){
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, point))
-                .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading)).build();
+                .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
+                .setPathEndHeadingConstraint(Math.toRadians(1))
+                .build();
         lastPoint = point;
     }
 
     public FollowPath(double startHeading, double endHeading){
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, lastPoint))
-                .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading)).build();
+                .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
+                .setPathEndHeadingConstraint(Math.toRadians(1))
+                .build();
     }
 
     private Point[] prependPoint(Point point, Point... otherPoints){
