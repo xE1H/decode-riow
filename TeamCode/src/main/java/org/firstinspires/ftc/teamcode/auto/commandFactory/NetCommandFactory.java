@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.auto.commandFactory;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
@@ -9,6 +11,8 @@ import org.firstinspires.ftc.teamcode.helpers.commands.ScoreBucketSample;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
+import java.lang.reflect.WildcardType;
+@Config
 public class NetCommandFactory extends CommandFactory {
     private int scoreHeading;
     private int sample1Heading;
@@ -19,6 +23,7 @@ public class NetCommandFactory extends CommandFactory {
     private Point toScore;
     private Point toSamples1And2;
     private Point toSample3;
+    private Point toNetArea;
 
     public NetCommandFactory(boolean isBlueTeam){
         initializeHeadings();
@@ -43,6 +48,7 @@ public class NetCommandFactory extends CommandFactory {
         toScore = new Point(22, 123);
         toSamples1And2 = new Point(22, 125);
         toSample3 = new Point(25, 125);
+        toNetArea = new Point(14, 130);
     }
     @Override
     public Point getStartingPoint() {
@@ -71,7 +77,9 @@ public class NetCommandFactory extends CommandFactory {
                 new GrabBucketSample(),
 
                 new FollowPath(sample3Heading, scoreHeading, toScore),
-                new ScoreBucketSample()
+                new ScoreBucketSample(),
+
+                new FollowPath(scoreHeading, toNetArea)
         );
     }
 }
