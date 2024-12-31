@@ -17,6 +17,10 @@ public class BlueObservationAuto extends VLRLinearOpMode {
         runner.initialize(hardwareMap);
         waitForStart();
         runner.run();
+
+        while(opModeIsActive()){
+            ///
+        }
     }
 
 }
