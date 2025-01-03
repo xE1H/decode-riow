@@ -5,8 +5,8 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 
-public class SetMaxSlideVelocity extends InstantCommand {
-    public SetMaxSlideVelocity(double velocity){
-        VLRSubsystem.getInstance(ArmSlideSubsystem.class).overrideMaxVelocity(velocity);
+public class ResetSlideCoeffs extends InstantCommand {
+    public ResetSlideCoeffs(){
+        VLRSubsystem.getInstance(ArmSlideSubsystem.class).resetMotionProfileCoeffs();
     }
 }

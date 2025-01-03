@@ -30,7 +30,6 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     private LowPassFilter filter = new LowPassFilter(a);
 
     private double encoderPosition = 0;
-    private double maxVelocity = MAX_VELOCITY_NOMINAL;
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
@@ -51,8 +50,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         extensionEncoder.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
         Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-        motionProfile = new MotionProfile(telemetry, "SLIDE", ACCELERATION, DECELERATION, maxVelocity, CREEP, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, FEED_FORWARD_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, SINE);
-        motionProfile.enableTelemetry(false);
+        motionProfile = new MotionProfile(telemetry, "SLIDE", ACCELERATION, DECELERATION, MAX_VELOCITY_NOMINAL, CREEP, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, FEED_FORWARD_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, SINE);
+        motionProfile.enableTelemetry(true);
     }
 
 
@@ -88,21 +87,24 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     }
 
 
-    public void overrideMaxVelocity(double maxVelocity){
-        this.maxVelocity = maxVelocity;
+    public void overrideMotionProfileCoeffs(double maxVelocity, double p, double i, double v, double a, double feedforward){
+        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, maxVelocity, p, i, FEEDBACK_DERIVATIVE_GAIN, v, a);
+        motionProfile.setFeedForwardGain(feedforward);
     }
 
 
-    public void resetMaxVelocity(){
-        this.maxVelocity = MAX_VELOCITY_NOMINAL;
+    public void resetMotionProfileCoeffs(){
+        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY_NOMINAL, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+        motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN);
     }
 
 
     public void periodic(double armAngleDegrees) {
         encoderPosition = extensionEncoder.getCurrentPosition();
 
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, maxVelocity, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
-        motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN);
+        //UNCOMMENT FOR TUNING:
+//        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, maxVelocity, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+//        motionProfile.setFeedForwardGain(feedforward);
 
         double power = filter.estimate(motionProfile.getPower(getPosition(), armAngleDegrees));
 

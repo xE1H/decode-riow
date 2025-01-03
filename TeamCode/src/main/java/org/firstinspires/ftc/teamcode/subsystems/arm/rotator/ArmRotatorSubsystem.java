@@ -73,10 +73,20 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         return Math.abs(getAngleDegrees() - angleDegrees) < ERROR_MARGIN;
     }
 
+    public void overrideArmCoeffs(double p, double i){
+        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+    }
+
+    public void resetCoeffs(){
+        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+    }
+
     @Override
     public void periodic() {
         encoderPosition = thoughBoreEncoder.getCurrentPosition();
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+
+        //UNCOMMENT FOR TUNING
+        //motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
 
         double currentAngle = getAngleDegrees();
         double currentFeedForwardGain = mapToRange(slideSubsystem.getPosition(), ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, RETRACTED_FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
