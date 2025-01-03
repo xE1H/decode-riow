@@ -58,6 +58,18 @@ public class MoveArmInToRobot extends SequentialCommandGroup {
                                     )
                             ),
                             () -> ArmState.get() == ArmState.State.DEPOSIT
+                    ),
+
+                    new CustomConditionalCommand(
+                            new SequentialCommandGroup(
+                                    new SetClawAngle(TargetAngle.UP),
+                                    new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
+                                    new WaitUntilCommand(slides::reachedTargetPosition),
+                                    new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.DOWN),
+                                    new WaitUntilCommand(arm::reachedTargetPosition),
+                                    new SetArmState(ArmState.State.IN_ROBOT)
+                            ),
+                            () -> ArmState.get() == ArmState.State.SECOND_STAGE_HANG
                     )
             );
     }

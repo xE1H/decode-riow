@@ -20,7 +20,7 @@ public class MoveArmToIntake extends CustomConditionalCommand {
                 new SequentialCommandGroup(
                         new CustomConditionalCommand(
                                 new MoveArmInToRobot(),
-                                () -> ArmState.get() == ArmState.State.DEPOSIT
+                                () -> (ArmState.get() == ArmState.State.DEPOSIT || ArmState.get() == ArmState.State.SECOND_STAGE_HANG)
                         ),
 
                         new SetClawAngle(TargetAngle.UP),
