@@ -10,17 +10,12 @@ import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 @Photon
 @Autonomous(name = "BlueObservationAuto", group = "Blue Team")
 public class BlueObservationAuto extends VLRLinearOpMode {
-
     @Override
     public void run() {
         AutoOpModeRunnner runner = new AutoOpModeRunnner(new ObservationCommandFactory(true), true);
         runner.initialize(hardwareMap);
         waitForStart();
-        runner.run();
-
-        while(opModeIsActive()){
-            ///
-        }
+        runner.run(this::opModeIsActive);
     }
 
 }

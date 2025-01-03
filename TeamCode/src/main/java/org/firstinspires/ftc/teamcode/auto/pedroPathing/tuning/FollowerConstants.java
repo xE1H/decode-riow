@@ -52,8 +52,8 @@ public class FollowerConstants {
         leftRearMotorDirection = GlobalConfig.INVERTED_MOTORS ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
         rightRearMotorDirection = GlobalConfig.INVERTED_MOTORS ? DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE;
 
-        double headingProportionalGain = GlobalConfig.INVERTED_MOTORS ? -0.6 : 0.6;
-        double headingDerivativeGain = GlobalConfig.INVERTED_MOTORS ? -0.002 : 0.002;
+        double headingProportionalGain = GlobalConfig.INVERTED_MOTORS ? -0.5 : 0.5;
+        double headingDerivativeGain = GlobalConfig.INVERTED_MOTORS ? -0.0015 : 0.0015;
 
         headingPIDFCoefficients = new CustomPIDFCoefficients(
                 headingProportionalGain,

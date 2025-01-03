@@ -34,8 +34,10 @@ public class StraightBackAndForth extends OpMode {
     private Telemetry telemetryA;
 
     public static double DISTANCE = 10;
-    public static int ANGLE = 180;
+    public static int ANGLE = 0;
     private boolean forward = true;
+    public static boolean inverted = true;
+    public static double translationalConstraint = 0.2;
 
     private Follower follower;
 
@@ -48,14 +50,16 @@ public class StraightBackAndForth extends OpMode {
      */
     @Override
     public void init() {
+        GlobalConfig.setIsInvertedMotors(inverted);
         follower = new Follower(hardwareMap);
         follower.setMaxPower(0.6);
         follower.setStartingPose(new Pose(0,0, Math.toRadians(ANGLE)));
         forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(DISTANCE,0, Point.CARTESIAN)));
         forwards.setConstantHeadingInterpolation(Math.toRadians(ANGLE));
+//        forwards.set
         backwards = new Path(new BezierLine(new Point(DISTANCE,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
         backwards.setConstantHeadingInterpolation(Math.toRadians(ANGLE));
-
+        backwards.setPathEndTranslationalConstraint(translationalConstraint);
         follower.followPath(forwards);
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());

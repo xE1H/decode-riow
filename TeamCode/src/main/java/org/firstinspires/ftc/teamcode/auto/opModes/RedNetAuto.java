@@ -20,11 +20,7 @@ public class RedNetAuto extends VLRLinearOpMode {
         AutoOpModeRunnner runner = new AutoOpModeRunnner(new NetCommandFactory(false), true, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class);
         runner.initialize(hardwareMap);
         waitForStart();
-        runner.run();
-
-        while(opModeIsActive()){
-            //
-        }
+        runner.run(this::opModeIsActive);
     }
 
 }
