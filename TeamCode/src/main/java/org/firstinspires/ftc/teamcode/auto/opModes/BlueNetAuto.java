@@ -20,10 +20,6 @@ public class BlueNetAuto extends VLRLinearOpMode {
         AutoOpModeRunnner runner = new AutoOpModeRunnner(new NetCommandFactory(true), false, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class);
         runner.initialize(hardwareMap);
         waitForStart();
-        runner.run();
-
-        while (opModeIsActive()) {
-            // This is a placeholder to keep the opmode running
-        }
+        runner.run(this::opModeIsActive, false);
     }
 }

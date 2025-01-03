@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto.pedroCommands;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.follower.Follower;
@@ -8,10 +9,12 @@ import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.BezierLin
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
 
+@Config
 public class FollowPath extends CommandBase {
     private static Follower follower;
     private PathChain pathChain = null;
     private static Point lastPoint;
+    public static double translationalErrorConstraint = 5;
 
     public FollowPath(double constantHeading, Point point){
         pathChain = follower.pathBuilder().addPath(
@@ -19,27 +22,21 @@ public class FollowPath extends CommandBase {
                         lastPoint,
                         point
                 )
-        ).setConstantHeadingInterpolation(Math.toRadians(constantHeading)).build();
-        lastPoint = point;
-    }
-
-    public FollowPath(double constantHeading, Point... points) {
-        pathChain = follower.pathBuilder().addPath(new BezierCurve(
-                prependPoint(lastPoint, points)
-        )).setConstantHeadingInterpolation(Math.toRadians(constantHeading)).build();
-        lastPoint = points[points.length - 1];
-    }
-
-    public FollowPath(boolean reverseTangentialDirection, Point point){
-        pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, point))
-                .setTangentHeadingInterpolation().setReversed(reverseTangentialDirection).build();
+        )
+                .setConstantHeadingInterpolation(Math.toRadians(constantHeading))
+                .setPathEndTranslationalConstraint(translationalErrorConstraint)
+                .build();
         lastPoint = point;
     }
 
     public FollowPath(boolean reverseTangentialDirection, Point... points){
         pathChain = follower.pathBuilder().addPath(new BezierCurve(
                 prependPoint(lastPoint, points)
-        )).setTangentHeadingInterpolation().setReversed(reverseTangentialDirection).build();
+        ))
+                .setTangentHeadingInterpolation()
+                .setPathEndTranslationalConstraint(translationalErrorConstraint)
+                .setReversed(reverseTangentialDirection)
+                .build();
         lastPoint = points[points.length - 1];
     }
 
@@ -47,6 +44,7 @@ public class FollowPath extends CommandBase {
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, point))
                 .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
                 .setPathEndHeadingConstraint(Math.toRadians(1))
+                .setPathEndTranslationalConstraint(translationalErrorConstraint)
                 .build();
         lastPoint = point;
     }
@@ -55,6 +53,7 @@ public class FollowPath extends CommandBase {
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, lastPoint))
                 .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
                 .setPathEndHeadingConstraint(Math.toRadians(1))
+                .setPathEndTranslationalConstraint(translationalErrorConstraint)
                 .build();
     }
 
