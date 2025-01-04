@@ -16,6 +16,6 @@ public class RedObservationAuto extends VLRLinearOpMode {
         AutoOpModeRunnner runner = new AutoOpModeRunnner(new ObservationCommandFactory(false), false);
         runner.initialize(hardwareMap);
         waitForStart();
-        runner.run(this::opModeIsActive);
+        runner.run(this::opModeIsActive, false);
     }
 }
