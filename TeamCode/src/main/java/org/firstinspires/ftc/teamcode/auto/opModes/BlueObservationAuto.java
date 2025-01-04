@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.auto.opModes;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.auto.commandFactory.ObservationCommandFactory;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
 @Config
 @Photon
@@ -14,8 +17,11 @@ public class BlueObservationAuto extends VLRLinearOpMode {
     public void run() {
         AutoOpModeRunnner runner = new AutoOpModeRunnner(new ObservationCommandFactory(true), true);
         runner.initialize(hardwareMap);
+        CommandScheduler.getInstance().schedule(
+                new SetClawTwist(ClawConfiguration.TargetTwist.FLIPPED)
+        );
         waitForStart();
-        runner.run(this::opModeIsActive);
+        runner.run(this::opModeIsActive, false);
     }
 
 }

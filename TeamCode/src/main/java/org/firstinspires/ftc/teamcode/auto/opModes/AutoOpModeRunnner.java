@@ -18,21 +18,21 @@ import java.util.function.BooleanSupplier;
 
 @Photon
 public class AutoOpModeRunnner {
-    private Class<? extends VLRSubsystem<?>>[] requiredSubsystems;
     private boolean isInvertedMotors;
     private CommandFactory commandFactory;
     private Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     private Follower follower;
 
 
-    public AutoOpModeRunnner(CommandFactory commandFactory, boolean isInvertedMotors, Class<? extends VLRSubsystem<?>>... requiredSubsystems) {
+    public AutoOpModeRunnner(CommandFactory commandFactory, boolean isInvertedMotors) {
         this.commandFactory = commandFactory;
         this.isInvertedMotors = isInvertedMotors;
-        this.requiredSubsystems = requiredSubsystems;
     }
 
     public void initialize(HardwareMap hardwareMap) {
-        VLRSubsystem.requireSubsystems(requiredSubsystems);
+        VLRSubsystem.requireSubsystems(
+                commandFactory.getRequiredSubsystems()
+        );
         VLRSubsystem.initializeAll(hardwareMap);
         GlobalConfig.setIsInvertedMotors(isInvertedMotors);
 

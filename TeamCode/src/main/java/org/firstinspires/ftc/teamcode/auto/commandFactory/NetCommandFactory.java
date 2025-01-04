@@ -8,7 +8,11 @@ import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.helpers.commands.GrabBucketSample;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScoreBucketSample;
+import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
 import java.lang.reflect.WildcardType;
@@ -50,10 +54,18 @@ public class NetCommandFactory extends CommandFactory {
         toSample3 = new Point(25, 125);
         toNetArea = new Point(14, 130);
     }
+
     @Override
     public Point getStartingPoint() {
         return startingPoint;
     }
+
+    @Override
+    public Class<? extends VLRSubsystem<?>>[] getRequiredSubsystems() {
+        return new Class[]{ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class};
+    }
+
+
     @Override
     public SequentialCommandGroup getCommands(){
         return new SequentialCommandGroup(
