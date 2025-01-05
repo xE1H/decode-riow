@@ -21,6 +21,9 @@ public class ArmRotatorConfiguration {
     public static double RETRACTED_FEEDFORWARD_GAIN = 0.12;
     public static double EXTENDED_FEEDFORWARD_GAIN = 0.5;
 
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.4;
+    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.007;
+
     public static double ERROR_MARGIN = 2;
 
     public static double MIN_ANGLE = 0;
@@ -39,13 +42,5 @@ public class ArmRotatorConfiguration {
         TargetAngle(double angleDegrees) {
             this.angleDegrees = angleDegrees;
         }
-    }
-
-    public enum RotatorState {
-        IN_ROBOT,
-        PRE_INTAKE,
-        INTAKE,
-        SECOND_BASKET,
-        FIRST_BASKET
     }
 }

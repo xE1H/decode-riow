@@ -31,6 +31,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
     private double encoderPosition = 0;
 
+
     @Override
     protected void initialize(HardwareMap hardwareMap) {
         extensionMotor0 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_0);
@@ -50,7 +51,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         extensionEncoder.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
         Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-        motionProfile = new MotionProfile(telemetry, "SLIDE", ACCELERATION, DECELERATION, MAX_VELOCITY_NOMINAL, CREEP, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, FEED_FORWARD_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, SINE);
+        motionProfile = new MotionProfile(telemetry, "SLIDE", ACCELERATION, DECELERATION, MAX_VELOCITY, CREEP, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, FEED_FORWARD_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, SINE);
         motionProfile.enableTelemetry(true);
     }
 
@@ -59,47 +60,52 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         setTargetPosition(position.extension);
     }
 
+
     public void setTargetPosition(double position) {
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
         motionProfile.setCurrentTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
     }
 
+
     public boolean reachedTargetPosition() {
         return reachedPosition(getTargetPosition());
     }
+
 
     public boolean reachedPosition(double position) {
         return Math.abs(getPosition() - position) <= ERROR_MARGIN;
     }
 
+
     public double getPosition() {
         if(GlobalConfig.INVERTED_ENCODERS){
             return encoderPosition;
         }
-
         return -encoderPosition;
-
     }
+
 
     public double getTargetPosition() {
         return motionProfile.getTargetPosition();
     }
 
+
     public double getTargetExtension(){return mapToRange(getPosition(), MIN_POSITION, MAX_POSITION, 0, 1);}
+
 
     public void incrementTargetPosition(double increment) {
         motionProfile.setCurrentTargetPosition(clamp(getTargetPosition() + increment, MIN_POSITION, HORIZONTAL_EXTENSION_LIMIT));
     }
 
 
-    public void overrideMotionProfileCoeffs(double maxVelocity, double p, double i, double v, double a, double feedforward){
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, maxVelocity, p, i, FEEDBACK_DERIVATIVE_GAIN, v, a);
-        motionProfile.setFeedForwardGain(feedforward);
+    public void setHangCoefficients(){
+        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY_HANG, FEEDBACK_PROPORTIONAL_GAIN_HANG, FEEDBACK_INTEGRAL_GAIN_HANG, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN_HANG, ACCELERATION_GAIN_HANG);
+        motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN_HANG);
     }
 
 
-    public void resetMotionProfileCoeffs(){
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY_NOMINAL, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+    public void setDefaultCoefficients(){
+        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
         motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN);
     }
 
@@ -107,9 +113,10 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     public void periodic(double armAngleDegrees) {
         encoderPosition = extensionEncoder.getCurrentPosition();
 
-        //UNCOMMENT FOR TUNING:
-//        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, maxVelocity, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
-//        motionProfile.setFeedForwardGain(feedforward);
+        if (GlobalConfig.DEBUG_MODE){
+            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR SLIDE TUNING");
+            setDefaultCoefficients();
+        }
 
         double power = filter.estimate(motionProfile.getPower(getPosition(), armAngleDegrees));
 
@@ -145,6 +152,5 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
             telemetry.addData("motor0 Current", extensionMotor0.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("motor1 Current", extensionMotor1.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("motor2 Current", extensionMotor2.getCurrent(CurrentUnit.AMPS));
-
     }
 }
