@@ -21,9 +21,8 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     private MotionProfile motionProfile;
     private ArmSlideSubsystem slideSubsystem;
 
-    private RotatorState rotatorState;
-
     private double encoderPosition = 0;
+
 
     public static double mapToRange(double value, double minInput, double maxInput, double minOutput, double maxOutput) {
         if (minInput == maxInput) {
@@ -31,6 +30,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         }
         return minOutput + ((value - minInput) * (maxOutput - minOutput)) / (maxInput - minInput);
     }
+
 
     protected void initialize(HardwareMap hardwareMap) {
         Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
@@ -45,22 +45,24 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
         motionProfile = new MotionProfile(telemetry, "ARM", ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, COSINE);
         motionProfile.enableTelemetry(false);
-
-        rotatorState = RotatorState.IN_ROBOT;
     }
+
 
     public void setTargetAngle(TargetAngle targetAngle) {
         motionProfile.setCurrentTargetPosition(clamp(targetAngle.angleDegrees, MIN_ANGLE, MAX_ANGLE));
     }
 
+
     public void setTargetPosition(ArmSlideConfiguration.TargetPosition targetPosition) {
         slideSubsystem.setTargetPosition(targetPosition);
     }
+
 
     public void setTargetPosition(double angleDegrees) {
         motionProfile.setCurrentTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
 
     }
+
 
     public double getAngleDegrees() {
         if(GlobalConfig.INVERTED_ENCODERS){
@@ -74,24 +76,28 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         return reachedPosition(motionProfile.getTargetPosition());
     }
 
+
     public boolean reachedPosition(double angleDegrees) {
         return Math.abs(getAngleDegrees() - angleDegrees) < ERROR_MARGIN;
     }
 
-    public void overrideArmCoeffs(double p, double i){
+    public void setHangCoefficients(){
+        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN_HANG, FEEDBACK_INTEGRAL_GAIN_HANG, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+    }
+
+    public void setDefaultCoefficients(){
         motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
     }
 
-    public void resetCoeffs(){
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
-    }
 
     @Override
     public void periodic() {
         encoderPosition = thoughBoreEncoder.getCurrentPosition();
 
-        //UNCOMMENT FOR TUNING
-        //motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+        if (GlobalConfig.DEBUG_MODE){
+            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR ARM TUNING");
+            setDefaultCoefficients();
+        }
 
         double currentAngle = getAngleDegrees();
         double currentFeedForwardGain = mapToRange(slideSubsystem.getPosition(), ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, RETRACTED_FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
@@ -105,14 +111,5 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         }
         motor.setPower(power);
         slideSubsystem.periodic(currentAngle);
-    }
-
-
-    public RotatorState getRotatorState() {
-        return this.rotatorState;
-    }
-
-    public void setRotatorState(RotatorState state) {
-        this.rotatorState = state;
     }
 }
