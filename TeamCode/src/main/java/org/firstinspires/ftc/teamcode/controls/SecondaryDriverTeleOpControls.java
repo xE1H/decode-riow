@@ -51,19 +51,19 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
         add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean f) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.OPEN))));
         add(new ButtonCtl(GamepadKeys.Button.DPAD_RIGHT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean g) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.CLOSED_NORMAL))));
 
-        addRightStickHandler((Double x, Double y) -> incrementClaw(x));
+        addRightStickHandler((Double x, Double y) -> incrementClaw(y));
         addLeftStickHandler((Double x, Double y) -> incrementSlidePosition(x));
     }
 
     private void incrementClaw(double input) {
         if (ArmState.get() == ArmState.State.INTAKE) {
-            claw.setTwistIncrement(input * 0.08);
+            claw.setTwistIncrement(input * 0.1);
         }
     }
 
     private void incrementSlidePosition(double input) {
         if (ArmState.get() == ArmState.State.INTAKE) {
-            slide.incrementTargetPosition(input * 0.2);
+            slide.incrementTargetPosition(input * 0.06);
         }
     }
 }

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.claw;
 
+import static com.arcrobotics.ftclib.util.MathUtils.clamp;
+
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -37,7 +39,7 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
 
         setTargetAngle(TargetAngle.UP);
         setTargetTwist(TargetTwist.NORMAL);
-        setTargetState(TargetState.CLOSED_NORMAL);
+        //setTargetState(TargetState.CLOSED_NORMAL);
     }
 
 
@@ -71,6 +73,12 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
                 break;
         }
     }
+
+
+    public void setTargetTwist(double twistAngle) {
+        twistServo.setPosition(clamp(twistAngle, TWIST_MIN, TWIST_MAX));
+    }
+
 
     public void setTwistIncrement(double increment) {
         twistIncrement = increment;

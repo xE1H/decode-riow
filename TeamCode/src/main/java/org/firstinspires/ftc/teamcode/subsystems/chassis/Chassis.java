@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.Localizer;
+import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.localizers.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.helpers.AsymmetricLowPassFilter;
@@ -35,9 +37,13 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
     AsymmetricLowPassFilter x_filter = new AsymmetricLowPassFilter(acceleration_a, deceleration_a);
     AsymmetricLowPassFilter y_filter = new AsymmetricLowPassFilter(acceleration_a, deceleration_a);
 
+    Localizer localizer;
+
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
+        localizer = new PinpointLocalizer(hardwareMap);
+
         MotorLeftFront = new MotorEx(hardwareMap, MOTOR_LEFT_FRONT);
         MotorRightFront = new MotorEx(hardwareMap, MOTOR_RIGHT_FRONT);
         MotorLeftBack = new MotorEx(hardwareMap, MOTOR_LEFT_BACK);
@@ -61,7 +67,7 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         this.driveMotors(new MecanumDriveController(
                 strafeMultiplier * x_filter.estimatePower(positionVector.getX()),
                 forwardsMultiplier * y_filter.estimatePower(positionVector.getY()),
-                positionVector.getHeading() * 0.05
+                (positionVector.getHeading()) * 0.05
         ));
     }
 

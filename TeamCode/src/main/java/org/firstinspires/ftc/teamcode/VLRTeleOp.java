@@ -30,6 +30,8 @@ public class VLRTeleOp extends VLRLinearOpMode {
         VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
+        GlobalConfig.setIsInvertedEncoders(false);
+
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
 
