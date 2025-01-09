@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 // Generic PIDF controller for motion profiling. This class is used to generate a motion profile for
@@ -46,11 +47,11 @@ public class MotionProfile {
         this.pd = new PIDController(feedbackProportionalGain, 0, feedbackDerivativeGain);
     }
 
-    public MotionProfile(Telemetry telemetry, String telemetryName, double acceleration, double deceleration, double maxVelocity, double creep,  double p, double i, double d, double v, double a, FeedforwardType feedforwardType){
+    public MotionProfile(Telemetry telemetry, String telemetryName, double acceleration, double deceleration, double maxVelocity, double creep, double p, double i, double d, double v, double a, FeedforwardType feedforwardType){
         this(telemetry, telemetryName, acceleration, deceleration, maxVelocity, creep, p, i, d, 0, v, a, feedforwardType);
     }
 
-    public MotionProfile(Telemetry telemetry, String telemetryName, double acceleration, double deceleration, double maxVelocity,  double p, double i, double d, double v, double a, FeedforwardType feedforwardType){
+    public MotionProfile(Telemetry telemetry, String telemetryName, double acceleration, double deceleration, double maxVelocity, double p, double i, double d, double v, double a, FeedforwardType feedforwardType){
         this(telemetry, telemetryName, acceleration, deceleration, maxVelocity, 0, p, i, d, 0, v, a, feedforwardType);
     }
 

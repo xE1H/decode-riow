@@ -27,7 +27,7 @@ public class MoveArmInToRobot extends SequentialCommandGroup {
             addCommands(
                     new CustomConditionalCommand(
                             new SequentialCommandGroup(
-                                    new SetClawState(TargetState.CLOSED_NORMAL),
+                                    new SetClawState(TargetState.CLOSED),
                                     new WaitCommand(100),
                                     new SetClawAngle(TargetAngle.UP),
                                     new SetClawTwist(TargetTwist.NORMAL),
@@ -45,7 +45,7 @@ public class MoveArmInToRobot extends SequentialCommandGroup {
                                     new WaitCommand(200),
                                     new SetClawAngle(TargetAngle.DOWN),
                                     new WaitCommand(100),
-                                    new SetClawState(TargetState.CLOSED_NORMAL),
+                                    new SetClawState(TargetState.CLOSED),
                                     new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                                     new WaitCommand(200),
                                     new SetClawAngle(TargetAngle.DEPOSIT),

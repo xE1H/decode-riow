@@ -38,6 +38,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
         motor = hardwareMap.get(DcMotorEx.class, MOTOR_NAME);
         motor.setDirection(DcMotorEx.Direction.REVERSE);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         thoughBoreEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
         thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -106,7 +107,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
         double power = motionProfile.getPower(currentAngle);
 
-        if (motionProfile.getTargetPosition() == TargetAngle.DOWN.angleDegrees && reachedPosition(TargetAngle.DOWN.angleDegrees)){
+        if (motionProfile.getTargetPosition() == TargetAngle.DOWN.angleDegrees && reachedTargetPosition()){
             power = 0;
         }
         motor.setPower(power);

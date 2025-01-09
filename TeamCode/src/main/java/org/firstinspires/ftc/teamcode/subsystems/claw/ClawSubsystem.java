@@ -13,21 +13,14 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
     private Servo angleServo, twistServo, grabServos;
     private AnalogInput analogLeft, analogRight;
 
-    public ClawState clawState = ClawState.OPEN;
-
     private double twistIncrement;
 
     private TargetAngle targetAngle = TargetAngle.UP;
+    private TargetState clawState = TargetState.CLOSED;
 
-
-    public ClawState getClawState() {
+    public TargetState getClawState() {
         return clawState;
     }
-
-    public void setClawState(ClawState clawState) {
-        this.clawState = clawState;
-    }
-
 
     protected void initialize(HardwareMap hardwareMap) {
         angleServo = hardwareMap.get(Servo.class, ANGLE_SERVO);
@@ -86,18 +79,15 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
 
 
     public void setTargetState(TargetState targetState) {
+        clawState = targetState;
         switch (targetState) {
             case OPEN:
                 grabServos.setPosition(state_open_pos);
                 break;
-            case CLOSED_NORMAL:
+            case CLOSED:
                 grabServos.setPosition(state_closed_normal_pos);
                 break;
-            case CLOSED_FORCED:
-                grabServos.setPosition(state_closed_forced_pos);
-                break;
         }
-        twistIncrement = 0;
     }
 
 
@@ -107,6 +97,5 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
 
     @Override
     public void periodic() {
-        twistServo.setPosition(Math.max(Math.min(twistServo.getPosition() + twistIncrement, TWIST_MAX), TWIST_MIN));
     }
 }

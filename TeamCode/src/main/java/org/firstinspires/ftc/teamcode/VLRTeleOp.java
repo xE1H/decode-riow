@@ -3,6 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.GoBildaPinpointDriver;
+import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.localizers.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.controls.PrimaryDriverTeleOpControls;
 import org.firstinspires.ftc.teamcode.controls.SecondaryDriverTeleOpControls;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
@@ -31,6 +36,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
         VLRSubsystem.initializeAll(hardwareMap);
 
         GlobalConfig.setIsInvertedEncoders(false);
+        VLRSubsystem.getInstance(Chassis.class).enableFieldCentric();
 
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
@@ -43,8 +49,8 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
             if (GlobalConfig.DEBUG_MODE) {
                 telemetry.addData("current state", ArmState.get());
-                telemetry.update();
             }
+            telemetry.update();
         }
     }
 }

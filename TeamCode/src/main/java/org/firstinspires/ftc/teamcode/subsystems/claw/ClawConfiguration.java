@@ -22,7 +22,7 @@ public interface ClawConfiguration {
 
     double state_closed_normal_pos = 0;
     double state_closed_forced_pos = 0;
-    double state_open_pos = 0.5;
+    double state_open_pos = 0.8;
 
     double analog_voltage_left = 0;
     double analog_voltage_right = 0;
@@ -40,13 +40,7 @@ public interface ClawConfiguration {
     }
 
     enum TargetState {
-        CLOSED_NORMAL,
-        CLOSED_FORCED,
+        CLOSED,
         OPEN
-    }
-
-    enum ClawState {
-        OPEN,
-        CLOSED
     }
 }

@@ -9,9 +9,9 @@ public class ArmSlideConfiguration {
     public static String MOTOR_NAME_2 = "MotorArm3";
     public static String ENCODER_NAME = "MotorRightFront";
 
-    public static double ACCELERATION = 22000;
-    public static double DECELERATION = 9000;
-    public static double MAX_VELOCITY = 1500;
+    public static double ACCELERATION = 20000;
+    public static double DECELERATION = 8000;
+    public static double MAX_VELOCITY = 1400;
     public static double FEEDBACK_PROPORTIONAL_GAIN = 0.02;
     public static double FEEDBACK_INTEGRAL_GAIN = 0.0001;
     public static double FEEDBACK_DERIVATIVE_GAIN = 0.0004;
@@ -31,7 +31,7 @@ public class ArmSlideConfiguration {
     public static double CREEP = 50;
 
     public static double ERROR_MARGIN = 10;
-    public static double a = 0.6;
+    public static double a = 0.5;
 
     public static double MIN_POSITION = 0;
     public static double HORIZONTAL_EXTENSION_LIMIT = 650;
@@ -39,9 +39,9 @@ public class ArmSlideConfiguration {
 
 
     public enum TargetPosition {
-        RETRACTED(0.0035),
+        RETRACTED(0.0025),
         INTAKE(0.45),
-        DEPOSIT(0.9875);
+        DEPOSIT(0.98);
 
         public final double extension;
 

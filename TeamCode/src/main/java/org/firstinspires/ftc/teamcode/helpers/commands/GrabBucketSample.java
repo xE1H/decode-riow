@@ -18,7 +18,7 @@ public class GrabBucketSample extends SequentialCommandGroup {
                 new WaitCommand(600),
                 new SetClawAngle(ClawConfiguration.TargetAngle.DOWN),
                 new WaitCommand(200),
-                new SetClawState(ClawConfiguration.TargetState.CLOSED_NORMAL),
+                new SetClawState(ClawConfiguration.TargetState.CLOSED),
                 new WaitCommand(100),
                 new SetClawAngle(ClawConfiguration.TargetAngle.UP),
                 new WaitCommand(50),

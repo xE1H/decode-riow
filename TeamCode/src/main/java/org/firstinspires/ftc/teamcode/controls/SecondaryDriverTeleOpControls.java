@@ -14,10 +14,9 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.commands.MoveArmInToRobot;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.MoveArmToIntake;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.ToggleClawAngle;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.ToggleClawState;
 
 /**
  * Abstraction for secondary driver controls. All controls will be defined here.
@@ -46,24 +45,25 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
         add(new ButtonCtl(SQUARE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new MoveArmInToRobot())));
         add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new MoveArmToDeposit())));
 
-        add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.UP))));
-        add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.DOWN))));
-        add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean f) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.OPEN))));
-        add(new ButtonCtl(GamepadKeys.Button.DPAD_RIGHT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean g) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.CLOSED_NORMAL))));
+        //add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.UP))));
+        //add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.DOWN))));
+        //add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean f) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.OPEN))));
+        //add(new ButtonCtl(GamepadKeys.Button.DPAD_RIGHT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean g) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.CLOSED))));
+        add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new ToggleClawState())));
+        add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new ToggleClawAngle())));
+
 
         addRightStickHandler((Double x, Double y) -> incrementClaw(y));
         addLeftStickHandler((Double x, Double y) -> incrementSlidePosition(x));
     }
 
     private void incrementClaw(double input) {
-        if (ArmState.get() == ArmState.State.INTAKE) {
-            claw.setTwistIncrement(input * 0.1);
-        }
+            claw.setTargetTwist(input);
     }
 
     private void incrementSlidePosition(double input) {
         if (ArmState.get() == ArmState.State.INTAKE) {
-            slide.incrementTargetPosition(input * 0.06);
+            slide.incrementTargetPosition(input * 4);
         }
     }
 }
