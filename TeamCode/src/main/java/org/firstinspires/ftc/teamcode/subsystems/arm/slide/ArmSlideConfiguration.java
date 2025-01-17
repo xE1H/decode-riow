@@ -7,7 +7,9 @@ public class ArmSlideConfiguration {
     public static String MOTOR_NAME_0 = "MotorArm1";
     public static String MOTOR_NAME_1 = "MotorArm2";
     public static String MOTOR_NAME_2 = "MotorArm3";
-    public static String ENCODER_NAME = "MotorRightFront";
+    public static String ENCODER_NAME = "MotorRotator";
+
+    public static String LIMIT_SW_NAME = "SlideLimit";
 
     public static double ACCELERATION = 20000;
     public static double DECELERATION = 8000;
@@ -31,6 +33,7 @@ public class ArmSlideConfiguration {
     public static double CREEP = 50;
 
     public static double ERROR_MARGIN = 10;
+    public static double ERROR_TIMEOUT_MILLIS = 3000; // ms before position is automatically classified as reached
     public static double a = 0.5;
 
     public static double MIN_POSITION = 0;

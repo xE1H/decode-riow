@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.auto.pedroPathing.tuning.FollowerConstants
 
 @Config
 public class GlobalConfig {
-    public static boolean DEBUG_MODE = false;
+    public static boolean DEBUG_MODE = true;
 
     /**
      * Avoid mutating this config variable directly, rather use the mutator setIsInvertedMotors.

@@ -33,7 +33,7 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
     public static double staticFrictionBar = 0.05;
 
-    boolean isDriveFieldCentric = true;
+    boolean isDriveFieldCentric = false;
 
     AsymmetricLowPassFilter x_filter = new AsymmetricLowPassFilter(acceleration_a, deceleration_a);
     AsymmetricLowPassFilter y_filter = new AsymmetricLowPassFilter(acceleration_a, deceleration_a);
@@ -86,7 +86,8 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 //    }
 
     public void drive(double xSpeed, double ySpeed, double zRotation) {
-        pinpoint.update();
+        // This sometimes fails and causes the whole robot to die
+        if (isDriveFieldCentric) pinpoint.update();
         Vector2d vector = new Vector2d(x_filter.estimatePower(xSpeed) * forwardsMultiplier, y_filter.estimatePower(ySpeed) * strafeMultiplier);
 
         if (isDriveFieldCentric) vector = vector.rotateBy(-Math.toDegrees(pinpoint.getHeading()));
@@ -101,13 +102,13 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         MotorLeftBack.set(clampPower(driveController.rearLeftMetersPerSecond) * motorPower);
         MotorRightBack.set(clampPower(driveController.rearRightMetersPerSecond) * motorPower);
 
-        if(GlobalConfig.DEBUG_MODE){
-            Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
-            telemetry.addData("Motor FL", MotorLeftFront.motorEx.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("Motor FR", MotorRightFront.motorEx.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("Motor BL", MotorLeftBack.motorEx.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("Motor BR", MotorRightBack.motorEx.getCurrent(CurrentUnit.AMPS));
-        }
+//        if(GlobalConfig.DEBUG_MODE){
+//            Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+//            telemetry.addData("Motor FL", MotorLeftFront.motorEx.getCurrent(CurrentUnit.AMPS));
+//            telemetry.addData("Motor FR", MotorRightFront.motorEx.getCurrent(CurrentUnit.AMPS));
+//            telemetry.addData("Motor BL", MotorLeftBack.motorEx.getCurrent(CurrentUnit.AMPS));
+//            telemetry.addData("Motor BR", MotorRightBack.motorEx.getCurrent(CurrentUnit.AMPS));
+//        }
     }
 
     public double clampPower(double motorPower){

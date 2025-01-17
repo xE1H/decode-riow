@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.helpers.controls;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * Abstraction for gamepad controls.
@@ -35,6 +37,10 @@ public class DriverControls {
      */
     QuadConsumer<Double, Double, Double, Double> bothSticksHandler;
 
+    /**
+     * Handler for vibrations
+     */
+    Supplier<Boolean> vibration;
 
     /**
      * Constructs a DriverControls object.
@@ -76,6 +82,10 @@ public class DriverControls {
         bothSticksHandler = control;
     }
 
+    public void addVibration(Supplier<Boolean> supplier) {
+        vibration = supplier;
+    }
+
     /**
      * Updates all controls and executes their associated actions.
      * This method should be called in the main control loop.
@@ -83,11 +93,17 @@ public class DriverControls {
     public void update() {
         if (bothSticksHandler != null)
             bothSticksHandler.accept(gamepad.getLeftY(), gamepad.getLeftX(), gamepad.getRightY(), gamepad.getRightX());
-        else{
+        else {
             if (leftStickHandler != null)
                 leftStickHandler.accept(gamepad.getLeftY(), gamepad.getLeftX());
             if (rightStickHandler != null)
                 rightStickHandler.accept(gamepad.getRightY(), gamepad.getRightX());
+        }
+
+        if (vibration != null && vibration.get()) {
+            gamepad.gamepad.rumble(0.5, 0.5, Gamepad.RUMBLE_DURATION_CONTINUOUS);
+        } else {
+            gamepad.gamepad.rumble(0, 0, 0);
         }
 
 

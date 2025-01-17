@@ -67,10 +67,10 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
     public double getAngleDegrees() {
         if(GlobalConfig.INVERTED_ENCODERS){
-            return encoderPosition / ENCODER_TICKS_PER_ROTATION * 360d;
+            return -encoderPosition / ENCODER_TICKS_PER_ROTATION * 360d;
         }
 
-        return -encoderPosition / ENCODER_TICKS_PER_ROTATION * 360d;
+        return encoderPosition / ENCODER_TICKS_PER_ROTATION * 360d;
     }
 
     public boolean reachedTargetPosition() {
@@ -95,13 +95,15 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     public void periodic() {
         encoderPosition = thoughBoreEncoder.getCurrentPosition();
 
-        if (GlobalConfig.DEBUG_MODE){
-            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR ARM TUNING");
-            setDefaultCoefficients();
-        }
+//        if (GlobalConfig.DEBUG_MODE){
+//            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR ARM TUNING");
+//            setDefaultCoefficients();
+//        }
 
         double currentAngle = getAngleDegrees();
         double currentFeedForwardGain = mapToRange(slideSubsystem.getPosition(), ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, RETRACTED_FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
+
+        FtcDashboard.getInstance().getTelemetry().addData("Rotator Angle", currentAngle);
 
         motionProfile.setFeedForwardGain(currentFeedForwardGain);
 

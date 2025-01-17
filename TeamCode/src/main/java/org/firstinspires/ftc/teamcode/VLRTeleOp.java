@@ -33,12 +33,12 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, Vision.class);
+        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         GlobalConfig.setIsInvertedEncoders(false);
-        VLRSubsystem.getInstance(Chassis.class).enableFieldCentric();
-
+//        VLRSubsystem.getInstance(Chassis.class).enableFieldCentric();
+        ArmSlideSubsystem ass = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
 
@@ -50,6 +50,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
             if (GlobalConfig.DEBUG_MODE) {
                 telemetry.addData("current state", ArmState.get());
+                telemetry.addData("Slide pos", ass.getPosition());
             }
             telemetry.update();
         }

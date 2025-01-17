@@ -12,6 +12,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -26,10 +27,13 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     private DcMotorEx extensionMotor2;
     private DcMotorEx extensionEncoder;
 
+    private TouchSensor limitSwitch;
+
     private MotionProfile motionProfile;
     private LowPassFilter filter = new LowPassFilter(a);
 
     private double encoderPosition = 0;
+    private double lastPositionChangeTime = 0;
 
 
     @Override
@@ -37,6 +41,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         extensionMotor0 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_0);
         extensionMotor1 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_1);
         extensionMotor2 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_2);
+
+        limitSwitch = hardwareMap.get(TouchSensor.class, LIMIT_SW_NAME);
 
         extensionMotor0.setDirection(DcMotorEx.Direction.FORWARD);
         extensionMotor1.setDirection(DcMotorEx.Direction.FORWARD);
@@ -57,6 +63,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
 
     public void setTargetPosition(TargetPosition position) {
+        lastPositionChangeTime = System.currentTimeMillis();
         setTargetPosition(position.extension);
     }
 
@@ -66,11 +73,19 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         motionProfile.setCurrentTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
     }
 
-
+    // This method should only be used for commands.
+    // Returns true if position has been reached, or position timeout has occurred.
+    // This is so the whole command system doesn't freeze if the slides are unable to reach the specified position
     public boolean reachedTargetPosition() {
+        if (lastPositionChangeTime != 0 && System.currentTimeMillis() - lastPositionChangeTime > ERROR_TIMEOUT_MILLIS) {
+            return true;
+        }
         return reachedPosition(getTargetPosition());
     }
 
+    public boolean reachedTargetPositionNoOverride() {
+        return reachedPosition(getTargetPosition());
+    }
 
     public boolean reachedPosition(double position) {
         return Math.abs(getPosition() - position) <= ERROR_MARGIN;
@@ -78,10 +93,10 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
 
     public double getPosition() {
-        if(GlobalConfig.INVERTED_ENCODERS){
-            return encoderPosition;
+        if (GlobalConfig.INVERTED_ENCODERS) {
+            return -encoderPosition;
         }
-        return -encoderPosition;
+        return encoderPosition;
     }
 
 
@@ -90,7 +105,9 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     }
 
 
-    public double getTargetExtension(){return mapToRange(getPosition(), MIN_POSITION, MAX_POSITION, 0, 1);}
+    public double getTargetExtension() {
+        return mapToRange(getPosition(), MIN_POSITION, MAX_POSITION, 0, 1);
+    }
 
 
     public void incrementTargetPosition(double increment) {
@@ -98,29 +115,38 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     }
 
 
-    public void setHangCoefficients(){
+    public void setHangCoefficients() {
         motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY_HANG, FEEDBACK_PROPORTIONAL_GAIN_HANG, FEEDBACK_INTEGRAL_GAIN_HANG, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN_HANG, ACCELERATION_GAIN_HANG);
         motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN_HANG);
     }
 
 
-    public void setDefaultCoefficients(){
+    public void setDefaultCoefficients() {
         motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
         motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN);
     }
 
+    public void checkLimitSwitch() {
+        if (limitSwitch.isPressed()) {
+            System.out.println("LIMIT ON");
+            extensionEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            extensionEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+    }
 
     public void periodic(double armAngleDegrees) {
-        encoderPosition = extensionEncoder.getCurrentPosition();
+        checkLimitSwitch();
 
-        if (GlobalConfig.DEBUG_MODE){
-            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR SLIDE TUNING");
-            setDefaultCoefficients();
-        }
+        encoderPosition = -extensionEncoder.getCurrentPosition();
+
+//        if (GlobalConfig.DEBUG_MODE){
+//            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR SLIDE TUNING");
+//            setDefaultCoefficients();
+//        }
 
         double power = filter.estimate(motionProfile.getPower(getPosition(), armAngleDegrees));
 
-        if (reachedTargetPosition()){
+        if (reachedTargetPositionNoOverride()) {
             motionProfile.setOperationMode(MotionProfile.OperationMode.USE_INTEGRAL);
             extensionMotor0.setPower(0);
             extensionMotor2.setPower(0);
@@ -128,16 +154,13 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
             extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            if (getTargetExtension() == TargetPosition.RETRACTED.extension){
+            if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
                 extensionMotor1.setPower(0);
                 extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            }
-            else{
+            } else {
                 extensionMotor1.setPower(power);
             }
-        }
-
-        else{
+        } else {
             motionProfile.setOperationMode(MotionProfile.OperationMode.NOT_USE_INTEGRAL);
             extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -148,9 +171,9 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
             //extensionMotor2.setPower(power);
         }
 
-            Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
-            telemetry.addData("motor0 Current", extensionMotor0.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("motor1 Current", extensionMotor1.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("motor2 Current", extensionMotor2.getCurrent(CurrentUnit.AMPS));
+        Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+        telemetry.addData("motor0 Current", extensionMotor0.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("motor1 Current", extensionMotor1.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("motor2 Current", extensionMotor2.getCurrent(CurrentUnit.AMPS));
     }
 }
