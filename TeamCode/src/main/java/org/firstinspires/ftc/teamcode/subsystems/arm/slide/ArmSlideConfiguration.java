@@ -11,15 +11,15 @@ public class ArmSlideConfiguration {
 
     public static String LIMIT_SW_NAME = "SlideLimit";
 
-    public static double ACCELERATION = 20000;
-    public static double DECELERATION = 8000;
-    public static double MAX_VELOCITY = 1400;
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.02;
-    public static double FEEDBACK_INTEGRAL_GAIN = 0.0001;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0004;
-    public static double FEED_FORWARD_GAIN = 0.05;
-    public static double VELOCITY_GAIN = 0.00025;
-    public static double ACCELERATION_GAIN = 0.00002;
+    public static double ACCELERATION = 26000;
+    public static double DECELERATION = 16000;
+    public static double MAX_VELOCITY = 2100;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.0085;
+    public static double FEEDBACK_INTEGRAL_GAIN = 0;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0003;
+    public static double FEED_FORWARD_GAIN = 0.1;
+    public static double VELOCITY_GAIN = 0.0001;
+    public static double ACCELERATION_GAIN = 0.00001;
 
 
     public static double MAX_VELOCITY_HANG = 100;
@@ -29,12 +29,10 @@ public class ArmSlideConfiguration {
     public static double VELOCITY_GAIN_HANG = 0.006;
     public static double ACCELERATION_GAIN_HANG = 0.0003;
 
+    public static double CREEP = 40;
 
-    public static double CREEP = 50;
-
-    public static double ERROR_MARGIN = 10;
+    public static double ERROR_MARGIN = 20;
     public static double ERROR_TIMEOUT_MILLIS = 3000; // ms before position is automatically classified as reached
-    public static double a = 0.5;
 
     public static double MIN_POSITION = 0;
     public static double HORIZONTAL_EXTENSION_LIMIT = 650;
@@ -44,7 +42,7 @@ public class ArmSlideConfiguration {
     public enum TargetPosition {
         RETRACTED(0.0025),
         INTAKE(0.45),
-        DEPOSIT(0.98);
+        DEPOSIT(0.985);
 
         public final double extension;
 

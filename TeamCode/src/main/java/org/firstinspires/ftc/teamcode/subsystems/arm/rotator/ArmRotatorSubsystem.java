@@ -45,7 +45,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motionProfile = new MotionProfile(telemetry, "ARM", ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, COSINE);
-        motionProfile.enableTelemetry(false);
+        motionProfile.enableTelemetry(true);
     }
 
 
@@ -95,10 +95,10 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     public void periodic() {
         encoderPosition = thoughBoreEncoder.getCurrentPosition();
 
-//        if (GlobalConfig.DEBUG_MODE){
-//            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR ARM TUNING");
-//            setDefaultCoefficients();
-//        }
+        if (GlobalConfig.DEBUG_MODE){
+            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR ARM TUNING");
+            setDefaultCoefficients();
+        }
 
         double currentAngle = getAngleDegrees();
         double currentFeedForwardGain = mapToRange(slideSubsystem.getPosition(), ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, RETRACTED_FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);

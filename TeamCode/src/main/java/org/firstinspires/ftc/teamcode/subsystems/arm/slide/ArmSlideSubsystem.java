@@ -30,7 +30,6 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     private TouchSensor limitSwitch;
 
     private MotionProfile motionProfile;
-    private LowPassFilter filter = new LowPassFilter(a);
 
     private double encoderPosition = 0;
     private double lastPositionChangeTime = 0;
@@ -48,9 +47,9 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         extensionMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         extensionMotor2.setDirection(DcMotorEx.Direction.FORWARD);
 
-        extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         extensionEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
         extensionEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -139,20 +138,16 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
         encoderPosition = -extensionEncoder.getCurrentPosition();
 
-//        if (GlobalConfig.DEBUG_MODE){
-//            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR SLIDE TUNING");
-//            setDefaultCoefficients();
-//        }
+        if (GlobalConfig.DEBUG_MODE){
+            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR SLIDE TUNING");
+            setDefaultCoefficients();
+        }
 
-        double power = filter.estimate(motionProfile.getPower(getPosition(), armAngleDegrees));
+        double power = motionProfile.getPower(getPosition(), armAngleDegrees);
 
         if (reachedTargetPositionNoOverride()) {
-            motionProfile.setOperationMode(MotionProfile.OperationMode.USE_INTEGRAL);
             extensionMotor0.setPower(0);
             extensionMotor2.setPower(0);
-
-            extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
                 extensionMotor1.setPower(0);
@@ -161,19 +156,9 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
                 extensionMotor1.setPower(power);
             }
         } else {
-            motionProfile.setOperationMode(MotionProfile.OperationMode.NOT_USE_INTEGRAL);
-            extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
             extensionMotor0.setPower(power);
             extensionMotor1.setPower(power);
-            //extensionMotor2.setPower(power);
+            extensionMotor2.setPower(power);
         }
-
-        Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
-        telemetry.addData("motor0 Current", extensionMotor0.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("motor1 Current", extensionMotor1.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("motor2 Current", extensionMotor2.getCurrent(CurrentUnit.AMPS));
     }
 }
