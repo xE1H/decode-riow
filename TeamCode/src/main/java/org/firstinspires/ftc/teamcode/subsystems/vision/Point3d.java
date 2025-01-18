@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.vision;
 
 public class Point3d {
-    double x;
-    double y;
-    double z;
+    public double x;
+    public double y;
+    public double z;
 
     Point3d(double x, double y, double z) {
         this.x = x;

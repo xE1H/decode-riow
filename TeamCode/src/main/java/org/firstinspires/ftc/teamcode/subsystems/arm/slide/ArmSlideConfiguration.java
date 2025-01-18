@@ -38,6 +38,7 @@ public class ArmSlideConfiguration {
     public static double HORIZONTAL_EXTENSION_LIMIT = 650;
     public static double MAX_POSITION = 1230;
     public static double TICKS_PER_IN = 17.97 * 2.54;
+    public static double MAX_EXTENSION_IN = HORIZONTAL_EXTENSION_LIMIT / TICKS_PER_IN;
 
 
     public enum TargetPosition {

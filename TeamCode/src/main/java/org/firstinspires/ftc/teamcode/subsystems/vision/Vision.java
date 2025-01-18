@@ -11,8 +11,11 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 
+import java.util.List;
+
 public class Vision extends VLRSubsystem<Vision> {
     private VisionPortal portal;
+    private SampleProcessor processor = new SampleProcessor();
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
@@ -21,9 +24,13 @@ public class Vision extends VLRSubsystem<Vision> {
                 .setCameraResolution(RESOLUTION)
                 .enableLiveView(true)
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-                .addProcessor(new SampleProcessor());
+                .addProcessor(processor);
 
         portal = builder.build();
         portal.resumeStreaming();
+    }
+
+    public List<SampleProcessor.Detection> getDetectionResults() {
+        return processor.getLatestDetections();
     }
 }

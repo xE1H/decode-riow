@@ -26,7 +26,7 @@ public class SampleProcessor implements VisionProcessor {
             LEFT_ANGLE, DOWN_ANGLE);
 
     // Store detection results
-    private static class Detection {
+    public static class Detection {
         Point center; // pixel coordinates
         Point3d worldPos;
         Rect bounds;
@@ -41,6 +41,10 @@ public class SampleProcessor implements VisionProcessor {
             this.color = color;
             this.area = area;
             this.contour = contour;
+        }
+
+        public Point3d getWorldPos() {
+            return worldPos;
         }
     }
 
@@ -76,6 +80,22 @@ public class SampleProcessor implements VisionProcessor {
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
         latestDetections.clear();
+
+        Mat masked = new Mat(frame.size(), frame.type(), new Scalar(255, 255, 255));
+        Imgproc.rectangle(masked,
+                new Point(0,0),
+                new Point(200, 720),
+                new Scalar(0,0,0),
+                -1);
+        Mat mask2 = new Mat(frame.size(), frame.type(), new Scalar(255, 255, 255));
+        Imgproc.rectangle(mask2,
+                new Point(700,0),
+                new Point(1280, 720),
+                new Scalar(0,0,0),
+                -1);
+
+        Core.bitwise_and(frame, masked, frame);
+        Core.bitwise_and(frame, mask2, frame);
 
         Mat undistorted = new Mat();
         Calib3d.undistort(frame, undistorted, cameraMatrix, distCoeffs);
@@ -217,5 +237,9 @@ public class SampleProcessor implements VisionProcessor {
         } catch (ConcurrentModificationException e) {
             System.out.println("Vision: Concurrent modification exception caught");
         }
+    }
+
+    public List<Detection> getLatestDetections() {
+        return latestDetections;
     }
 }
