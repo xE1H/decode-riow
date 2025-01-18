@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.vision.Vision;
 
 
@@ -33,7 +34,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class);
+        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, HangSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         GlobalConfig.setIsInvertedEncoders(false);

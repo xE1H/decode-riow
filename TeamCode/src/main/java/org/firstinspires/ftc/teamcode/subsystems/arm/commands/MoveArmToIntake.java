@@ -35,7 +35,7 @@ public class MoveArmToIntake extends CustomConditionalCommand {
                         new SetSlideExtension(extension),
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmRotatorSubsystem.class)::reachedTargetPosition),
                         new SetClawAngle(TargetAngle.DEPOSIT),
-                        new SetClawState(TargetState.OPEN),
+                        new SetClawState(TargetState.CLOSED),
                         new SetArmState(ArmState.State.INTAKE)
                 ),
                 () -> (ArmState.get() != ArmState.State.INTAKE && !ArmState.isMoving()) || ArmOverrideState.get()

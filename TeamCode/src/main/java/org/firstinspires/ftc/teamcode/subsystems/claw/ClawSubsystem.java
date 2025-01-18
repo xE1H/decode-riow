@@ -32,7 +32,7 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
 
         setTargetAngle(TargetAngle.UP);
         setTargetTwist(TargetTwist.NORMAL);
-        //setTargetState(TargetState.CLOSED_NORMAL);
+        setTargetState(TargetState.CLOSED);
     }
 
 

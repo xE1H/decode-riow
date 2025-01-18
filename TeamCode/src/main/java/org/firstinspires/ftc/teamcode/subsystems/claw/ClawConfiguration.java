@@ -11,10 +11,10 @@ public interface ClawConfiguration {
     String ANALOG_ENCODER_RIGHT = "analog1";
 
     double angle_down_pos = 0;
-    double angle_up_pos = 1;
-    double angle_deposit_pos = 0.625;
+    double angle_up_pos = 0.9;
+    double angle_deposit_pos = 0.85;
 
-    double twist_normal_pos = 0.05;
+    double twist_normal_pos = 0.5;
     double twist_flipped_pos = 0.8;
 
     double TWIST_MIN = 0.04;

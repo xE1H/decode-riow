@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
+import org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration;
 
 import java.util.function.BooleanSupplier;
 
@@ -29,19 +30,24 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
                 ),
 
                 new SetClawAngle(ClawConfiguration.TargetAngle.UP),
-                new SetRotatorAngle(97),
+                new SetRotatorAngle(105),
                 new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 60),
                 new SetSlideExtension(0.942),
                 new WaitUntilCommand(()-> VLRSubsystem.getInstance(ArmSlideSubsystem.class).reachedTargetPosition()),
                 new SetArmState(ArmState.State.SECOND_STAGE_HANG),
+                // hang off 2nd
                 new WaitUntilCommand(gamepadCondition),
                 new SetHangCoefficients(),
-                new SetSlideExtension(0.735),
+                new SetSlideExtension(0.5),
+                new SetHangPosition(HangConfiguration.TargetPosition.HALF),
                 new WaitCommand(500),
-                new SetRotatorAngle(89),
+                new SetRotatorAngle(160),
+                // release off 2nd, hang on 1st
                 new WaitUntilCommand(gamepadCondition),
-                new SetDefaultCoefficients(),
-                new SetRotatorAngle(97.5),
+                new SetRotatorAngle(160),
+                new SetHangPosition(HangConfiguration.TargetPosition.UP),
+                new WaitCommand(500),
+                //new SetDefaultCoefficients(),
                 new SetSlideExtension(0.88)
             );
 

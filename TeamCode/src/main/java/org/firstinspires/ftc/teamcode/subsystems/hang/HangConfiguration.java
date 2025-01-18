@@ -7,16 +7,11 @@ public interface HangConfiguration {
     String LEFT_AXON = "leftHang";
     String RIGHT_AXON = "rightHang";
 
-    String ANALOG_ENCODER_LEFT = "analogHangLeft";
-    String ANALOG_ENCODER_RIGHT = "analogHangRight";
-
-
     enum TargetPosition {
         DOWN (0),
-        UP (-16.5),
-        HANG (-10);
-
-        public final double rotations;
-        TargetPosition(double rotations) {this.rotations = rotations;}
+        HALF(0.7),
+        UP (1);
+        public final double pos;
+        TargetPosition(double pos) {this.pos = pos;}
     }
 }
