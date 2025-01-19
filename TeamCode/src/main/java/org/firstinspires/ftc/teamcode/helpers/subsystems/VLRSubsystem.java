@@ -79,4 +79,8 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
             }
         }
     }
+
+    public static void clearSubsystems() {
+        instances.clear();
+    }
 }
