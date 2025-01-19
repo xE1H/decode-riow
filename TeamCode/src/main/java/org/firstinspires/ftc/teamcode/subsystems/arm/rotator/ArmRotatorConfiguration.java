@@ -33,10 +33,11 @@ public class ArmRotatorConfiguration {
 
 
     public enum TargetAngle {
-        DOWN(0),
-        INTAKE(0),
-        DEPOSIT(110);
-
+        RETRACT(0),
+        INTAKE_SAMPLE(0),
+        SCORE_SAMPLE_HIGH(110),
+        PREPARE_SPECIMEN_HIGH(103.5),
+        INTAKE_SPECIMEN(25);
         public final double angleDegrees;
 
         TargetAngle(double angleDegrees) {

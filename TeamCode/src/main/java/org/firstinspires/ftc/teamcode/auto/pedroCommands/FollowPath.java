@@ -16,7 +16,7 @@ public class FollowPath extends CommandBase {
     private static Point lastPoint;
     public static double translationalErrorConstraint = 5;
 
-    public FollowPath(double constantHeading, Point point){
+    public FollowPath(int constantHeading, Point point){
         pathChain = follower.pathBuilder().addPath(
                 new BezierLine(
                         lastPoint,
@@ -27,6 +27,17 @@ public class FollowPath extends CommandBase {
                 .setPathEndTranslationalConstraint(translationalErrorConstraint)
                 .build();
         lastPoint = point;
+    }
+
+    public FollowPath(int constantHeading, Point... points){
+        pathChain = follower.pathBuilder().addPath(new BezierCurve(
+                        prependPoint(lastPoint, points)
+                ))
+                .setConstantHeadingInterpolation(Math.toRadians(constantHeading))
+                .setPathEndTranslationalConstraint(translationalErrorConstraint)
+
+                .build();
+        lastPoint = points[points.length - 1];
     }
 
     public FollowPath(boolean reverseTangentialDirection, Point... points){
@@ -40,7 +51,7 @@ public class FollowPath extends CommandBase {
         lastPoint = points[points.length - 1];
     }
 
-    public FollowPath(double startHeading, double endHeading, Point point){
+    public FollowPath(int startHeading, int endHeading, Point point){
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, point))
                 .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
                 .setPathEndHeadingConstraint(Math.toRadians(1))
@@ -49,7 +60,7 @@ public class FollowPath extends CommandBase {
         lastPoint = point;
     }
 
-    public FollowPath(double startHeading, double endHeading){
+    public FollowPath(int startHeading, int endHeading){
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, lastPoint))
                 .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
                 .setPathEndHeadingConstraint(Math.toRadians(1))

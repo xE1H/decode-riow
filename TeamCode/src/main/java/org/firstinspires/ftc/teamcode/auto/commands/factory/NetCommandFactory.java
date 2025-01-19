@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.teamcode.auto.commandFactory;
+package org.firstinspires.ftc.teamcode.auto.commands.factory;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
-import org.firstinspires.ftc.teamcode.helpers.commands.GrabBucketSample;
-import org.firstinspires.ftc.teamcode.helpers.commands.ScoreBucketSample;
+import org.firstinspires.ftc.teamcode.auto.commands.GrabBucketSample;
+import org.firstinspires.ftc.teamcode.auto.commands.ScoreHighBucketSample;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
@@ -15,7 +14,6 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
-import java.lang.reflect.WildcardType;
 @Config
 public class NetCommandFactory extends CommandFactory {
     private int scoreHeading;
@@ -71,25 +69,25 @@ public class NetCommandFactory extends CommandFactory {
         return new SequentialCommandGroup(
                 new SetClawTwist(ClawConfiguration.TargetTwist.NORMAL),
                 new FollowPath(0, scoreHeading, toScore),
-                new ScoreBucketSample(),
+                new ScoreHighBucketSample(),
 
                 new FollowPath(scoreHeading, sample1Heading, toSamples1And2),
                 new GrabBucketSample(),
 
                 new FollowPath(sample1Heading, scoreHeading, toScore),
-                new ScoreBucketSample(),
+                new ScoreHighBucketSample(),
 
                 new FollowPath(scoreHeading, sample2Heading, toSamples1And2),
                 new GrabBucketSample(),
 
                 new FollowPath(sample2Heading, scoreHeading, toScore),
-                new ScoreBucketSample(),
+                new ScoreHighBucketSample(),
 
                 new FollowPath(scoreHeading, sample3Heading, toSample3),
                 new GrabBucketSample(),
 
                 new FollowPath(sample3Heading, scoreHeading, toScore),
-                new ScoreBucketSample(),
+                new ScoreHighBucketSample(),
 
                 new FollowPath(scoreHeading, toNetArea)
         );

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.arm.commands;
+package org.firstinspires.ftc.teamcode.helpers.commands;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;

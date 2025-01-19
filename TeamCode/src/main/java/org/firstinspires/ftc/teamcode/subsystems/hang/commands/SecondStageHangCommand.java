@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems.hang.commands;
 
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.CustomConditionalCommand;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.MoveArmInToRobot;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetDefaultCoefficients;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmState;
+import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetHangCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
@@ -25,8 +23,8 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
     public SecondStageHangCommand(BooleanSupplier gamepadCondition){
         addCommands(
                 new CustomConditionalCommand(
-                        new MoveArmInToRobot(),
-                        () -> (ArmState.get() == ArmState.State.INTAKE || ArmState.get() == ArmState.State.DEPOSIT)
+                        new RetractArm(),
+                        () -> (ArmState.get() != ArmState.State.SECOND_STAGE_HANG && ArmState.get() != ArmState.State.IN_ROBOT)
                 ),
 
                 new SetClawAngle(ClawConfiguration.TargetAngle.UP),
@@ -34,7 +32,7 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
                 new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 60),
                 new SetSlideExtension(0.942),
                 new WaitUntilCommand(()-> VLRSubsystem.getInstance(ArmSlideSubsystem.class).reachedTargetPosition()),
-                new SetArmState(ArmState.State.SECOND_STAGE_HANG),
+                new SetCurrentArmState(ArmState.State.SECOND_STAGE_HANG),
                 // hang off 2nd
                 new WaitUntilCommand(gamepadCondition),
                 new SetHangCoefficients(),

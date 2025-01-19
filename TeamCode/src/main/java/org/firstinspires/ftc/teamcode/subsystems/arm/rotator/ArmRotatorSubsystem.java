@@ -109,7 +109,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
         double power = motionProfile.getPower(currentAngle);
 
-        if (motionProfile.getTargetPosition() == TargetAngle.DOWN.angleDegrees && reachedTargetPosition()){
+        if (motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && reachedTargetPosition()){
             power = 0;
         }
         motor.setPower(power);

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm;
 
-import com.arcrobotics.ftclib.command.CommandBase;
-
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 
 public class ArmState {
@@ -29,10 +27,29 @@ public class ArmState {
         }
     }
 
+    public static boolean isCurrentState(State state) {
+        return currentState == state;
+    }
+
+    public static boolean isCurrentState(State ...states) {
+        for (State state : states) {
+            if (currentState == state) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public enum State {
         IN_ROBOT,
-        INTAKE,
-        DEPOSIT,
+        INTAKE_SAMPLE,
+        INTAKE_SPECIMEN,
+        SCORE_SAMPLE_LOW,
+        SCORE_SAMPLE_HIGH,
+        PREPARE_SPECIMEN_HIGH,
+        SCORE_SPECIMEN_HIGH,
+        PREPARE_SPECIMEN_LOW,
+        SCORE_SPECIMEN_LOW,
         SECOND_STAGE_HANG
     }
 }

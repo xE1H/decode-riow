@@ -1,10 +1,15 @@
-package org.firstinspires.ftc.teamcode.auto.commandFactory;
+package org.firstinspires.ftc.teamcode.auto.commands.factory;
 
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.specimen.IntakeSpecimen;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.specimen.PrepareSpecimenHigh;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.specimen.ScoreSpecimenHigh;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
@@ -12,9 +17,11 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.PrintCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
+import com.roboctopi.cuttlefish.queue.PointTask;
 
 public class ObservationCommandFactory extends CommandFactory {
     private boolean isBlueTeam;
@@ -36,6 +43,9 @@ public class ObservationCommandFactory extends CommandFactory {
     private Point toSample2Vertical;
     private Point toSample3Horizontal;
     private Point sample3ToObservation;
+    private Point toScoreControl1;
+    private Point toSpecimenIntake;
+    private Point toSpecimenIntakeControl1;
 
 
     public ObservationCommandFactory(boolean isBlueTeam) {
@@ -60,12 +70,17 @@ public class ObservationCommandFactory extends CommandFactory {
         toSample1Horizontal = new Point(57.5, 19);
         sample1ToObservation = new Point(21, 19);
         toSample1Vertical = new Point(57.5, 19);
-        toSample2Horizontal = new Point(57, 9.5);
+        toSample2Horizontal = new Point(57.5, 9.5);
         sample2ToObservation = new Point(21, 9.5);
-        toSample2Vertical = new Point(57, 9.5);
-        toSample3Horizontal = new Point(57, 3.5);
+        toSample2Vertical = new Point(57.5, 9.5);
+        toSample3Horizontal = new Point(57.5, 3.5);
         sample3ToObservation = new Point(21, 3.5);
+        toScoreControl1 = new Point(20, 47);
+        toSpecimenIntake = new Point(14, 37.5);
+        toSpecimenIntakeControl1 = new Point(37, 42.6);
+
     }
+
     @Override
     public Point getStartingPoint() {
         return startingPoint;
@@ -79,24 +94,27 @@ public class ObservationCommandFactory extends CommandFactory {
     @Override
     public SequentialCommandGroup getCommands() {
         return new SequentialCommandGroup(
+
                 new ParallelCommandGroup(
-                        new FollowPath(0, toSpecimenScore),
+                        new SequentialCommandGroup(
+                                new PrintCommand("Specimen: Reaching Score"),
+                                new FollowPath(0, toSpecimenScore),
+                                new PrintCommand("Specimen: Score Reached")
+                        ),
                         new SequentialCommandGroup(
                                 new WaitCommand(600),
-                                new SetRotatorAngle(103.5),
-                                new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 60),
-                                new SetClawTwist(ClawConfiguration.TargetTwist.NORMAL),
-                                new SetSlideExtension(0.36),
-                                new WaitUntilCommand(()-> VLRSubsystem.getInstance(ArmSlideSubsystem.class).reachedTargetPosition()),
-                                new WaitCommand(100)
+                                new PrintCommand("Specimen: Preparing"),
+                                new PrepareSpecimenHigh(),
+                                new PrintCommand("Specimen: Prepared")
                         )
                 ),
 
                 new WaitCommand(100),
-                new SetSlideExtension(0.165),
-                new WaitUntilCommand(()-> VLRSubsystem.getInstance(ArmSlideSubsystem.class).reachedTargetPosition()),
-                new WaitCommand(20000),
-                new FollowPath(0, toSpecimenScore),
+                new PrintCommand("Specimen: Scoring"),
+                new ScoreSpecimenHigh(),
+                new PrintCommand("Specimen: Scored"),
+                new RetractArm(),
+                new PrintCommand("Specimen: Arm Retracted"),
                 new FollowPath(0, -90, rotate),
                 new WaitCommand(500),
                 new FollowPath(!isBlueTeam, toAllSamplesControl1, toAllSamplesControl2, toAllSamples),
@@ -107,7 +125,33 @@ public class ObservationCommandFactory extends CommandFactory {
                 new FollowPath(0, sample2ToObservation),
                 new FollowPath(0, toSample2Vertical),
                 new FollowPath(0, toSample3Horizontal),
-                new FollowPath(0, sample3ToObservation)
+                new FollowPath(0, sample3ToObservation),
+                new IntakeSpecimen(),
+                new ParallelCommandGroup(
+                        new RetractArm(),
+                        new FollowPath(0, toScoreControl1, toSpecimenScore)
+                ),
+                new ScoreSpecimenHigh(),
+                new ParallelCommandGroup(
+                        new RetractArm(),
+                        new FollowPath(0, toSpecimenIntakeControl1, toSpecimenIntake)
+                ),
+                new IntakeSpecimen(),
+                new ParallelCommandGroup(
+                        new RetractArm(),
+                        new FollowPath(0, toScoreControl1, toSpecimenScore)
+                ),
+                new ScoreSpecimenHigh(),
+                new ParallelCommandGroup(
+                        new RetractArm(),
+                        new FollowPath(0, toSpecimenIntakeControl1, toSpecimenIntake)
+                ),
+                new IntakeSpecimen(),
+                new ParallelCommandGroup(
+                        new RetractArm(),
+                        new FollowPath(0, toScoreControl1, toSpecimenScore)
+                ),
+                new ScoreSpecimenHigh()
         );
 
     }

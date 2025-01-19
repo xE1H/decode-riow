@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.arm.commands;
+package org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample;
 
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -6,14 +6,20 @@ import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmOverrideState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration;
+import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetIsArmMoving;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.TargetAngle;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.TargetState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 
-public class MoveArmToDeposit extends CustomConditionalCommand {
+public class IntakeSample extends CustomConditionalCommand {
     {
         // This needs to be here, since addRequirements needs to be called BEFORE the command is
         // able to run. The running may happen instantly (on super() being called), or at any point
@@ -22,26 +28,27 @@ public class MoveArmToDeposit extends CustomConditionalCommand {
         addRequirements(VLRSubsystem.getInstance(ArmRotatorSubsystem.class), VLRSubsystem.getInstance(ArmSlideSubsystem.class));
     }
 
-    public MoveArmToDeposit() {
+    public IntakeSample(double extension) {
         super(new SequentialCommandGroup(
                         new CustomConditionalCommand(
-                                new MoveArmInToRobot(),
-                                () -> (ArmState.get() == ArmState.State.INTAKE || ArmState.get() == ArmState.State.SECOND_STAGE_HANG)
+                                new RetractArm(),
+                                () -> !ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE, ArmState.State.IN_ROBOT)
                         ),
-                        new SetArmMoving(),
+                        new SetIsArmMoving(),
 
-                        new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.DEPOSIT),
-                        new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 30),
-                        new SetClawAngle(TargetAngle.DOWN),
-
+                        new SetClawAngle(TargetAngle.UP),
+                        new SetSlideExtension(extension),
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmRotatorSubsystem.class)::reachedTargetPosition),
-                        new SetSlideExtension(ArmSlideConfiguration.TargetPosition.DEPOSIT),
-
-                        new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition),
                         new SetClawAngle(TargetAngle.DEPOSIT),
-                        new SetArmState(ArmState.State.DEPOSIT)
+                        new SetClawState(TargetState.CLOSED),
+                        new SetCurrentArmState(ArmState.State.INTAKE_SAMPLE)
                 ),
-                () -> (ArmState.get() != ArmState.State.DEPOSIT && !ArmState.isMoving()) || ArmOverrideState.get()
+                () -> (!ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving()) || ArmOverrideState.get()
         );
     }
+
+    public IntakeSample() {
+        this(ArmSlideConfiguration.TargetPosition.INTAKE_SAMPLE.extension);
+    }
+
 }
