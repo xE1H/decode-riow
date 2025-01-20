@@ -32,7 +32,7 @@ public class ScoreSampleHigh extends CustomConditionalCommand {
         super(new SequentialCommandGroup(
                         new CustomConditionalCommand(
                                 new RetractArm(),
-                                () -> !ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE, ArmState.State.IN_ROBOT)
+                                () -> !ArmState.isCurrentState(ArmState.State.SCORE_SAMPLE_HIGH, ArmState.State.IN_ROBOT)
                         ),
                         new SetIsArmMoving(),
 

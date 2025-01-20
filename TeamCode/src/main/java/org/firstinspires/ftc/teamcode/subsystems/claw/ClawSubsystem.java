@@ -69,7 +69,7 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
 
 
     public void setTargetTwist(double twistAngle) {
-        twistServo.setPosition(clamp(twistAngle, TWIST_MIN, TWIST_MAX));
+        twistServo.setPosition(clamp((1 + twistAngle) * 0.5, TWIST_MIN, TWIST_MAX));
     }
 
 

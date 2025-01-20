@@ -45,7 +45,7 @@ public class ArmSlideConfiguration {
     public enum TargetPosition {
         RETRACTED(0.0025),
         INTAKE_SAMPLE(0.45), // 30.8cm
-        SCORE_BUCKET_HIGH(0.985),
+        SCORE_BUCKET_HIGH(1.02),
         PREPARE_SPECIMEN_HIGH(0.45),
         SCORE_SPECIMEN_HIGH(0.165),
         INTAKE_SPECIMEN(0.45);
