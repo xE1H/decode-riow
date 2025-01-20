@@ -15,7 +15,6 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.IntakeSample;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.ToggleClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.ToggleClawState;
@@ -63,7 +62,7 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     }
 
     private void incrementClaw(double input) {
-        claw.setTargetTwist(input);
+        claw.setHorizontalRotation(input);
     }
 
     private void incrementSlidePosition(double input) {

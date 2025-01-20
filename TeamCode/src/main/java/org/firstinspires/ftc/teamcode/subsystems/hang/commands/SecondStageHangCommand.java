@@ -27,7 +27,7 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
                         () -> (ArmState.get() != ArmState.State.SECOND_STAGE_HANG && ArmState.get() != ArmState.State.IN_ROBOT)
                 ),
 
-                new SetClawAngle(ClawConfiguration.TargetAngle.UP),
+                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetRotatorAngle(105),
                 new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 60),
                 new SetSlideExtension(0.942),

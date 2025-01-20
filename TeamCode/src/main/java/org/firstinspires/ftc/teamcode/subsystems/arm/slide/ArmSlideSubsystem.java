@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
 @Config
 public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
@@ -37,6 +38,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
+        ArmState.resetAll();
         extensionMotor0 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_0);
         extensionMotor1 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_1);
         extensionMotor2 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_2);

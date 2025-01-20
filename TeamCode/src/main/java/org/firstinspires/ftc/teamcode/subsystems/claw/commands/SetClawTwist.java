@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 
 public class SetClawTwist extends InstantCommand {
 
-    public SetClawTwist(ClawConfiguration.TargetTwist twist) {
-        super(() -> VLRSubsystem.getInstance(ClawSubsystem.class).setTargetTwist(twist));
+    public SetClawTwist(ClawConfiguration.HorizontalRotation twist) {
+        super(() -> VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(twist));
     }
 }

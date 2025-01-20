@@ -40,6 +40,12 @@ public class ArmState {
         return false;
     }
 
+    public static void resetAll() {
+        currentState = State.IN_ROBOT;
+        moving = false;
+        lastMoved = 0;
+    }
+
     public enum State {
         IN_ROBOT,
         INTAKE_SAMPLE,

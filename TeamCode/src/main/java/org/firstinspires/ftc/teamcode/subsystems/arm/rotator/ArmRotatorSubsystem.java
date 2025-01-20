@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 
@@ -33,6 +34,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
 
     protected void initialize(HardwareMap hardwareMap) {
+        ArmState.resetAll();
         Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
         slideSubsystem = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
 

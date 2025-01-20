@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfigura
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.TargetAngle;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.VerticalRotation;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 
 public class ScoreSampleHigh extends CustomConditionalCommand {
@@ -38,13 +38,13 @@ public class ScoreSampleHigh extends CustomConditionalCommand {
 
                         new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.SCORE_SAMPLE_HIGH),
                         new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 30),
-                        new SetClawAngle(TargetAngle.DOWN),
+                        new SetClawAngle(VerticalRotation.DOWN),
 
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmRotatorSubsystem.class)::reachedTargetPosition),
                         new SetSlideExtension(ArmSlideConfiguration.TargetPosition.SCORE_BUCKET_HIGH),
 
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition),
-                        new SetClawAngle(TargetAngle.DEPOSIT),
+                        new SetClawAngle(VerticalRotation.DEPOSIT),
                         new SetCurrentArmState(ArmState.State.SCORE_SAMPLE_HIGH)
                 ),
                 () -> (ArmState.get() != ArmState.State.SCORE_SAMPLE_HIGH && !ArmState.isMoving()) || ArmOverrideState.get()

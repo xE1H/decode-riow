@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.TargetAngle;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.TargetState;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.VerticalRotation;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.GripperState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 
@@ -36,11 +36,11 @@ public class IntakeSample extends CustomConditionalCommand {
                         ),
                         new SetIsArmMoving(),
 
-                        new SetClawAngle(TargetAngle.UP),
+                        new SetClawAngle(VerticalRotation.UP),
                         new SetSlideExtension(extension),
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmRotatorSubsystem.class)::reachedTargetPosition),
-                        new SetClawAngle(TargetAngle.DEPOSIT),
-                        new SetClawState(TargetState.CLOSED),
+                        new SetClawAngle(VerticalRotation.DEPOSIT),
+                        new SetClawState(GripperState.CLOSED),
                         new SetCurrentArmState(ArmState.State.INTAKE_SAMPLE)
                 ),
                 () -> (!ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving()) || ArmOverrideState.get()

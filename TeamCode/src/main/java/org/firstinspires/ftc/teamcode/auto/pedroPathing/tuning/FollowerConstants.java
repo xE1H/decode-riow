@@ -42,6 +42,12 @@ public class FollowerConstants {
     // Heading error PIDF coefficients
     public static CustomPIDFCoefficients headingPIDFCoefficients;
 
+    // Secondary heading error PIDF coefficients
+    public static CustomPIDFCoefficients secondaryHeadingPIDFCoefficients;
+
+    // Feed forward constant added on to the secondary heading PIDF
+    public static double secondaryHeadingPIDFFeedForward;
+
     static {
         updateConstants();
     }
@@ -52,8 +58,8 @@ public class FollowerConstants {
         leftRearMotorDirection = GlobalConfig.INVERTED_MOTORS ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
         rightRearMotorDirection = GlobalConfig.INVERTED_MOTORS ? DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE;
 
-        double headingProportionalGain = GlobalConfig.INVERTED_MOTORS ? -0.4 : 0.4;
-        double headingDerivativeGain = GlobalConfig.INVERTED_MOTORS ? -0.001 : 0.001;
+        double headingProportionalGain = GlobalConfig.INVERTED_MOTORS ? -0.45 : 0.45;
+        double headingDerivativeGain = GlobalConfig.INVERTED_MOTORS ? -0.0015 : 0.0015;
 
         headingPIDFCoefficients = new CustomPIDFCoefficients(
                 headingProportionalGain,
@@ -63,6 +69,16 @@ public class FollowerConstants {
         );
 
         headingPIDFFeedForward = GlobalConfig.INVERTED_MOTORS ? -0.012 : 0.012;
+
+        double secondaryHeadingProportionalGain = GlobalConfig.INVERTED_MOTORS ? -0.45 : 0.45;
+
+        secondaryHeadingPIDFCoefficients = new CustomPIDFCoefficients(
+                secondaryHeadingProportionalGain,
+                0,
+                headingDerivativeGain,
+                0);
+
+        secondaryHeadingPIDFFeedForward = GlobalConfig.INVERTED_MOTORS ? -0.012 : 0.012;
     }
 
 
@@ -180,9 +196,9 @@ public class FollowerConstants {
 
     // These activate / deactivate the secondary PIDs. These take over at errors under a set limit for
     // the translational, heading, and drive PIDs.
-    public static boolean useSecondaryTranslationalPID = false;
-    public static boolean useSecondaryHeadingPID = false;
-    public static boolean useSecondaryDrivePID = false;
+    public static boolean useSecondaryTranslationalPID = true;
+    public static boolean useSecondaryHeadingPID = true;
+    public static boolean useSecondaryDrivePID = true;
 
 
     // the limit at which the translational PIDF switches between the main and secondary translational PIDFs,
@@ -191,7 +207,7 @@ public class FollowerConstants {
 
     // Secondary translational PIDF coefficients (don't use integral)
     public static CustomPIDFCoefficients secondaryTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.3,
+            0.2,
             0,
             0.008,
             0);
@@ -206,27 +222,15 @@ public class FollowerConstants {
     // Feed forward constant added on to the small translational PIDF
     public static double secondaryTranslationalPIDFFeedForward = 0.015;
 
-
     // the limit at which the heading PIDF switches between the main and secondary heading PIDFs
     public static double headingPIDFSwitch = Math.PI / 20;
-
-    // Secondary heading error PIDF coefficients
-    public static CustomPIDFCoefficients secondaryHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            0.9,
-            0,
-            0.04,
-            0);
-
-    // Feed forward constant added on to the secondary heading PIDF
-    public static double secondaryHeadingPIDFFeedForward = 0.01;
-
 
     // the limit at which the heading PIDF switches between the main and secondary drive PIDFs
     public static double drivePIDFSwitch = 20;
 
     // Secondary drive PIDF coefficients
     public static CustomFilteredPIDFCoefficients secondaryDrivePIDFCoefficients = new CustomFilteredPIDFCoefficients(
-            0.0055,
+            0.008,
             0,
             0.0000012,
             0.6,

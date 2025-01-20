@@ -14,13 +14,13 @@ public class GrabBucketSample extends SequentialCommandGroup {
         addCommands(
                 new WaitCommand(100),
                 new IntakeSample(0.62),
-                new SetClawState(ClawConfiguration.TargetState.OPEN),
+                new SetClawState(ClawConfiguration.GripperState.OPEN),
                 new WaitCommand(600),
-                new SetClawAngle(ClawConfiguration.TargetAngle.DOWN),
+                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                 new WaitCommand(200),
-                new SetClawState(ClawConfiguration.TargetState.CLOSED),
+                new SetClawState(ClawConfiguration.GripperState.CLOSED),
                 new WaitCommand(100),
-                new SetClawAngle(ClawConfiguration.TargetAngle.UP),
+                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new WaitCommand(50),
                 new RetractArm()
         );

@@ -10,37 +10,44 @@ public interface ClawConfiguration {
     String ANALOG_ENCODER_LEFT = "analog0";
     String ANALOG_ENCODER_RIGHT = "analog1";
 
-    double angle_down_pos = 0;
-    double angle_up_pos = 0.9;
-    double angle_deposit_pos = 0.85;
-
-    double twist_normal_pos = 0.5;
-    double twist_flipped_pos = 0.8;
-
-    double TWIST_MIN = 0.04;
-    double TWIST_MAX = 0.96;
+    double HORIZONTAL_ROTATION_MIN = 0.04;
+    double HORIZONTAL_ROTATION_MAX = 0.96;
 
     double state_closed_normal_pos = 0;
-    double state_closed_forced_pos = 0;
     double state_open_pos = 0.8;
 
     double analog_voltage_left = 0;
     double analog_voltage_right = 0;
 
 
-    enum TargetAngle {
-        DOWN,
-        UP,
-        DEPOSIT
+    enum VerticalRotation {
+        DOWN(0),
+        UP(0.9),
+        DEPOSIT(0.85);
+
+        public final double pos;
+        VerticalRotation(double pos) {
+            this.pos = pos;
+        }
     }
 
-    enum TargetTwist {
-        NORMAL,
-        FLIPPED
+    enum HorizontalRotation {
+        NORMAL(0.5),
+        FLIPPED(0.8);
+
+        public final double pos;
+        HorizontalRotation(double pos) {
+            this.pos = pos;
+        }
     }
 
-    enum TargetState {
-        CLOSED,
-        OPEN
+    enum GripperState {
+        CLOSED(0),
+        OPEN(0.8);
+
+        public final double pos;
+        GripperState(double pos) {
+            this.pos = pos;
+        }
     }
 }

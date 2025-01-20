@@ -13,10 +13,10 @@ public class GrabSample extends SequentialCommandGroup {
     public GrabSample() {
         ClawSubsystem claw = VLRSubsystem.getInstance(ClawSubsystem.class);
         addCommands(
-                new SetClawState(ClawConfiguration.TargetState.CLOSED),
+                new SetClawState(ClawConfiguration.GripperState.CLOSED),
                 new SequentialCommandGroup(
                         new WaitCommand(200),
-                        new SetClawState(ClawConfiguration.TargetState.CLOSED)));
+                        new SetClawState(ClawConfiguration.GripperState.CLOSED)));
         addRequirements(claw);
     }
 }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.auto.commands.factory;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.outoftheboxrobotics.photoncore.Photon;
 
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
 @Config
+@Photon
 public class NetCommandFactory extends CommandFactory {
     private int scoreHeading;
     private int sample1Heading;
@@ -32,7 +34,7 @@ public class NetCommandFactory extends CommandFactory {
         initializePointsForBlueTeam();
         if(!isBlueTeam){
             Point[] allPoints = {
-                    startingPoint, toScore, toSamples1And2, toSample3
+                    startingPoint, toScore, toSamples1And2, toSample3, toNetArea
             };
             mirrorPointsToRedTeam(allPoints);
         }
@@ -67,7 +69,7 @@ public class NetCommandFactory extends CommandFactory {
     @Override
     public SequentialCommandGroup getCommands(){
         return new SequentialCommandGroup(
-                new SetClawTwist(ClawConfiguration.TargetTwist.NORMAL),
+                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                 new FollowPath(0, scoreHeading, toScore),
                 new ScoreHighBucketSample(),
 

@@ -15,11 +15,8 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 public class BlueObservationAuto extends VLRLinearOpMode {
     @Override
     public void run() {
-        AutoOpModeRunnner runner = new AutoOpModeRunnner(new ObservationCommandFactory(true), true);
+        AutoOpModeRunnner runner = new AutoOpModeRunnner(new ObservationCommandFactory(true), false);
         runner.initialize(hardwareMap);
-        CommandScheduler.getInstance().schedule(
-                new SetClawTwist(ClawConfiguration.TargetTwist.FLIPPED)
-        );
         waitForStart();
         runner.run(this::opModeIsActive, false);
     }

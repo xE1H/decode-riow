@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 
 public class SetClawState extends InstantCommand {
 
-    public SetClawState(ClawConfiguration.TargetState state) {
+    public SetClawState(ClawConfiguration.GripperState state) {
         super(() -> VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(state));
     }
 }

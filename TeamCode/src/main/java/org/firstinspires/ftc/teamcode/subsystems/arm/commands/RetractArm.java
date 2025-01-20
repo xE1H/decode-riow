@@ -12,9 +12,9 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfigura
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.TargetTwist;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.TargetAngle;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.TargetState;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.HorizontalRotation;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.VerticalRotation;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.GripperState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
@@ -29,10 +29,10 @@ public class RetractArm extends SequentialCommandGroup {
                 new SetIsArmMoving(),
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                                new SetClawTwist(TargetTwist.NORMAL),
-                                new SetClawState(TargetState.CLOSED),
+                                new SetClawTwist(HorizontalRotation.NORMAL),
+                                new SetClawState(GripperState.CLOSED),
                                 new WaitCommand(100),
-                                new SetClawAngle(TargetAngle.UP),
+                                new SetClawAngle(VerticalRotation.UP),
                                 new WaitCommand(80),
                                 new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.RETRACT), // Just in case the state gets bugged
                                 new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
@@ -44,16 +44,16 @@ public class RetractArm extends SequentialCommandGroup {
 
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                                new SetClawState(TargetState.OPEN),
+                                new SetClawState(GripperState.OPEN),
                                 new WaitCommand(200),
-                                new SetClawState(TargetState.CLOSED),
+                                new SetClawState(GripperState.CLOSED),
                                 new WaitCommand(100),
-                                new SetClawAngle(TargetAngle.DOWN),
+                                new SetClawAngle(VerticalRotation.DOWN),
                                 new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                                 new WaitCommand(200),
-                                new SetClawAngle(TargetAngle.DEPOSIT),
+                                new SetClawAngle(VerticalRotation.DEPOSIT),
                                 new WaitUntilCommand(slides::reachedTargetPosition),
-                                new SetClawAngle(TargetAngle.UP),
+                                new SetClawAngle(VerticalRotation.UP),
                                 new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.RETRACT),
                                 new WaitUntilCommand(arm::reachedTargetPosition),
                                 new SetCurrentArmState(
@@ -65,7 +65,7 @@ public class RetractArm extends SequentialCommandGroup {
 
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                                new SetClawAngle(TargetAngle.UP),
+                                new SetClawAngle(VerticalRotation.UP),
                                 new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                                 new WaitUntilCommand(slides::reachedTargetPosition),
                                 new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.RETRACT),
