@@ -48,6 +48,7 @@ public class AutoOpModeRunnner {
 
     public void run(BooleanSupplier isActive, boolean enableDebug) {
         while (isActive.getAsBoolean()) {
+            follower.update();
             if (enableDebug) {
                 follower.telemetryDebug(telemetry);
             }

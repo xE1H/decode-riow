@@ -16,20 +16,20 @@ public class FollowPath extends CommandBase {
     private static Point lastPoint;
     public static double translationalErrorConstraint = 5;
 
-    public FollowPath(int constantHeading, Point point){
+    public FollowPath(int constantHeading, Point point) {
         pathChain = follower.pathBuilder().addPath(
-                new BezierLine(
-                        lastPoint,
-                        point
+                        new BezierLine(
+                                lastPoint,
+                                point
+                        )
                 )
-        )
                 .setConstantHeadingInterpolation(Math.toRadians(constantHeading))
                 .setPathEndTranslationalConstraint(translationalErrorConstraint)
                 .build();
         lastPoint = point;
     }
 
-    public FollowPath(int constantHeading, Point... points){
+    public FollowPath(int constantHeading, Point... points) {
         pathChain = follower.pathBuilder().addPath(new BezierCurve(
                         prependPoint(lastPoint, points)
                 ))
@@ -40,10 +40,10 @@ public class FollowPath extends CommandBase {
         lastPoint = points[points.length - 1];
     }
 
-    public FollowPath(boolean reverseTangentialDirection, Point... points){
+    public FollowPath(boolean reverseTangentialDirection, Point... points) {
         pathChain = follower.pathBuilder().addPath(new BezierCurve(
-                prependPoint(lastPoint, points)
-        ))
+                        prependPoint(lastPoint, points)
+                ))
                 .setTangentHeadingInterpolation()
                 .setPathEndTranslationalConstraint(translationalErrorConstraint)
                 .setReversed(reverseTangentialDirection)
@@ -51,7 +51,7 @@ public class FollowPath extends CommandBase {
         lastPoint = points[points.length - 1];
     }
 
-    public FollowPath(int startHeading, int endHeading, Point point){
+    public FollowPath(int startHeading, int endHeading, Point point) {
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, point))
                 .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
                 .setPathEndHeadingConstraint(Math.toRadians(1))
@@ -60,7 +60,7 @@ public class FollowPath extends CommandBase {
         lastPoint = point;
     }
 
-    public FollowPath(int startHeading, int endHeading){
+    public FollowPath(int startHeading, int endHeading) {
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, lastPoint))
                 .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
                 .setPathEndHeadingConstraint(Math.toRadians(1))
@@ -68,34 +68,24 @@ public class FollowPath extends CommandBase {
                 .build();
     }
 
-    private Point[] prependPoint(Point point, Point... otherPoints){
+    private Point[] prependPoint(Point point, Point... otherPoints) {
         Point[] updatedArray = new Point[otherPoints.length + 1];
         updatedArray[0] = point;
         System.arraycopy(otherPoints, 0, updatedArray, 1, otherPoints.length);
         return updatedArray;
     }
 
-    public static void setStartingPoint(Point point){
+    public static void setStartingPoint(Point point) {
         lastPoint = point;
     }
 
-    public static void setFollower(Follower newFollower){
+    public static void setFollower(Follower newFollower) {
         follower = newFollower;
     }
 
     @Override
     public void initialize() {
         follower.followPath(pathChain);
-    }
-
-    @Override
-    public void execute() {
-        follower.update();
-    }
-
-    @Override
-    public void end(boolean isInterrupted){
-        follower.update();
     }
 
     @Override
