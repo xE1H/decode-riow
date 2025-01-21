@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
+import java.util.function.IntConsumer;
+
 @Config
 @Photon
 public class NetCommandFactory extends CommandFactory {
@@ -29,6 +31,7 @@ public class NetCommandFactory extends CommandFactory {
     private Point toSample3;
     private Point toNetArea;
 
+
     public NetCommandFactory(boolean isBlueTeam){
         initializeHeadings();
         initializePointsForBlueTeam();
@@ -40,11 +43,24 @@ public class NetCommandFactory extends CommandFactory {
         }
     }
 
+    private int calculateSampleHeading(Point samplePoint){
+        return (int) Math.toDegrees(Math.atan2(samplePoint.getY() - startingPoint.getY(), samplePoint.getX() - startingPoint.getX()));
+    }
+
     private void initializeHeadings(){
+        Point sample1 = new Point(1,1);
+        Point sample2 = new Point(1,1);
+        Point sample3 = new Point(1,1);
+
         scoreHeading = -50;
-        sample1Heading = -13;
-        sample2Heading = 5;
-        sample3Heading = 28;
+
+//        sample1Heading = -13;
+//        sample2Heading = 5;
+//        sample3Heading = 28;
+
+        sample1Heading = calculateSampleHeading(sample1);
+        sample2Heading = calculateSampleHeading(sample2);
+        sample3Heading = calculateSampleHeading(sample3);
     }
     @Override
     public void initializePointsForBlueTeam(){
