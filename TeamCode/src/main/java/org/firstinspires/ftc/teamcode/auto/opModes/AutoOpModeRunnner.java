@@ -38,7 +38,7 @@ public class AutoOpModeRunnner {
 
         follower = new Follower(hardwareMap);
         follower.setStartingPose(new Pose(commandFactory.getStartingPoint(), 0));
-        follower.setMaxPower(0.6);
+        follower.setMaxPower(0.95);
 
         FollowPath.setStartingPoint(commandFactory.getStartingPoint());
         FollowPath.setFollower(follower);

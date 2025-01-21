@@ -22,7 +22,7 @@ public interface ClawConfiguration {
     enum VerticalRotation {
         DOWN(0.9),
         UP(0.07),
-        DEPOSIT(0.4);
+        DEPOSIT(0.25);
 
         public final double pos;
         VerticalRotation(double pos) {
