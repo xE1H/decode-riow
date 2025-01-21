@@ -12,15 +12,15 @@ public class ToggleClawAngle extends ConditionalCommand {
     public ToggleClawAngle() {
         super(
                 new SequentialCommandGroup(
-                        new SetClawState(ClawConfiguration.TargetState.CLOSED),
-                        new SetClawAngle(ClawConfiguration.TargetAngle.DOWN),
+                        new SetClawState(ClawConfiguration.GripperState.CLOSED),
+                        new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                         new WaitCommand(50),
-                        new SetClawState(ClawConfiguration.TargetState.OPEN)
+                        new SetClawState(ClawConfiguration.GripperState.OPEN)
                 ),
                 new SequentialCommandGroup(
-                        new SetClawState(ClawConfiguration.TargetState.CLOSED),
+                        new SetClawState(ClawConfiguration.GripperState.CLOSED),
                         new WaitCommand(200),
-                        new SetClawAngle(ClawConfiguration.TargetAngle.UP)
+                        new SetClawAngle(ClawConfiguration.VerticalRotation.UP)
                 ),
                 () -> VLRSubsystem.getInstance(ClawSubsystem.class).getTargetAngle() == ClawConfiguration.VerticalRotation.UP)
         ;
