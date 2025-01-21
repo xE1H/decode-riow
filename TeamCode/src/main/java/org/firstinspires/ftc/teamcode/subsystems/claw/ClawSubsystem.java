@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.claw;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 
+import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem.mapToRange;
+
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -47,11 +49,9 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         return targetAngle;
     }
 
-
     public void setHorizontalRotation(HorizontalRotation rotation) {
         twistServo.setPosition(rotation.pos);
     }
-
 
     public void setHorizontalRotation(double rotationPos) {
         twistServo.setPosition(clamp((1 + rotationPos) * 0.5, HORIZONTAL_ROTATION_MIN, HORIZONTAL_ROTATION_MAX));
