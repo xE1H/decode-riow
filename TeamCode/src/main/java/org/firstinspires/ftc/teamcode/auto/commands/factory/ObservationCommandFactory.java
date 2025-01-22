@@ -124,7 +124,7 @@ public class ObservationCommandFactory extends CommandFactory {
 
                 new ParallelCommandGroup(
                         new RetractArm(),
-                        new FollowPath(0, 180, new Point(24, 48 - 20)),
+                        new FollowPath(0, 180, new Point(24 + 12, 48 - 20)),
                         new SequentialCommandGroup(
                                 new WaitCommand(800),
                                 new SetRotatorAngle(20),
@@ -141,7 +141,8 @@ public class ObservationCommandFactory extends CommandFactory {
 //                new FollowPath(0, sample3ToObservation),
                 //new FollowPath(0, new Point(30, 24)),
                 //new FollowPath(180, new Point(24, 48 - 20)),
-                new WaitCommand(5000),
+                new FollowPath(180, new Point(24, 48 - 20)),
+                new WaitCommand(3000),
                 new FollowPath(180, new Point(24 - 2, 48 - 20)),
                 new WaitCommand(100),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
