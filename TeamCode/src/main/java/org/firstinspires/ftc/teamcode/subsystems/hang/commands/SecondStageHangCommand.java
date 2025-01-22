@@ -5,6 +5,9 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.MoveArmInToRobot;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmOperationMode;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
@@ -12,6 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetHangCoefficient
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
@@ -35,7 +39,7 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
                 new SetCurrentArmState(ArmState.State.SECOND_STAGE_HANG),
                 // hang off 2nd
                 new WaitUntilCommand(gamepadCondition),
-                new SetHangCoefficients(),
+                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG),
                 new SetSlideExtension(0.5),
                 new SetHangPosition(HangConfiguration.TargetPosition.HALF),
                 new WaitCommand(500),

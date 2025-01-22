@@ -22,11 +22,13 @@ public class ArmSlideConfiguration {
     public static double ACCELERATION_GAIN = 0.00001;
 
 
-    public static double MAX_VELOCITY_HANG = 100;
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.55;
-    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.0005;
-    public static double FEED_FORWARD_GAIN_HANG = -0.6;
-    public static double VELOCITY_GAIN_HANG = 0.006;
+    public static double ACCELERATION_HANG = 1000;
+    public static double DECELERATION_HANG = 500;
+    public static double MAX_VELOCITY_HANG = 800;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.6;
+    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.000000;
+    public static double FEED_FORWARD_GAIN_HANG = -0.68;
+    public static double VELOCITY_GAIN_HANG = 0.004;
     public static double ACCELERATION_GAIN_HANG = 0.0003;
 
     public static double CREEP = 40;
@@ -56,5 +58,11 @@ public class ArmSlideConfiguration {
         TargetPosition(double extension) {
             this.extension = extension;
         }
+    }
+
+
+    public enum OperationMode {
+        NORMAL,
+        HANG
     }
 }

@@ -9,7 +9,7 @@ public interface HangConfiguration {
 
     enum TargetPosition {
         DOWN (0),
-        HALF(0.7),
+        HALF(0.75),
         UP (1);
         public final double pos;
         TargetPosition(double pos) {this.pos = pos;}

@@ -35,6 +35,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     private double encoderPosition = 0;
     private double lastPositionChangeTime = 0;
 
+    private OperationMode operationMode = OperationMode.NORMAL;
+
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
@@ -98,6 +100,11 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     }
 
 
+    public double getExtension(){
+        return mapToRange(getPosition(), MIN_POSITION, MAX_POSITION, 0, 1);
+    }
+
+
     public double getTargetPosition() {
         return motionProfile.getTargetPosition();
     }
@@ -114,7 +121,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
 
     public void setHangCoefficients() {
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY_HANG, FEEDBACK_PROPORTIONAL_GAIN_HANG, FEEDBACK_INTEGRAL_GAIN_HANG, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN_HANG, ACCELERATION_GAIN_HANG);
+        motionProfile.updateCoefficients(ACCELERATION_HANG, DECELERATION_HANG, MAX_VELOCITY_HANG, FEEDBACK_PROPORTIONAL_GAIN_HANG, FEEDBACK_INTEGRAL_GAIN_HANG, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN_HANG, ACCELERATION_GAIN_HANG);
         motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN_HANG);
     }
 
@@ -132,29 +139,45 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         }
     }
 
+
+    public void setOperationMode(OperationMode operationMode){
+        this.operationMode = operationMode;
+    }
+
+
+    public OperationMode getOperationMode(){
+        return operationMode;
+    }
+
+
     public void periodic(double armAngleDegrees) {
         checkLimitSwitch();
 
         encoderPosition = -extensionEncoder.getCurrentPosition();
-
-        if (GlobalConfig.DEBUG_MODE){
-            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR SLIDE TUNING");
-            setDefaultCoefficients();
-        }
-
         double power = motionProfile.getPower(getPosition(), armAngleDegrees);
 
-        if (reachedTargetPositionNoOverride()) {
-            extensionMotor0.setPower(0);
-            extensionMotor2.setPower(0);
 
-            if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
-                extensionMotor1.setPower(0);
-                extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        if (operationMode == OperationMode.NORMAL) {
+            setDefaultCoefficients();
+
+            if (reachedTargetPositionNoOverride()) {
+                extensionMotor0.setPower(0);
+                extensionMotor2.setPower(0);
+
+                if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
+                    extensionMotor1.setPower(0);
+                    extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                } else extensionMotor1.setPower(power);
+
             } else {
+                extensionMotor0.setPower(power);
                 extensionMotor1.setPower(power);
+                extensionMotor2.setPower(power);
             }
-        } else {
+        }
+
+        else{
+            setHangCoefficients();
             extensionMotor0.setPower(power);
             extensionMotor1.setPower(power);
             extensionMotor2.setPower(power);
