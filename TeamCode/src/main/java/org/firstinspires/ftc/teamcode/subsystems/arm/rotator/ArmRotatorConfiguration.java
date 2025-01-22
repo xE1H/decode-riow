@@ -13,7 +13,7 @@ public class ArmRotatorConfiguration {
     public static double MAX_VELOCITY = 310;
 
     public static double FEEDBACK_PROPORTIONAL_GAIN = 0.075;
-    public static double FEEDBACK_INTEGRAL_GAIN = 0.00001;
+    public static double FEEDBACK_INTEGRAL_GAIN = 0;
     public static double FEEDBACK_DERIVATIVE_GAIN = 0.00045;
     public static double VELOCITY_GAIN = 0.003;
     public static double ACCELERATION_GAIN = 0.00005;
