@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.auto.commands.factory.CommandFactory;
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
+import org.firstinspires.ftc.teamcode.auto.pedroCommands.TranslateHeading;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
@@ -18,15 +19,13 @@ import java.util.function.BooleanSupplier;
 
 @Photon
 public class AutoOpModeRunnner {
-    private boolean isInvertedMotors;
     private CommandFactory commandFactory;
     private Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     private Follower follower;
 
 
-    public AutoOpModeRunnner(CommandFactory commandFactory, boolean isInvertedMotors) {
+    public AutoOpModeRunnner(CommandFactory commandFactory) {
         this.commandFactory = commandFactory;
-        this.isInvertedMotors = isInvertedMotors;
     }
 
     public void initialize(HardwareMap hardwareMap) {
@@ -34,7 +33,7 @@ public class AutoOpModeRunnner {
                 commandFactory.getRequiredSubsystems()
         );
         VLRSubsystem.initializeAll(hardwareMap);
-        GlobalConfig.setIsInvertedMotors(isInvertedMotors);
+
 
         follower = new Follower(hardwareMap);
         follower.setStartingPose(new Pose(commandFactory.getStartingPoint(), 0));
@@ -42,6 +41,7 @@ public class AutoOpModeRunnner {
 
         FollowPath.setStartingPoint(commandFactory.getStartingPoint());
         FollowPath.setFollower(follower);
+        TranslateHeading.setFollower(follower);
 
         CommandScheduler.getInstance().schedule(commandFactory.getCommands());
     }
@@ -53,6 +53,10 @@ public class AutoOpModeRunnner {
                 follower.telemetryDebug(telemetry);
             }
         }
+    }
+
+    public void setPower(double power) {
+        follower.setMaxPower(power);
     }
 
     public void run(BooleanSupplier isActive){

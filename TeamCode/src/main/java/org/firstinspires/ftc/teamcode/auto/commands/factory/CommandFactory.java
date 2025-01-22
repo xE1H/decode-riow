@@ -12,7 +12,6 @@ public abstract class CommandFactory {
             point.mirrorCartesianY();
         }
     }
-    public abstract void initializePointsForBlueTeam();
     public abstract Point getStartingPoint();
     public abstract SequentialCommandGroup getCommands();
     public abstract Class<? extends VLRSubsystem<?>>[] getRequiredSubsystems();

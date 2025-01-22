@@ -28,8 +28,6 @@ public class VisionAuto extends VLRLinearOpMode {
         VLRSubsystem.requireSubsystems(Chassis.class, ArmRotatorSubsystem.class, ArmSlideSubsystem.class, ClawSubsystem.class, Vision.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
-        GlobalConfig.setIsInvertedEncoders(false);
-
         Follower follower = new Follower(hardwareMap);
         follower.setStartingPose(new Pose(0, 0, 0));
         follower.setMaxPower(0.6);
