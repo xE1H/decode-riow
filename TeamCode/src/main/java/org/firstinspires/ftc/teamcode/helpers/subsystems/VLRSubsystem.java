@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.helpers.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +41,14 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
         } catch (NullPointerException e) {
             throw new RuntimeException("Error getting instance of " + clazz.getName(), e);
         }
+    }
+
+    public static ArmRotatorSubsystem getRotator(){
+        return VLRSubsystem.getInstance(ArmRotatorSubsystem.class);
+    }
+
+    public static ArmSlideSubsystem getSlides(){
+        return VLRSubsystem.getInstance(ArmSlideSubsystem.class);
     }
 
     /**

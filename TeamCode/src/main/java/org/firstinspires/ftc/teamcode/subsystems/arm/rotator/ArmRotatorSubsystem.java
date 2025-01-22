@@ -85,11 +85,25 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     }
 
     public void setHangCoefficients(){
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN_HANG, FEEDBACK_INTEGRAL_GAIN_HANG, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+        motionProfile.updateCoefficients(ACCELERATION_HANG, DECELERATION_HANG, MAX_VELOCITY_HANG, FEEDBACK_PROPORTIONAL_GAIN_HANG, FEEDBACK_INTEGRAL_GAIN_HANG, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+        motionProfile.setFeedForwardGain(FEEDFORWARD_GAIN_HANG);
     }
 
     public void setDefaultCoefficients(){
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+        double slidePosition = slideSubsystem.getPosition();
+        double p = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, FEEDBACK_PROPORTIONAL_GAIN, EXTENDED_FEEDBACK_PROPORTIONAL_GAIN);
+        double i = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, FEEDBACK_INTEGRAL_GAIN, EXTENDED_FEEDBACK_INTEGRAL_GAIN);
+        double d = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, FEEDBACK_DERIVATIVE_GAIN, EXTENDED_FEEDBACK_DERIVATIVE_GAIN);
+        double v = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, VELOCITY_GAIN, EXTENDED_VELOCITY_GAIN);
+        double a = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, ACCELERATION_GAIN, EXTENDED_ACCELERATION_GAIN);
+
+        double acceleration = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, ACCELERATION, EXTENDED_ACCELERATION);
+        double deceleration = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, DECELERATION, EXTENDED_DECELERATION);
+        double maxVelocity = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, MAX_VELOCITY, EXTENDED_MAX_VELOCITY);
+        double feedforward = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
+
+        motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
+        motionProfile.setFeedForwardGain(feedforward);
     }
 
 
@@ -97,22 +111,20 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     public void periodic() {
         encoderPosition = thoughBoreEncoder.getCurrentPosition();
 
-        if (GlobalConfig.DEBUG_MODE){
-            FtcDashboard.getInstance().getTelemetry().addLine("DEBUG MODE ENABLED, USING DEFAULT PIDs FOR ARM TUNING");
-            setDefaultCoefficients();
-        }
-
         double currentAngle = getAngleDegrees();
-        double currentFeedForwardGain = mapToRange(slideSubsystem.getPosition(), ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, RETRACTED_FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
 
         FtcDashboard.getInstance().getTelemetry().addData("Rotator Angle", currentAngle);
-
-        motionProfile.setFeedForwardGain(currentFeedForwardGain);
-
         double power = motionProfile.getPower(currentAngle);
 
-        if (motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && reachedTargetPosition()){
-            power = 0;
+        if (slideSubsystem.getOperationMode() == ArmSlideConfiguration.OperationMode.NORMAL) {
+            setDefaultCoefficients();
+
+            if (motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && reachedTargetPosition()) {
+                power = 0;
+            }
+        }
+        else{
+            setHangCoefficients();
         }
         motor.setPower(power);
         slideSubsystem.periodic(currentAngle);

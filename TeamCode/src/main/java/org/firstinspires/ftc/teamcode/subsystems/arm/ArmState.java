@@ -56,6 +56,7 @@ public class ArmState {
         SCORE_SPECIMEN_HIGH,
         PREPARE_SPECIMEN_LOW,
         SCORE_SPECIMEN_LOW,
-        SECOND_STAGE_HANG
+        SECOND_STAGE_HANG,
+        THIRD_STAGE_HANG
     }
 }
