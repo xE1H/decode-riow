@@ -127,7 +127,7 @@ public class ObservationCommandFactory extends CommandFactory {
                         new FollowPath(0, 180, new Point(24 + 12, 48 - 20)),
                         new SequentialCommandGroup(
                                 new WaitCommand(800),
-                                new SetRotatorAngle(20),
+                                new SetRotatorAngle(19.3),
                                 new SetSlideExtension(0.28),
                                 new SetClawAngle(0.57),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN)
@@ -147,15 +147,16 @@ public class ObservationCommandFactory extends CommandFactory {
                 new WaitCommand(100),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
                 new WaitCommand(100),
+
+                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new ParallelCommandGroup(
-                        new SetSlideExtension(0),
-                        new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                        new FollowPath(180, new Point(12, toScoreY))
+                        new FollowPath(180, new Point(12, toScoreY)),
+                        new SetSlideExtension(0)
                 ),
+                new SetClawAngle(CLAW_ANGLE),
                 new ParallelCommandGroup(
                         new FollowPath(0, new Point(toScoreX2, toScoreY - 3)),
-                        new PrepareSpecimenHigh(),
-                        new SetClawAngle(CLAW_ANGLE)
+                        new PrepareSpecimenHigh()
                 ),
                 new SetClawAngle(CLAW_ANGLE_2),
                 new WaitCommand(200),
