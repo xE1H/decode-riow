@@ -18,27 +18,28 @@ import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
  * This is the Pinpoint class. This class extends the Localizer superclass and is a
  * localizer that uses the two wheel odometry set up with the IMU to have more accurate heading
  * readings. The diagram below, which is modified from Road Runner, shows a typical set up.
- *
+ * <p>
  * The view is from the top of the robot looking downwards.
- *
+ * <p>
  * left on robot is the y positive direction
- *
+ * <p>
  * forward on robot is the x positive direction
- *
- *    /--------------\
- *    |     ____     |
- *    |     ----     |
- *    | ||           |
- *    | ||           |  ----> left (y positive)
- *    |              |
- *    |              |
- *    \--------------/
- *           |
- *           |
- *           V
- *    forward (x positive)
+ * <p>
+ * /--------------\
+ * |     ____     |
+ * |     ----     |
+ * | ||           |
+ * | ||           |  ----> left (y positive)
+ * |              |
+ * |              |
+ * \--------------/
+ * |
+ * |
+ * V
+ * forward (x positive)
  * With the pinpoint your readings will be used in mm
  * to use inches ensure to divide your mm value by 25.4
+ *
  * @author Logan Nash
  * @author Havish Sripada 12808 - RevAmped Robotics
  * @author Ethan Doak - Gobilda
@@ -61,31 +62,27 @@ public class PinpointLocalizer extends Localizer {
      *
      * @param map the HardwareMap
      */
-    public PinpointLocalizer(HardwareMap map){ this(map, new Pose());}
+    public PinpointLocalizer(HardwareMap map) {
+        this(map, new Pose());
+    }
 
     /**
      * This creates a new PinpointLocalizer from a HardwareMap and a Pose, with the Pose
      * specifying the starting pose of the localizer.
      *
-     * @param map the HardwareMap
+     * @param map          the HardwareMap
      * @param setStartPose the Pose to start from
      */
-    public PinpointLocalizer(HardwareMap map, Pose setStartPose){
+    public PinpointLocalizer(HardwareMap map, Pose setStartPose) {
         hardwareMap = map;
 
-        odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
         //The default units are inches, but you can swap the units if you wish.
         //If you have already tuned the TwoWheelLocalizer, you can simply use the forwardEncoderPose's y value and strafeEncoderPose's x values.
 
-        double xOffset; double yOffset;
-        if(GlobalConfig.INVERTED_OFFSETS){
-            xOffset = 75;
-            yOffset = -30;
-        } else {
-            xOffset = -75;
-            yOffset = 30;
-        }
+        double xOffset = -75;
+        double yOffset = 30;
 
         setOffsets(xOffset, yOffset, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
 
@@ -95,11 +92,7 @@ public class PinpointLocalizer extends Localizer {
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         //odo.setEncoderResolution(13.26291192);
         GoBildaPinpointDriver.EncoderDirection encoderDirection;
-        if(GlobalConfig.INVERTED_ENCODERS){
-            encoderDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
-        } else {
-            encoderDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
-        }
+        encoderDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
 
         odo.setEncoderDirections(encoderDirection, encoderDirection);
 
@@ -196,6 +189,7 @@ public class PinpointLocalizer extends Localizer {
 
     /**
      * This returns the Y encoder value as none of the odometry tuners are required for this localizer
+     *
      * @return returns the Y encoder value
      */
     @Override
@@ -205,6 +199,7 @@ public class PinpointLocalizer extends Localizer {
 
     /**
      * This returns the X encoder value as none of the odometry tuners are required for this localizer
+     *
      * @return returns the X encoder value
      */
     @Override
@@ -214,6 +209,7 @@ public class PinpointLocalizer extends Localizer {
 
     /**
      * This returns either the factory tuned yaw scalar or the yaw scalar tuned by yourself.
+     *
      * @return returns the yaw scalar
      */
     @Override
@@ -223,9 +219,10 @@ public class PinpointLocalizer extends Localizer {
 
     /**
      * This sets the offsets and converts inches to millimeters
+     *
      * @param xOffset How far to the side from the center of the robot is the x-pod? Use positive values if it's to the left and negative if it's to the right.
      * @param yOffset How far forward from the center of the robot is the y-pod? Use positive values if it's forward and negative if it's to the back.
-     * @param unit The units that the measurements are given in
+     * @param unit    The units that the measurements are given in
      */
     private void setOffsets(double xOffset, double yOffset, DistanceUnit unit) {
         odo.setOffsets(unit.toMm(xOffset), unit.toMm(yOffset));

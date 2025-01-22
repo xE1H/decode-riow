@@ -70,10 +70,6 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
 
     public double getAngleDegrees() {
-        if (GlobalConfig.INVERTED_ENCODERS) {
-            return -encoderPosition / ENCODER_TICKS_PER_ROTATION * 360d;
-        }
-
         return encoderPosition / ENCODER_TICKS_PER_ROTATION * 360d;
     }
 

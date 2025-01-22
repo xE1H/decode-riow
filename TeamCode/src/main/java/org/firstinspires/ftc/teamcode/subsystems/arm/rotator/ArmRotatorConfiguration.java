@@ -9,8 +9,8 @@ public class ArmRotatorConfiguration {
     public static String ENCODER_NAME = "MotorRightBack"; // PORT 3 CONTOR LHUB
 
     public static double ACCELERATION = 8000;
-    public static double DECELERATION = 1300;
-    public static double MAX_VELOCITY = 310;
+    public static double DECELERATION = 1100;
+    public static double MAX_VELOCITY = 300;
 
     public static double FEEDBACK_PROPORTIONAL_GAIN = 0.075;
     public static double FEEDBACK_INTEGRAL_GAIN = 0;
@@ -41,7 +41,7 @@ public class ArmRotatorConfiguration {
 
 
 
-    public static double ERROR_MARGIN = 5;
+    public static double ERROR_MARGIN = 2;
 
     public static double MIN_ANGLE = 0;
     public static double MAX_ANGLE = 150;

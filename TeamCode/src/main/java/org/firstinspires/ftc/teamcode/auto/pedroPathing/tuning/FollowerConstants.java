@@ -31,56 +31,31 @@ public class FollowerConstants {
     public static String rightFrontMotorName = "MotorRightFront";
     public static String rightRearMotorName = "MotorRightBack";
 
-    public static DcMotorSimple.Direction leftFrontMotorDirection;
-    public static DcMotorSimple.Direction rightFrontMotorDirection;
-    public static DcMotorSimple.Direction leftRearMotorDirection;
-    public static DcMotorSimple.Direction rightRearMotorDirection;
+    public static DcMotorSimple.Direction leftFrontMotorDirection =  DcMotorSimple.Direction.FORWARD;
+    public static DcMotorSimple.Direction rightFrontMotorDirection =  DcMotorSimple.Direction.REVERSE;
+    public static DcMotorSimple.Direction leftRearMotorDirection =  DcMotorSimple.Direction.FORWARD;
+    public static DcMotorSimple.Direction rightRearMotorDirection =  DcMotorSimple.Direction.REVERSE;
 
     // Feed forward constant added on to the heading PIDF
-    public static double headingPIDFFeedForward;
+    public static double headingPIDFFeedForward = 0.012;
 
     // Heading error PIDF coefficients
-    public static CustomPIDFCoefficients headingPIDFCoefficients;
+    public static CustomPIDFCoefficients headingPIDFCoefficients = new CustomPIDFCoefficients(
+            0.45,
+            0,
+            0.0015,
+            0
+    );
 
     // Secondary heading error PIDF coefficients
-    public static CustomPIDFCoefficients secondaryHeadingPIDFCoefficients;
+    public static CustomPIDFCoefficients secondaryHeadingPIDFCoefficients = new CustomPIDFCoefficients(
+            0.1,
+            0,
+            0.05,
+            0);
 
     // Feed forward constant added on to the secondary heading PIDF
-    public static double secondaryHeadingPIDFFeedForward;
-
-    static {
-        updateConstants();
-    }
-
-    public static void updateConstants() {
-        leftFrontMotorDirection = GlobalConfig.INVERTED_MOTORS ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
-        rightFrontMotorDirection = GlobalConfig.INVERTED_MOTORS ? DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE;
-        leftRearMotorDirection = GlobalConfig.INVERTED_MOTORS ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
-        rightRearMotorDirection = GlobalConfig.INVERTED_MOTORS ? DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE;
-
-        double headingProportionalGain = GlobalConfig.INVERTED_MOTORS ? -0.45 : 0.45;
-        double headingDerivativeGain = GlobalConfig.INVERTED_MOTORS ? -0.0015 : 0.0015;
-
-        headingPIDFCoefficients = new CustomPIDFCoefficients(
-                headingProportionalGain,
-                0,
-                headingDerivativeGain,
-                0
-        );
-
-        headingPIDFFeedForward = GlobalConfig.INVERTED_MOTORS ? -0.012 : 0.012;
-
-        double secondaryHeadingProportionalGain = GlobalConfig.INVERTED_MOTORS ? -0.45 : 0.45;
-
-        secondaryHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-                secondaryHeadingProportionalGain,
-                0,
-                headingDerivativeGain,
-                0);
-
-        secondaryHeadingPIDFFeedForward = GlobalConfig.INVERTED_MOTORS ? -0.012 : 0.012;
-    }
-
+    public static double secondaryHeadingPIDFFeedForward = 0;
 
     // This section is for setting the actual drive vector for the front left wheel, if the robot
     // is facing a heading of 0 radians with the wheel centered at (0,0)
@@ -203,13 +178,13 @@ public class FollowerConstants {
 
     // the limit at which the translational PIDF switches between the main and secondary translational PIDFs,
     // if the secondary PID is active
-    public static double translationalPIDFSwitch = 3;
+    public static double translationalPIDFSwitch = 2;
 
     // Secondary translational PIDF coefficients (don't use integral)
     public static CustomPIDFCoefficients secondaryTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.2,
+            0.22,
             0,
-            0.008,
+            0.0025,
             0);
 
     // Secondary translational Integral value
@@ -220,22 +195,22 @@ public class FollowerConstants {
             0);
 
     // Feed forward constant added on to the small translational PIDF
-    public static double secondaryTranslationalPIDFFeedForward = 0.015;
+    public static double secondaryTranslationalPIDFFeedForward = 0;
 
     // the limit at which the heading PIDF switches between the main and secondary heading PIDFs
-    public static double headingPIDFSwitch = Math.PI / 20;
+    public static double headingPIDFSwitch = 0.1;
 
     // the limit at which the heading PIDF switches between the main and secondary drive PIDFs
-    public static double drivePIDFSwitch = 20;
+    public static double drivePIDFSwitch = 10;
 
     // Secondary drive PIDF coefficients
     public static CustomFilteredPIDFCoefficients secondaryDrivePIDFCoefficients = new CustomFilteredPIDFCoefficients(
-            0.008,
+            0.0065,
             0,
-            0.0000012,
+            0,
             0.6,
             0);
 
     // Feed forward constant added on to the secondary drive PIDF
-    public static double secondaryDrivePIDFFeedForward = 0.01;
+    public static double secondaryDrivePIDFFeedForward = 0;
 }

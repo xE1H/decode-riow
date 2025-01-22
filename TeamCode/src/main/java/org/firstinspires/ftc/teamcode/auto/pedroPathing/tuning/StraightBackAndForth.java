@@ -60,7 +60,6 @@ public class StraightBackAndForth extends VLRLinearOpMode {
     public void run() {
         VLRSubsystem.requireSubsystems(ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
-        GlobalConfig.setIsInvertedMotors(inverted);
 
         follower = new Follower(hardwareMap);
         follower.setMaxPower(0.6);

@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.PathChain;
@@ -14,7 +15,9 @@ public class FollowPath extends CommandBase {
     private static Follower follower;
     private PathChain pathChain = null;
     private static Point lastPoint;
-    public static double translationalErrorConstraint = 5;
+    public static double translationalErrorConstraint = 0.01;
+    public static double headingErrorConstraint = Math.PI / 360;
+
 
     public FollowPath(int constantHeading, Point point) {
         pathChain = follower.pathBuilder().addPath(
@@ -25,6 +28,7 @@ public class FollowPath extends CommandBase {
                 )
                 .setConstantHeadingInterpolation(Math.toRadians(constantHeading))
                 .setPathEndTranslationalConstraint(translationalErrorConstraint)
+                .setPathEndHeadingConstraint(headingErrorConstraint)
                 .build();
         lastPoint = point;
     }
@@ -63,24 +67,6 @@ public class FollowPath extends CommandBase {
     public FollowPath(int startHeading, int endHeading) {
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, lastPoint))
                 .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
-                .setPathEndHeadingConstraint(Math.toRadians(1))
-                .setPathEndTranslationalConstraint(translationalErrorConstraint)
-                .build();
-    }
-
-    private int calculateTargetHeading(Point targetPoint){
-        double currentY = follower.getPose().getY();
-        double currentX = follower.getPose().getX();
-        return (int) Math.toDegrees(Math.atan2(targetPoint.getY() - currentY, targetPoint.getX() - currentX));
-    }
-
-    public FollowPath(Point targetPoint){
-
-        double currentHeading = follower.getTotalHeading();
-        double targetHeading = calculateTargetHeading(targetPoint);
-
-        pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, targetPoint))
-                .setLinearHeadingInterpolation(Math.toRadians(currentHeading), Math.toRadians(targetHeading))
                 .setPathEndHeadingConstraint(Math.toRadians(1))
                 .setPathEndTranslationalConstraint(translationalErrorConstraint)
                 .build();

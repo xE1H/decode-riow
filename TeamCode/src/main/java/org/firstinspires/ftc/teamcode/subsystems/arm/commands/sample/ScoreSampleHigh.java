@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.VerticalRotation;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 
+@Config
 public class ScoreSampleHigh extends CustomConditionalCommand {
     {
         // This needs to be here, since addRequirements needs to be called BEFORE the command is
@@ -28,6 +30,9 @@ public class ScoreSampleHigh extends CustomConditionalCommand {
         addRequirements(VLRSubsystem.getInstance(ArmRotatorSubsystem.class), VLRSubsystem.getInstance(ArmSlideSubsystem.class));
     }
 
+    public static int ROTATOR = 113;
+    public static double SLIDE = 1.02;
+
     public ScoreSampleHigh() {
         super(new SequentialCommandGroup(
                         new CustomConditionalCommand(
@@ -36,12 +41,12 @@ public class ScoreSampleHigh extends CustomConditionalCommand {
                         ),
                         new SetIsArmMoving(),
 
-                        new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.SCORE_SAMPLE_HIGH),
+                        new SetRotatorAngle(ROTATOR),
                         new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 30),
                         new SetClawAngle(VerticalRotation.DOWN),
 
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmRotatorSubsystem.class)::reachedTargetPosition),
-                        new SetSlideExtension(ArmSlideConfiguration.TargetPosition.SCORE_BUCKET_HIGH),
+                        new SetSlideExtension(SLIDE),
 
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition),
                         new SetClawAngle(VerticalRotation.DEPOSIT),

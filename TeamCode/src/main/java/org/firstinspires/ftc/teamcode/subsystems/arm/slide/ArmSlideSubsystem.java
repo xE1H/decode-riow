@@ -66,12 +66,11 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
 
     public void setTargetPosition(TargetPosition position) {
-        lastPositionChangeTime = System.currentTimeMillis();
         setTargetPosition(position.extension);
     }
 
-
     public void setTargetPosition(double position) {
+        lastPositionChangeTime = System.currentTimeMillis();
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
         motionProfile.setCurrentTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
     }
