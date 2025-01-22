@@ -41,4 +41,8 @@ public class TranslatePosition extends CommandBase {
 
         follower.followPath(path);
     }
+
+    public boolean isFinished() {
+        return !follower.isBusy();
+    }
 }
