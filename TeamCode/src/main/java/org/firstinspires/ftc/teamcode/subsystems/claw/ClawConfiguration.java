@@ -32,7 +32,7 @@ public interface ClawConfiguration {
 
     enum HorizontalRotation {
         NORMAL(0.5),
-        FLIPPED(0.8);
+        FLIPPED(0.95);
 
         public final double pos;
         HorizontalRotation(double pos) {
