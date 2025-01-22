@@ -25,6 +25,10 @@ public class NetCommandFactory extends CommandFactory {
     private int sample2Heading;
     private int sample3Heading;
 
+    Point sample1 = new Point(119,46);
+    Point sample2 = new Point(129,46);
+    Point sample3 = new Point(139,46);
+
     private Point startingPoint;
     private Point toScore;
     private Point toSamples1And2;
@@ -43,24 +47,13 @@ public class NetCommandFactory extends CommandFactory {
         }
     }
 
-    private int calculateSampleHeading(Point samplePoint){
-        return (int) Math.toDegrees(Math.atan2(samplePoint.getY() - startingPoint.getY(), samplePoint.getX() - startingPoint.getX()));
-    }
-
     private void initializeHeadings(){
-        Point sample1 = new Point(1,1);
-        Point sample2 = new Point(1,1);
-        Point sample3 = new Point(1,1);
-
         scoreHeading = -50;
 
 //        sample1Heading = -13;
 //        sample2Heading = 5;
 //        sample3Heading = 28;
 
-        sample1Heading = calculateSampleHeading(sample1);
-        sample2Heading = calculateSampleHeading(sample2);
-        sample3Heading = calculateSampleHeading(sample3);
     }
     @Override
     public void initializePointsForBlueTeam(){
@@ -89,19 +82,19 @@ public class NetCommandFactory extends CommandFactory {
                 new FollowPath(0, scoreHeading, toScore),
                 new ScoreHighBucketSample(),
 
-                new FollowPath(scoreHeading, sample1Heading, toSamples1And2),
+                new FollowPath(toSamples1And2),
                 new GrabBucketSample(),
 
                 new FollowPath(sample1Heading, scoreHeading, toScore),
                 new ScoreHighBucketSample(),
 
-                new FollowPath(scoreHeading, sample2Heading, toSamples1And2),
+                new FollowPath(toSamples1And2),
                 new GrabBucketSample(),
 
                 new FollowPath(sample2Heading, scoreHeading, toScore),
                 new ScoreHighBucketSample(),
 
-                new FollowPath(scoreHeading, sample3Heading, toSample3),
+                new FollowPath(toSample3),
                 new GrabBucketSample(),
 
                 new FollowPath(sample3Heading, scoreHeading, toScore),

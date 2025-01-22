@@ -68,6 +68,24 @@ public class FollowPath extends CommandBase {
                 .build();
     }
 
+    private int calculateTargetHeading(Point targetPoint){
+        double currentY = follower.getPose().getY();
+        double currentX = follower.getPose().getX();
+        return (int) Math.toDegrees(Math.atan2(targetPoint.getY() - currentY, targetPoint.getX() - currentX));
+    }
+
+    public FollowPath(Point targetPoint){
+
+        double currentHeading = follower.getTotalHeading();
+        double targetHeading = calculateTargetHeading(targetPoint);
+
+        pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, targetPoint))
+                .setLinearHeadingInterpolation(Math.toRadians(currentHeading), Math.toRadians(targetHeading))
+                .setPathEndHeadingConstraint(Math.toRadians(1))
+                .setPathEndTranslationalConstraint(translationalErrorConstraint)
+                .build();
+    }
+
     private Point[] prependPoint(Point point, Point... otherPoints) {
         Point[] updatedArray = new Point[otherPoints.length + 1];
         updatedArray[0] = point;
