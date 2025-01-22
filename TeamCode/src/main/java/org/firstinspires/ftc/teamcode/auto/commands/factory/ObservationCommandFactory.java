@@ -121,22 +121,27 @@ public class ObservationCommandFactory extends CommandFactory {
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetCurrentArmState(ArmState.State.SCORE_SPECIMEN_HIGH),
                 new PrintCommand("Specimen: Scored"),
+
                 new ParallelCommandGroup(
                         new RetractArm(),
-                        new FollowPath(0, rotate, toAllSamplesControl1, toAllSamplesControl2, toAllSamples, toSample1Horizontal)
+                        new FollowPath(0, 180, new Point(24, 48 - 20)),
+                        new SequentialCommandGroup(
+                                new WaitCommand(800),
+                                new SetRotatorAngle(20),
+                                new SetSlideExtension(0.28),
+                                new SetClawAngle(0.57),
+                                new SetClawState(ClawConfiguration.GripperState.OPEN)
+                        )
+//                        new FollowPath(0, rotate, toAllSamplesControl1, toAllSamplesControl2, toAllSamples, toSample1Horizontal)
                 ),
-                new FollowPath(0, sample1ToObservation),
-                new FollowPath(0, toSample1Vertical, toSample2Horizontal),
-                new FollowPath(0, sample2ToObservation),
-                new FollowPath(0, toSample2Vertical, toSample3Horizontal),
-                new FollowPath(0, sample3ToObservation),
-                new FollowPath(0, new Point(30, 24)),
-                new FollowPath(180, new Point(24, 48 - 20)),
-                new SetRotatorAngle(20),
-                new SetSlideExtension(0.28),
-                new SetClawAngle(0.57),
-                new SetClawState(ClawConfiguration.GripperState.OPEN),
-                new WaitCommand(300),
+//                new FollowPath(0, sample1ToObservation),
+//                new FollowPath(0, toSample1Vertical, toSample2Horizontal),
+//                new FollowPath(0, sample2ToObservation),
+//                new FollowPath(0, toSample2Vertical, toSample3Horizontal),
+//                new FollowPath(0, sample3ToObservation),
+                //new FollowPath(0, new Point(30, 24)),
+                //new FollowPath(180, new Point(24, 48 - 20)),
+                new WaitCommand(5000),
                 new FollowPath(180, new Point(24 - 2, 48 - 20)),
                 new WaitCommand(100),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
