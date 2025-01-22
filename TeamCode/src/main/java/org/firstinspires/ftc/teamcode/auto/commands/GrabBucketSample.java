@@ -4,28 +4,42 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
+import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.IntakeSample;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
 @Config
 public class GrabBucketSample extends SequentialCommandGroup {
     public static double SLIDE = 0.2;
-    public GrabBucketSample(){
+    public GrabBucketSample(boolean clawTwisted){
         addCommands(
-                new WaitCommand(100),
                 new IntakeSample(SLIDE),
                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                new WaitCommand(400),
+                new WaitCommand(300),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                new CustomConditionalCommand(
+                        new SequentialCommandGroup(
+                            new SetClawTwist(ClawConfiguration.HorizontalRotation.FLIPPED),
+                            new WaitCommand(200)
+                        ),
+                        () -> clawTwisted
+                ),
                 new WaitCommand(200),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                new WaitCommand(300),
+                new WaitCommand(200),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new WaitCommand(50),
                 new RetractArm()
         );
+    }
+
+    public GrabBucketSample(){
+        this(false);
     }
 }

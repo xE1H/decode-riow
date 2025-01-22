@@ -29,11 +29,15 @@ public class PrepareSpecimenHigh extends ParallelCommandGroup {
                 new FollowPath(0, new Point(setX, setY)),
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                                new SetRotatorAngle(ROTATOR),
-                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                                new SetSlideExtension(SLIDE),
-                                new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition),
-                                new SetCurrentArmState(ArmState.State.PREPARE_SPECIMEN_HIGH)
+                                new ParallelCommandGroup(
+                                        new SetRotatorAngle(ROTATOR),
+                                        new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+                                        new SequentialCommandGroup(
+                                                new SetSlideExtension(SLIDE),
+                                                new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)),
+                                        new SetCurrentArmState(ArmState.State.PREPARE_SPECIMEN_HIGH)
+                                )
+
                         ),
                         () -> !ArmState.isCurrentState(ArmState.State.PREPARE_SPECIMEN_HIGH)
                 ),

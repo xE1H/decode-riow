@@ -36,7 +36,7 @@ public class ScoreSpecimenHigh extends CustomConditionalCommand {
 
     public static double CLAW_ANGLE = 0.8;
     public static double ROTATOR_ANGLE = 50;
-    public static int ROTATOR_TIMEOUT = 800;
+    public static int ROTATOR_TIMEOUT = 400;
 
     public ScoreSpecimenHigh() {
         super(new SequentialCommandGroup(

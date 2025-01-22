@@ -9,8 +9,7 @@ public class ScoreHighBucketSample extends SequentialCommandGroup {
         addCommands(
                 new ScoreSampleHigh(),
                 new WaitCommand(100),
-                new RetractArm(),
-                new WaitCommand(200)
+                new RetractArm()
         );
     }
 }

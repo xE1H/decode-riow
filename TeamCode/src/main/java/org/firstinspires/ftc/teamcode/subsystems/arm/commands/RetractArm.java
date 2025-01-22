@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.commands;
 
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -44,8 +45,9 @@ public class RetractArm extends SequentialCommandGroup {
 
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
+
                                 new SetClawState(GripperState.OPEN),
-                                new WaitCommand(200),
+                                new WaitCommand(300),
                                 new SetClawState(GripperState.CLOSED),
                                 new WaitCommand(100),
                                 new SetClawAngle(VerticalRotation.DOWN),

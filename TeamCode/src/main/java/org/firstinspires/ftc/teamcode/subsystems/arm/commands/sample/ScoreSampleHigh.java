@@ -30,7 +30,7 @@ public class ScoreSampleHigh extends CustomConditionalCommand {
         addRequirements(VLRSubsystem.getInstance(ArmRotatorSubsystem.class), VLRSubsystem.getInstance(ArmSlideSubsystem.class));
     }
 
-    public static int ROTATOR = 113;
+    public static int ROTATOR = 117;
     public static double SLIDE = 1.02;
 
     public ScoreSampleHigh() {

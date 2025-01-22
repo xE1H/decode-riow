@@ -33,12 +33,13 @@ public class FollowPath extends CommandBase {
         lastPoint = point;
     }
 
-    public FollowPath(int constantHeading, Point... points) {
+    public FollowPath(int startHeading, int endHeading, Point... points) {
         pathChain = follower.pathBuilder().addPath(new BezierCurve(
                         prependPoint(lastPoint, points)
                 ))
-                .setConstantHeadingInterpolation(Math.toRadians(constantHeading))
-                .setPathEndTranslationalConstraint(translationalErrorConstraint)
+                .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
+                .setPathEndHeadingConstraint(Math.toRadians(1))
+                .setPathEndTranslationalConstraint(1)
 
                 .build();
         lastPoint = points[points.length - 1];

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.commands.specimen;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -21,9 +22,9 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
-
+@Config
 public class IntakeSpecimen extends SequentialCommandGroup {
-    public static int specimenIntakePrepTimeout = 2000;
+    public static int specimenIntakePrepTimeout = 500;
 
     public IntakeSpecimen(Point toSpecimenIntake) {
         addCommands(

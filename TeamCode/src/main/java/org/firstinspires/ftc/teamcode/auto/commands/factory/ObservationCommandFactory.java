@@ -32,8 +32,8 @@ import com.outoftheboxrobotics.photoncore.Photon;
 @Photon
 public class ObservationCommandFactory extends CommandFactory {
     public static Point startingPoint = new Point(9.6, 59.5);
-    public static Point toPrepareSpecimenIntake1 = new Point(37, 28);
-    public static Point toPrepareSpecimenIntake2 = new Point(25, 28);
+    public static Point toPrepareSpecimenIntake1 = new Point(38, 28);
+    public static Point toPrepareSpecimenIntake2 = new Point(26, 28);
     public static Point toSpecimenIntake = new Point(22, 28);
 
     public static double toScoreX = 38;
@@ -60,10 +60,14 @@ public class ObservationCommandFactory extends CommandFactory {
                 new PrepareSpecimenHigh(toScoreX, toScoreY),
                 new ScoreSpecimenHigh(),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+
+
+//                new FollowPath(0, 180, new Point(8, 28.9), new Point(99, 27), new Point(108.2, 10.2), new Point(26.3, 38), new Point(20.4, 23.8)),
+
                 // Intake specimen 1
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
-                                new WaitCommand(300),
+                                new WaitCommand(100),
                                 new FollowPath(0, 180, toPrepareSpecimenIntake1)
                         ),
                         new SequentialCommandGroup(
@@ -72,6 +76,7 @@ public class ObservationCommandFactory extends CommandFactory {
                                 new PrepareSpecimenIntake()
                         )
                 ),
+
 
                 new FollowPath(180, toPrepareSpecimenIntake2),
                 new IntakeSpecimen(toSpecimenIntake),
@@ -88,7 +93,7 @@ public class ObservationCommandFactory extends CommandFactory {
                 // Intake specimen 2
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
-                                new WaitCommand(300),
+                                new WaitCommand(100),
                                 new FollowPath(0, 180, toPrepareSpecimenIntake1)
                         ),
                         new SequentialCommandGroup(
