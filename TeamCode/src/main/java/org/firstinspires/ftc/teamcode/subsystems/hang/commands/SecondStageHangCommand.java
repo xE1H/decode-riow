@@ -5,13 +5,10 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.MoveArmInToRobot;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmOperationMode;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetHangCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
@@ -28,7 +25,7 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
         addCommands(
                 new CustomConditionalCommand(
                         new RetractArm(),
-                        () -> (ArmState.get() != ArmState.State.SECOND_STAGE_HANG && ArmState.get() != ArmState.State.IN_ROBOT)
+                        () -> !ArmState.isCurrentState(ArmState.State.IN_ROBOT, ArmState.State.SECOND_STAGE_HANG)
                 ),
 
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),

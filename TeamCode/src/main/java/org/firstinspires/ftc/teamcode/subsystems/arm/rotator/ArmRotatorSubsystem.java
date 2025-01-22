@@ -119,7 +119,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         if (slideSubsystem.getOperationMode() == ArmSlideConfiguration.OperationMode.NORMAL) {
             setDefaultCoefficients();
 
-            if (motionProfile.getTargetPosition() == TargetAngle.DOWN.angleDegrees && reachedTargetPosition()) {
+            if (motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && reachedTargetPosition()) {
                 power = 0;
             }
         }
