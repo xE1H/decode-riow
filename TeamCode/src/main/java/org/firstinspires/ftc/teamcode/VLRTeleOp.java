@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -41,6 +42,17 @@ public class VLRTeleOp extends VLRLinearOpMode {
         ArmSlideSubsystem ass = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
+
+        ass.setMotorPower(-0.2);
+        ElapsedTime timeout = new ElapsedTime();
+        while (!ass.getLimitSwitchState()){
+            sleep(10);
+            if (timeout.seconds() > 5){
+                break;
+            }
+        }
+        ass.setMotorPower(0);
+        ass.checkLimitSwitch();
 
         waitForStart();
 
