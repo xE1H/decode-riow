@@ -131,12 +131,25 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN);
     }
 
+
+    public void setMotorPower(double power) {
+        extensionMotor0.setPower(power);
+        extensionMotor1.setPower(power);
+        extensionMotor2.setPower(power);
+    }
+
+
     public void checkLimitSwitch() {
         if (limitSwitch.isPressed()) {
-            System.out.println("LIMIT ON");
+            //System.out.println("LIMIT ON");
             extensionEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             extensionEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
+    }
+
+
+    public boolean getLimitSwitchState(){
+        return limitSwitch.isPressed();
     }
 
 
