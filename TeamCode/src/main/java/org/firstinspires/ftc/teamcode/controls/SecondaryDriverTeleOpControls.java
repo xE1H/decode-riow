@@ -34,6 +34,8 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     GamepadKeys.Button CROSS = GamepadKeys.Button.A;
     GamepadKeys.Button CIRCLE = GamepadKeys.Button.B;
 
+    long lastInterval = System.nanoTime();
+
     public SecondaryDriverTeleOpControls(Gamepad gamepad) {
         super(new GamepadEx(gamepad));
 
@@ -44,15 +46,15 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
 
         add(new ButtonCtl(CROSS, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new IntakeSample())));
         add(new ButtonCtl(SQUARE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new RetractArm())));
-        add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new ScoreSampleHigh())));
+        add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new ScoreSampleHigh(107))));
         add(new ButtonCtl(CIRCLE, ButtonCtl.Trigger.SIMPLE, false, ArmOverrideState::set));
 
         //add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.UP))));
         //add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.DOWN))));
         //add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean f) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.OPEN))));
         //add(new ButtonCtl(GamepadKeys.Button.DPAD_RIGHT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean g) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.CLOSED))));
-        add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new ToggleClawState())));
-        add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new ToggleClawAngle())));
+        add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new ToggleClawState())));
+        add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new ToggleClawAngle())));
 
 
         addRightStickHandler((Double x, Double y) -> incrementClaw(y));
@@ -66,8 +68,9 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     }
 
     private void incrementSlidePosition(double input) {
-        if (ArmState.get() == ArmState.State.INTAKE_SAMPLE) {
-            slide.incrementTargetPosition(input * 4);
+        if (ArmState.get() == ArmState.State.INTAKE_SAMPLE && !ArmState.isMoving() && !ArmOverrideState.get()) {
+            slide.incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval));
         }
+        lastInterval = System.nanoTime();
     }
 }

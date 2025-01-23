@@ -22,7 +22,7 @@ public class ToggleClawAngle extends ConditionalCommand {
                         new WaitCommand(200),
                         new SetClawAngle(ClawConfiguration.VerticalRotation.UP)
                 ),
-                () -> VLRSubsystem.getInstance(ClawSubsystem.class).getTargetAngle() == ClawConfiguration.VerticalRotation.UP)
+                () -> VLRSubsystem.getInstance(ClawSubsystem.class).getTargetAngle() != ClawConfiguration.VerticalRotation.DOWN)
         ;
     }
 }

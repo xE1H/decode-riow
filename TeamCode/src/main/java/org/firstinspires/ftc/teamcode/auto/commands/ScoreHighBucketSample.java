@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.ScoreSample
 public class ScoreHighBucketSample extends SequentialCommandGroup {
     public ScoreHighBucketSample(){
         addCommands(
-                new ScoreSampleHigh(),
+                new ScoreSampleHigh(117),
                 new WaitCommand(100),
                 new RetractArm()
         );

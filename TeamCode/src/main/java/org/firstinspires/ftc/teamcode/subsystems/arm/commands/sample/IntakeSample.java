@@ -30,11 +30,11 @@ public class IntakeSample extends CustomConditionalCommand {
 
     public IntakeSample(double extension) {
         super(new SequentialCommandGroup(
+                        new SetIsArmMoving(),
                         new CustomConditionalCommand(
                                 new RetractArm(),
                                 () -> !ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE, ArmState.State.IN_ROBOT)
                         ),
-                        new SetIsArmMoving(),
 
                         new SetClawAngle(VerticalRotation.UP),
                         new SetSlideExtension(extension),

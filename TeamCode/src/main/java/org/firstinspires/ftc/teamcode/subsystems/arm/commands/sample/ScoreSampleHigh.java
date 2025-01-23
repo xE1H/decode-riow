@@ -33,15 +33,15 @@ public class ScoreSampleHigh extends CustomConditionalCommand {
     public static int ROTATOR = 117;
     public static double SLIDE = 1.02;
 
-    public ScoreSampleHigh() {
+    public ScoreSampleHigh(int rotator) {
         super(new SequentialCommandGroup(
+                        new SetIsArmMoving(),
                         new CustomConditionalCommand(
                                 new RetractArm(),
                                 () -> !ArmState.isCurrentState(ArmState.State.SCORE_SAMPLE_HIGH, ArmState.State.IN_ROBOT)
                         ),
-                        new SetIsArmMoving(),
 
-                        new SetRotatorAngle(ROTATOR),
+                        new SetRotatorAngle(rotator),
                         new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 30),
                         new SetClawAngle(VerticalRotation.DOWN),
 

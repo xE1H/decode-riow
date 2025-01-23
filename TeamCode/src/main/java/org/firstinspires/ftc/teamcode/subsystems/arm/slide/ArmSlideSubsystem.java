@@ -115,7 +115,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
 
     public void incrementTargetPosition(double increment) {
-        motionProfile.setCurrentTargetPosition(clamp(getTargetPosition() + increment, MIN_POSITION, HORIZONTAL_EXTENSION_LIMIT));
+        System.out.printf("sniegas " + clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT) + "\n");
+        motionProfile.setCurrentTargetPosition(clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT));
     }
 
 

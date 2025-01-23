@@ -26,6 +26,25 @@ public class RetractArm extends SequentialCommandGroup {
         ArmRotatorSubsystem arm = VLRSubsystem.getInstance(ArmRotatorSubsystem.class);
         ArmSlideSubsystem slides = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         addRequirements(arm, slides);
+        if (ArmOverrideState.get()) {
+            addCommands(
+                    new SetClawState(GripperState.CLOSED),
+                    new SetClawAngle(VerticalRotation.UP),
+                    new WaitCommand(400),
+                    new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
+                    new WaitCommand(200),
+                    new SetClawAngle(VerticalRotation.DEPOSIT),
+                    new WaitUntilCommand(slides::reachedTargetPosition),
+                    new SetClawAngle(VerticalRotation.UP),
+                    new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.RETRACT),
+                    new WaitUntilCommand(arm::reachedTargetPosition),
+                    new SetCurrentArmState(
+                            ArmState.State.IN_ROBOT
+                    )
+            );
+            return;
+        }
+
         addCommands(
                 new SetIsArmMoving(),
                 new CustomConditionalCommand(
@@ -45,7 +64,6 @@ public class RetractArm extends SequentialCommandGroup {
 
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-
                                 new SetClawState(GripperState.OPEN),
                                 new WaitCommand(300),
                                 new SetClawState(GripperState.CLOSED),

@@ -37,6 +37,7 @@ public class ArmSlideConfiguration {
     public static double ERROR_TIMEOUT_MILLIS = 1000; // ms before position is automatically classified as reached
 
     public static double MIN_POSITION = 0;
+    public static double MIN_MANUAL_ADJUST_POSITION = 160;
     public static double HORIZONTAL_EXTENSION_LIMIT = 650;
     public static double MAX_POSITION = 1230;
     public static double TICKS_PER_IN = 17.97 * 2.54;
