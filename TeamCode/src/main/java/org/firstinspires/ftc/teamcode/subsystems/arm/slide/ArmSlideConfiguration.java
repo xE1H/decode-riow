@@ -31,7 +31,7 @@ public class ArmSlideConfiguration {
     public static double VELOCITY_GAIN_HANG = 0.004;
     public static double ACCELERATION_GAIN_HANG = 0.0003;
 
-    public static double CREEP = 40;
+    public static double CREEP = 60;
 
     public static double ERROR_MARGIN = 20;
     public static double ERROR_TIMEOUT_MILLIS = 1000; // ms before position is automatically classified as reached

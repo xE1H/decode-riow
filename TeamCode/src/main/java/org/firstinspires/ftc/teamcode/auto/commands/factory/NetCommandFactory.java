@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.auto.commands.factory;
 
+import static org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration.TargetPosition.UP;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -10,12 +12,14 @@ import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.auto.commands.GrabBucketSample;
 import org.firstinspires.ftc.teamcode.auto.commands.ScoreHighBucketSample;
+import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
+import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 
 @Config
 @Photon
@@ -60,7 +64,7 @@ public class NetCommandFactory extends CommandFactory {
 
     @Override
     public Class<? extends VLRSubsystem<?>>[] getRequiredSubsystems() {
-        return new Class[]{ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class};
+        return new Class[]{ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, HangSubsystem.class};
     }
 
 
@@ -118,8 +122,14 @@ public class NetCommandFactory extends CommandFactory {
 //
 //                new FollowPath(0, toScoreHeading, toScore),
 //                new ScoreHighBucketSample(),
-
-                new FollowPath(toScoreHeading, toNetArea)
+                new InstantCommand() {
+                    @Override
+                    public void run() {
+                        VLRSubsystem.getInstance(HangSubsystem.class).setTargetPosition(UP);
+                    }
+                },
+                new FollowPath(toScoreHeading, 90, new Point(72, 140), new Point(64, 89))
+                //new FollowPath(toScoreHeading, toNetArea)
         );
     }
 }

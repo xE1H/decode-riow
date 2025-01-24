@@ -26,6 +26,8 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
     private double encoderPosition = 0;
 
+    private boolean motorResetEnabled = false;
+
 
     public static double mapToRange(double value, double minInput, double maxInput, double minOutput, double maxOutput) {
         if (minInput == maxInput) {
@@ -58,14 +60,8 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     }
 
 
-    public void setTargetPosition(ArmSlideConfiguration.TargetPosition targetPosition) {
-        slideSubsystem.setTargetPosition(targetPosition);
-    }
-
-
     public void setTargetPosition(double angleDegrees) {
         motionProfile.setCurrentTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
-
     }
 
 
@@ -105,9 +101,23 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
     }
 
+    public void disableMotor() {
+        motorResetEnabled = true;
+        motor.setPower(0);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
+    public void reenableMotor() {
+        motorResetEnabled = false;
+
+        thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
 
     @Override
     public void periodic() {
+        if (motorResetEnabled) return;
         encoderPosition = thoughBoreEncoder.getCurrentPosition();
 
         double currentAngle = getAngleDegrees();

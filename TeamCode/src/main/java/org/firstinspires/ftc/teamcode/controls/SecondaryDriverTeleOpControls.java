@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmOverrideState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.ResetRotatorMotor;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.ScoreSampleHigh;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.IntakeSample;
@@ -56,6 +57,7 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
         add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new ToggleClawState())));
         add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new ToggleClawAngle())));
 
+        add(new ButtonCtl(GamepadKeys.Button.LEFT_BUMPER, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean f) -> cs.schedule(new ResetRotatorMotor())));
 
         addRightStickHandler((Double x, Double y) -> incrementClaw(y));
         addLeftStickHandler((Double x, Double y) -> incrementSlidePosition(x));
@@ -68,8 +70,8 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     }
 
     private void incrementSlidePosition(double input) {
-        if (ArmState.get() == ArmState.State.INTAKE_SAMPLE && !ArmState.isMoving() && !ArmOverrideState.get()) {
-            slide.incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval));
+        if (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE, ArmState.State.SECOND_STAGE_HANG) && !ArmState.isMoving() && !ArmOverrideState.get()) {
+            slide.incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval) * (ArmState.isCurrentState(ArmState.State.THIRD_STAGE_HANG) ? -0.1 : 1));
         }
         lastInterval = System.nanoTime();
     }

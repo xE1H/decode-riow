@@ -75,6 +75,11 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         motionProfile.setCurrentTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
     }
 
+    public void setUnreachablePosForCalibration(){
+        lastPositionChangeTime = System.currentTimeMillis();
+        motionProfile.setCurrentTargetPosition(-100);
+    }
+
     // This method should only be used for commands.
     // Returns true if position has been reached, or position timeout has occurred.
     // This is so the whole command system doesn't freeze if the slides are unable to reach the specified position
@@ -115,7 +120,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
 
     public void incrementTargetPosition(double increment) {
-        System.out.printf("sniegas " + clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT) + "\n");
+        //System.out.printf("sniegas " + clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT) + "\n");
         motionProfile.setCurrentTargetPosition(clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT));
     }
 

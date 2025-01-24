@@ -48,6 +48,8 @@ public class ArmRotatorConfiguration {
 
     public static double ENCODER_TICKS_PER_ROTATION = 8192;
 
+    public static long ERROR_TIMEOUT_MILLIS = 2500;
+
     public static double PREPARE_SPECIMEN_HIGH = 103.5;
 
     public enum TargetAngle {
