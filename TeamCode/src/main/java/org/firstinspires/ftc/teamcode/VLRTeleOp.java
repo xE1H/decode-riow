@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.subsystems.vision.Vision;
  * @noinspection unchecked
  */
 @Photon
-@TeleOp(name = "VLRTeleOp")
+@TeleOp(name = "VLRTeleOp", group = "!TELEOP")
 public class VLRTeleOp extends VLRLinearOpMode {
     // Controls
     PrimaryDriverTeleOpControls primaryDriver;
@@ -35,7 +35,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, HangSubsystem.class);
+        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
 //        VLRSubsystem.getInstance(Chassis.class).enableFieldCentric();
@@ -43,18 +43,22 @@ public class VLRTeleOp extends VLRLinearOpMode {
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
 
+
+        waitForStart();
+        // since judges are pizdabolai
+        VLRSubsystem.initializeOne(hardwareMap, ClawSubsystem.class);
+        VLRSubsystem.initializeOne(hardwareMap, HangSubsystem.class);
+
         ass.setMotorPower(-0.2);
         ElapsedTime timeout = new ElapsedTime();
-        while (!ass.getLimitSwitchState()){
+        while (!ass.getLimitSwitchState()) {
             sleep(10);
-            if (timeout.seconds() > 5){
+            if (timeout.seconds() > 5) {
                 break;
             }
         }
         ass.setMotorPower(0);
         ass.checkLimitSwitch();
-
-        waitForStart();
 
         while (opModeIsActive()) {
             primaryDriver.update();

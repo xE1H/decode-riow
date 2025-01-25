@@ -16,7 +16,9 @@ import java.util.Map;
  * @param <T> The specific subsystem type extending this class
  */
 public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemBase {
-    /** Map to store singleton instances of subsystems */
+    /**
+     * Map to store singleton instances of subsystems
+     */
     private static final Map<Class<?>, VLRSubsystem<?>> instances = new HashMap<>();
 
     /**
@@ -29,7 +31,7 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
     /**
      * Gets the singleton instance of a specific subsystem.
      *
-     * @param <E> The type of the subsystem
+     * @param <E>   The type of the subsystem
      * @param clazz The class of the subsystem
      * @return The singleton instance of the specified subsystem
      * @throws RuntimeException if the instance cannot be retrieved
@@ -43,11 +45,11 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
         }
     }
 
-    public static ArmRotatorSubsystem getRotator(){
+    public static ArmRotatorSubsystem getRotator() {
         return VLRSubsystem.getInstance(ArmRotatorSubsystem.class);
     }
 
-    public static ArmSlideSubsystem getSlides(){
+    public static ArmSlideSubsystem getSlides() {
         return VLRSubsystem.getInstance(ArmSlideSubsystem.class);
     }
 
@@ -62,12 +64,18 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
     /**
      * Initializes all of the required subsystems with the given hardware map.
      * This method should be called once at the beginning of the OpMode to ensure all subsystems are ready.
+     *
      * @param hardwareMap The HardwareMap to use for initialization
      */
     public static void initializeAll(HardwareMap hardwareMap) {
         for (VLRSubsystem<?> subsystem : instances.values()) {
             subsystem.initialize(hardwareMap);
         }
+    }
+
+    public static void initializeOne(HardwareMap hardwareMap, Class<? extends VLRSubsystem<?>> subsystem) {
+        requireSubsystems(subsystem);
+        instances.get(subsystem).initialize(hardwareMap);
     }
 
     /**
