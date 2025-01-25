@@ -18,6 +18,7 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        VLRSubsystem.clearSubsystems(); // Clear all subsystems
         executorService = Executors.newCachedThreadPool();
 
         commandRunner = new CommandRunner(this::opModeIsActive);

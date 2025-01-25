@@ -20,6 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.ToggleClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.ToggleClawState;
 
+import java.sql.SQLOutput;
+
 /**
  * Abstraction for secondary driver controls. All controls will be defined here.
  * For this to work well, all subsystems will be defined as singletons.
@@ -70,8 +72,11 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     }
 
     private void incrementSlidePosition(double input) {
-        if (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE, ArmState.State.SECOND_STAGE_HANG) && !ArmState.isMoving() && !ArmOverrideState.get()) {
-            slide.incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval) * (ArmState.isCurrentState(ArmState.State.THIRD_STAGE_HANG) ? -0.1 : 1));
+        System.out.printf("HANG SECOND: " + ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG));
+        System.out.printf("HANG INTAKE: " + (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving() && !ArmOverrideState.get()));
+        if (ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG) || (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving() && !ArmOverrideState.get())) {
+            System.out.println("HANG: IF ACCESSES");
+            slide.incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval) * (ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG) ? -0.5 : 0.5));
         }
         lastInterval = System.nanoTime();
     }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.ResetSlide;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
@@ -35,30 +37,27 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class);
+        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, HangSubsystem.class  );
         VLRSubsystem.initializeAll(hardwareMap);
 
 //        VLRSubsystem.getInstance(Chassis.class).enableFieldCentric();
         ArmSlideSubsystem ass = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
-
-
-        waitForStart();
-        // since judges are pizdabolai
-        VLRSubsystem.initializeOne(hardwareMap, ClawSubsystem.class);
-        VLRSubsystem.initializeOne(hardwareMap, HangSubsystem.class);
-
-        ass.setMotorPower(-0.2);
+        
+        ass.setMotorPower(-0.6);
         ElapsedTime timeout = new ElapsedTime();
         while (!ass.getLimitSwitchState()) {
             sleep(10);
-            if (timeout.seconds() > 5) {
+            if (timeout.milliseconds() > 1000) {
                 break;
             }
         }
         ass.setMotorPower(0);
         ass.checkLimitSwitch();
+
+        waitForStart();
+        // since judges are pizdabolai
 
         while (opModeIsActive()) {
             primaryDriver.update();
@@ -66,7 +65,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
             if (GlobalConfig.DEBUG_MODE) {
                 telemetry.addData("current state", ArmState.get());
-                telemetry.addData("Slide pos", ass.getPosition());
+//                telemetry.addData("Slide pos", ass.getPosition());
             }
             telemetry.update();
         }
