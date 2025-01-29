@@ -44,7 +44,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
         ArmSlideSubsystem ass = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
-        
+
         ass.setMotorPower(-0.6);
         ElapsedTime timeout = new ElapsedTime();
         while (!ass.getLimitSwitchState()) {
