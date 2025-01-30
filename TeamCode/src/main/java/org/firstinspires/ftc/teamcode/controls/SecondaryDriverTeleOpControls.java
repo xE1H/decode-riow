@@ -26,19 +26,17 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.ToggleClawState;
  */
 public class SecondaryDriverTeleOpControls extends DriverControls {
     ClawSubsystem claw;
-    ArmRotatorSubsystem arm;
     ArmSlideSubsystem slide;
-    CommandScheduler cs;
 
     long lastInterval = System.nanoTime();
 
     public SecondaryDriverTeleOpControls(Gamepad gamepad) {
         super(new GamepadEx(gamepad));
 
+        CommandScheduler cs = CommandScheduler.getInstance();
+
         claw = VLRSubsystem.getInstance(ClawSubsystem.class);
-        arm = VLRSubsystem.getInstance(ArmRotatorSubsystem.class);
         slide = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
-        cs = CommandScheduler.getInstance();
 
         add(new ButtonCtl(CROSS, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new IntakeSample())));
         add(new ButtonCtl(SQUARE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new RetractArm())));

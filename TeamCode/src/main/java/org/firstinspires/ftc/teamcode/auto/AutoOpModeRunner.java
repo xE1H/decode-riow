@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.opModes;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandScheduler;
@@ -58,7 +58,7 @@ public class AutoOpModeRunner {
         follower.setMaxPower(power);
     }
 
-    public void run(BooleanSupplier isActive){
+    public void run(BooleanSupplier isActive) {
         run(isActive, true);
     }
 }

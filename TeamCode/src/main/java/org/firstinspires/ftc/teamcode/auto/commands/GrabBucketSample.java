@@ -17,7 +17,8 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 @Config
 public class GrabBucketSample extends SequentialCommandGroup {
     public static double SLIDE = 0.2;
-    public GrabBucketSample(boolean clawTwisted){
+
+    public GrabBucketSample(boolean clawTwisted) {
         addCommands(
                 new IntakeSample(SLIDE),
                 new SetClawState(ClawConfiguration.GripperState.OPEN),
@@ -25,8 +26,8 @@ public class GrabBucketSample extends SequentialCommandGroup {
                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                            new SetClawTwist(ClawConfiguration.HorizontalRotation.FLIPPED),
-                            new WaitCommand(200)
+                                new SetClawTwist(ClawConfiguration.HorizontalRotation.FLIPPED),
+                                new WaitCommand(200)
                         ),
                         () -> clawTwisted
                 ),
@@ -39,7 +40,7 @@ public class GrabBucketSample extends SequentialCommandGroup {
         );
     }
 
-    public GrabBucketSample(){
+    public GrabBucketSample() {
         this(false);
     }
 }

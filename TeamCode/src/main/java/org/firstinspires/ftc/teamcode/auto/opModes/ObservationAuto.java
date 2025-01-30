@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.auto.opModes;
 import com.acmerobotics.dashboard.config.Config;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import org.firstinspires.ftc.teamcode.auto.AutoOpModeRunner;
 import org.firstinspires.ftc.teamcode.auto.commands.factory.ObservationCommandFactory;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
