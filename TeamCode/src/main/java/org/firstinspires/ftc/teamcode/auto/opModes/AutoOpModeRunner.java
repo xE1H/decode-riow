@@ -11,20 +11,19 @@ import org.firstinspires.ftc.teamcode.auto.pedroCommands.TranslateHeading;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.function.BooleanSupplier;
 
 
 @Photon
-public class AutoOpModeRunnner {
+public class AutoOpModeRunner {
     private CommandFactory commandFactory;
     private Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     private Follower follower;
 
 
-    public AutoOpModeRunnner(CommandFactory commandFactory) {
+    public AutoOpModeRunner(CommandFactory commandFactory) {
         this.commandFactory = commandFactory;
     }
 

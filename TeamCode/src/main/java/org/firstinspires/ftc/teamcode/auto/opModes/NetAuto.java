@@ -9,12 +9,12 @@ import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 
 @Config
 @Photon
-@Autonomous(name = "BlueNetAuto", group = "Blue Team")
+@Autonomous(name = "NetAuto", group = "!AUTO")
 public class NetAuto extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        AutoOpModeRunnner runner = new AutoOpModeRunnner(new NetCommandFactory());
+        AutoOpModeRunner runner = new AutoOpModeRunner(new NetCommandFactory());
         runner.initialize(hardwareMap);
         waitForStart();
         runner.run(this::opModeIsActive, false);
