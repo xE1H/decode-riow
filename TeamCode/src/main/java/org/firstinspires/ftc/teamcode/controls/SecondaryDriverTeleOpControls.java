@@ -28,8 +28,6 @@ import java.sql.SQLOutput;
  */
 public class SecondaryDriverTeleOpControls extends DriverControls {
     ClawSubsystem claw;
-    ArmRotatorSubsystem arm;
-    ArmSlideSubsystem slide;
     CommandScheduler cs;
 
     GamepadKeys.Button TRIANGLE = GamepadKeys.Button.Y;
@@ -42,9 +40,6 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     public SecondaryDriverTeleOpControls(Gamepad gamepad) {
         super(new GamepadEx(gamepad));
 
-        claw = VLRSubsystem.getInstance(ClawSubsystem.class);
-        arm = VLRSubsystem.getInstance(ArmRotatorSubsystem.class);
-        slide = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         cs = CommandScheduler.getInstance();
 
         add(new ButtonCtl(CROSS, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new IntakeSample())));
@@ -68,7 +63,8 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     }
 
     private void incrementClaw(double input) {
-        claw.setHorizontalRotation(input);
+        if (VLRSubsystem.getInstance(ClawSubsystem.class) != null)
+            VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(input);
     }
 
     private void incrementSlidePosition(double input) {
@@ -76,7 +72,7 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
         System.out.printf("HANG INTAKE: " + (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving() && !ArmOverrideState.get()));
         if (ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG) || (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving() && !ArmOverrideState.get())) {
             System.out.println("HANG: IF ACCESSES");
-            slide.incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval) * (ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG) ? -0.5 : 0.5));
+            VLRSubsystem.getInstance(ArmSlideSubsystem.class).incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval) * (ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG) ? -0.5 : 0.5));
         }
         lastInterval = System.nanoTime();
     }

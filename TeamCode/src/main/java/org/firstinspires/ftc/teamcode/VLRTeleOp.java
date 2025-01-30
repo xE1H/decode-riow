@@ -43,8 +43,14 @@ public class VLRTeleOp extends VLRLinearOpMode {
 //        VLRSubsystem.getInstance(Chassis.class).enableFieldCentric();
         ArmSlideSubsystem ass = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
-        secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
-        
+
+
+
+        waitForStart();
+        // since judges are pizdabolai
+        VLRSubsystem.initializeOne(hardwareMap, HangSubsystem.class);
+
+
         ass.setMotorPower(-0.6);
         ElapsedTime timeout = new ElapsedTime();
         while (!ass.getLimitSwitchState()) {
@@ -56,8 +62,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
         ass.setMotorPower(0);
         ass.checkLimitSwitch();
 
-        waitForStart();
-        // since judges are pizdabolai
+        secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
 
         while (opModeIsActive()) {
             primaryDriver.update();
