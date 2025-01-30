@@ -61,11 +61,11 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     }
 
     private void incrementSlidePosition(double input) {
-        System.out.printf("HANG SECOND: " + ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG));
-        System.out.printf("HANG INTAKE: " + (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving() && !ArmOverrideState.get()));
-        if (ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG) || (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving() && !ArmOverrideState.get())) {
+        System.out.printf("HANG SECOND: " + ArmState.isCurrentState(ArmState.State.HANG_SECOND_STAGE));
+        System.out.printf("HANG INTAKE: " + (ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE) && !ArmState.isMoving() && !ArmOverrideState.get()));
+        if (ArmState.isCurrentState(ArmState.State.HANG_SECOND_STAGE) || (ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE) && !ArmState.isMoving() && !ArmOverrideState.get())) {
             System.out.println("HANG: IF ACCESSES");
-            slide.incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval) * (ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG) ? -0.5 : 0.5));
+            slide.incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval) * (ArmState.isCurrentState(ArmState.State.HANG_SECOND_STAGE) ? -0.5 : 0.5));
         }
         lastInterval = System.nanoTime();
     }

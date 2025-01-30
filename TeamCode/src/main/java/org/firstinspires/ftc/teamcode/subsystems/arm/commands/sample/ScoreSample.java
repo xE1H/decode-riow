@@ -38,7 +38,7 @@ public class ScoreSample extends CustomConditionalCommand {
                         new SetIsArmMoving(),
                         new CustomConditionalCommand(
                                 new RetractArm(),
-                                () -> !ArmState.isCurrentState(ArmState.State.SCORE_SAMPLE_HIGH, ArmState.State.IN_ROBOT)
+                                () -> !ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.IN_ROBOT)
                         ),
 
                         new SetRotatorAngle(rotator),
@@ -50,9 +50,9 @@ public class ScoreSample extends CustomConditionalCommand {
 
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition),
                         new SetClawAngle(VerticalRotation.DEPOSIT),
-                        new SetCurrentArmState(ArmState.State.SCORE_SAMPLE_HIGH)
+                        new SetCurrentArmState(ArmState.State.SAMPLE_SCORE)
                 ),
-                () -> (ArmState.get() != ArmState.State.SCORE_SAMPLE_HIGH && !ArmState.isMoving()) || ArmOverrideState.get()
+                () -> (ArmState.get() != ArmState.State.SAMPLE_SCORE && !ArmState.isMoving()) || ArmOverrideState.get()
         );
     }
 }

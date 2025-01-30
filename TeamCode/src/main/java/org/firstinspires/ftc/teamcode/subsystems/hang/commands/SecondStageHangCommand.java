@@ -25,7 +25,7 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
         addCommands(
                 new CustomConditionalCommand(
                         new RetractArm(),
-                        () -> !ArmState.isCurrentState(ArmState.State.IN_ROBOT, ArmState.State.SECOND_STAGE_HANG)
+                        () -> !ArmState.isCurrentState(ArmState.State.IN_ROBOT, ArmState.State.HANG_SECOND_STAGE)
                 ),
 
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
@@ -33,7 +33,7 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
                 new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 60),
                 new SetSlideExtension(0.942),
                 new WaitUntilCommand(()-> VLRSubsystem.getInstance(ArmSlideSubsystem.class).reachedTargetPosition()),
-                new SetCurrentArmState(ArmState.State.SECOND_STAGE_HANG),
+                new SetCurrentArmState(ArmState.State.HANG_SECOND_STAGE),
                 // hang off 2nd
                 new WaitUntilCommand(gamepadCondition),
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG),

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.commands;
 
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -59,7 +58,7 @@ public class RetractArm extends SequentialCommandGroup {
                                 new WaitUntilCommand(slides::reachedTargetPosition),
                                 new SetCurrentArmState(ArmState.State.IN_ROBOT)
                         ),
-                        () -> ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE, ArmState.State.INTAKE_SPECIMEN)
+                        () -> ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE, ArmState.State.SPECIMEN_INTAKE)
                 ),
 
                 new CustomConditionalCommand(
@@ -80,7 +79,7 @@ public class RetractArm extends SequentialCommandGroup {
                                         ArmState.State.IN_ROBOT
                                 )
                         ),
-                        () -> ArmState.isCurrentState(ArmState.State.SCORE_SAMPLE_LOW, ArmState.State.SCORE_SAMPLE_HIGH, ArmState.State.PREPARE_SPECIMEN_HIGH, ArmState.State.SCORE_SPECIMEN_HIGH, ArmState.State.PREPARE_SPECIMEN_LOW, ArmState.State.SCORE_SPECIMEN_LOW)
+                        () -> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_PREPARE, ArmState.State.SPECIMEN_SCORE)
                 ),
 
                 new CustomConditionalCommand(
@@ -92,7 +91,7 @@ public class RetractArm extends SequentialCommandGroup {
                                 new WaitUntilCommand(arm::reachedTargetPosition),
                                 new SetCurrentArmState(ArmState.State.IN_ROBOT)
                         ),
-                        () -> ArmState.get() == ArmState.State.SECOND_STAGE_HANG
+                        () -> ArmState.get() == ArmState.State.HANG_SECOND_STAGE
                 )
         );
     }
