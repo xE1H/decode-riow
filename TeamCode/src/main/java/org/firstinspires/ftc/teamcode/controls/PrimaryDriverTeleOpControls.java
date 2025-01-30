@@ -23,11 +23,6 @@ public class PrimaryDriverTeleOpControls extends DriverControls {
     public PrimaryDriverTeleOpControls(Gamepad gamepad) {
         super(new GamepadEx(gamepad));
 
-        GamepadKeys.Button TRIANGLE = GamepadKeys.Button.Y;
-        GamepadKeys.Button SQUARE = GamepadKeys.Button.X;
-        GamepadKeys.Button CROSS = GamepadKeys.Button.A;
-        GamepadKeys.Button CIRCLE = GamepadKeys.Button.B;
-
         CommandScheduler cs = CommandScheduler.getInstance();
 
         Chassis chassis = VLRSubsystem.getInstance(Chassis.class);
@@ -37,7 +32,7 @@ public class PrimaryDriverTeleOpControls extends DriverControls {
                     chassis.drive(leftY, -leftX, -rightX);
                 }
         );
-        add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new ThirdStageHangCommand(()-> (gamepad.left_bumper && gamepad.right_bumper)))));
+        add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new ThirdStageHangCommand(() -> (gamepad.left_bumper && gamepad.right_bumper)))));
         add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new RetractArm())));
 
         add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new SetHangPosition(HangConfiguration.TargetPosition.UP))));

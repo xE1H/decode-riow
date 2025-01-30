@@ -37,12 +37,19 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, HangSubsystem.class  );
+        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
 //        VLRSubsystem.getInstance(Chassis.class).enableFieldCentric();
         ArmSlideSubsystem ass = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
+
+        waitForStart();
+        // since judges are pizdabolai
+        VLRSubsystem.initializeOne(hardwareMap, ClawSubsystem.class); // Modified the claw subsystem
+        // a bit, now it just *might* work like this now. Removed everything that is not used
+        // (like analog feedback lines) and removed empty periodic function.
+        VLRSubsystem.initializeOne(hardwareMap, HangSubsystem.class);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
 
         ass.setMotorPower(-0.6);
@@ -55,9 +62,6 @@ public class VLRTeleOp extends VLRLinearOpMode {
         }
         ass.setMotorPower(0);
         ass.checkLimitSwitch();
-
-        waitForStart();
-        // since judges are pizdabolai
 
         while (opModeIsActive()) {
             primaryDriver.update();
