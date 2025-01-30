@@ -8,8 +8,6 @@ import org.firstinspires.ftc.teamcode.controls.PrimaryDriverTeleOpControls;
 import org.firstinspires.ftc.teamcode.controls.SecondaryDriverTeleOpControls;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
-import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
