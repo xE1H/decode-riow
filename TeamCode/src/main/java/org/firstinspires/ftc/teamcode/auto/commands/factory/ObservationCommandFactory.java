@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto.commands.factory;
 
+import org.firstinspires.ftc.teamcode.auto.commands.GrabBucketSample;
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
@@ -41,6 +42,16 @@ public class ObservationCommandFactory extends CommandFactory {
 
     public static double toParkX = 18;
     public static double toParkY = 18;
+
+    public static double toSampleX = 29.9;
+    public static double toSampleY = 24.1;
+
+
+    public static double toSamplePickupX = 12;
+    public static double toSamplePickupY = 12;
+
+    public static double ROTATOR_PICKUP = 160;
+    public static double SLIDE_PICKUP = 0.1;
 
     @Override
     public Point getStartingPoint() {
@@ -90,6 +101,27 @@ public class ObservationCommandFactory extends CommandFactory {
                 new PrepareSpecimenHigh(toScoreX, toScoreY - 3),
                 new ScoreSpecimenHigh(),
 
+                // Prepare Sample
+                new FollowPath(0, new Point(4, 37.6), new Point(toSampleX, toSampleY)),
+                new ParallelCommandGroup(
+                        new FollowPath(0, new Point(toSamplePickupX, toSamplePickupY)),
+                        new SequentialCommandGroup(
+                                new WaitCommand(300),
+                                new GrabBucketSample()
+                        )
+                ),
+
+                new SequentialCommandGroup(
+                        new RetractArm(),
+                        new WaitCommand(100),
+                        new ParallelCommandGroup(
+                                new SetRotatorAngle(ROTATOR_PICKUP),
+                                new SetSlideExtension(SLIDE_PICKUP)
+                        ),
+                        new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                        new SetClawState(ClawConfiguration.GripperState.OPEN)
+                ),
+
                 // Intake specimen 2
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
@@ -113,6 +145,7 @@ public class ObservationCommandFactory extends CommandFactory {
                 ),
                 new PrepareSpecimenHigh(toScoreX, toScoreY - 6),
                 new ScoreSpecimenHigh(),
+
                 new RetractArm(),
                 new FollowPath(0, new Point(toParkX, toParkY))
         );
