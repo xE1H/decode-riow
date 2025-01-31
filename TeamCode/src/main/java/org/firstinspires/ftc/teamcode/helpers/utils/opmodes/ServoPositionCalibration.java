@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.helpers.utils;
+package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp
+@TeleOp(name = "Servo Position Calibration", group = "Utils")
 @Photon
-public class ServoCalibration extends LinearOpMode {
+public class ServoPositionCalibration extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {

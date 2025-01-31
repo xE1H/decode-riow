@@ -33,7 +33,7 @@ public class IntakeSample extends CustomConditionalCommand {
                         new SetIsArmMoving(),
                         new CustomConditionalCommand(
                                 new RetractArm(),
-                                () -> !ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE, ArmState.State.IN_ROBOT)
+                                () -> !ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE, ArmState.State.IN_ROBOT)
                         ),
 
                         new SetClawAngle(VerticalRotation.UP),
@@ -41,9 +41,9 @@ public class IntakeSample extends CustomConditionalCommand {
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmRotatorSubsystem.class)::reachedTargetPosition),
                         new SetClawAngle(VerticalRotation.DEPOSIT),
                         new SetClawState(GripperState.CLOSED),
-                        new SetCurrentArmState(ArmState.State.INTAKE_SAMPLE)
+                        new SetCurrentArmState(ArmState.State.SAMPLE_INTAKE)
                 ),
-                () -> (!ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving()) || ArmOverrideState.get()
+                () -> (!ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE) && !ArmState.isMoving()) || ArmOverrideState.get()
         );
     }
 

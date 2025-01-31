@@ -7,20 +7,13 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.ArmOverrideState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetIsArmMoving;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
-import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.VerticalRotation;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 
@@ -49,8 +42,8 @@ public class ScoreSpecimenHigh extends CustomConditionalCommand {
                         ),
                         new WaitCommand(300),
                         new SetClawState(ClawConfiguration.GripperState.OPEN),
-                        new SetCurrentArmState(ArmState.State.SCORE_SAMPLE_HIGH)
+                        new SetCurrentArmState(ArmState.State.SAMPLE_SCORE)
                 ),
-                () -> (ArmState.get() != ArmState.State.SCORE_SAMPLE_HIGH));
+                () -> (ArmState.get() != ArmState.State.SAMPLE_SCORE));
     }
 }

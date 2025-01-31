@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.hang.commands;
 
-import static org.firstinspires.ftc.teamcode.subsystems.arm.ArmState.State.SECOND_STAGE_HANG;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.ArmState.State.HANG_SECOND_STAGE;
 
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -28,9 +28,9 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
         addCommands(
                 new CustomConditionalCommand(
                         new RetractArm(),
-                        () -> !ArmState.isCurrentState(ArmState.State.IN_ROBOT, ArmState.State.THIRD_STAGE_HANG, SECOND_STAGE_HANG)
+                        () -> !ArmState.isCurrentState(ArmState.State.IN_ROBOT, ArmState.State.HANG_THIRD_STAGE, HANG_SECOND_STAGE)
                 ),
-                new SetCurrentArmState(SECOND_STAGE_HANG),
+                new SetCurrentArmState(HANG_SECOND_STAGE),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
 
 //                new ForceSlideExtensionReset(),
@@ -60,7 +60,7 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
 
 
                 new WaitUntilCommand(gamepadCondition),
-                new SetCurrentArmState(ArmState.State.THIRD_STAGE_HANG), //
+                new SetCurrentArmState(ArmState.State.HANG_THIRD_STAGE), //
                 new SetSlideExtension(0.265),
                 new SetRotatorAngle(90),
 

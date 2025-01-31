@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.teamcode.helpers.utils;
+package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 
-@TeleOp(name = "MotorIdent")
-public class MotorIdent extends VLRLinearOpMode {
+@TeleOp(name = "Drivetrain Motor Identification", group = "Utils")
+public class DrivetrainMotorIdent extends VLRLinearOpMode {
     @Override
     public void run() {
         MotorEx lf = new MotorEx(hardwareMap, "MotorLeftFront");

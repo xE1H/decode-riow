@@ -48,15 +48,12 @@ public class ArmState {
 
     public enum State {
         IN_ROBOT,
-        INTAKE_SAMPLE,
-        INTAKE_SPECIMEN,
-        SCORE_SAMPLE_LOW,
-        SCORE_SAMPLE_HIGH,
-        PREPARE_SPECIMEN_HIGH,
-        SCORE_SPECIMEN_HIGH,
-        PREPARE_SPECIMEN_LOW,
-        SCORE_SPECIMEN_LOW,
-        SECOND_STAGE_HANG,
-        THIRD_STAGE_HANG
+        SAMPLE_INTAKE,
+        SAMPLE_SCORE,
+        SPECIMEN_INTAKE,
+        SPECIMEN_PREPARE,
+        SPECIMEN_SCORE,
+        HANG_SECOND_STAGE,
+        HANG_THIRD_STAGE
     }
 }

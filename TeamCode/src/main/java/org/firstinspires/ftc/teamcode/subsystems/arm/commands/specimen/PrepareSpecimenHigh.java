@@ -35,11 +35,11 @@ public class PrepareSpecimenHigh extends ParallelCommandGroup {
                                         new SequentialCommandGroup(
                                                 new SetSlideExtension(SLIDE),
                                                 new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)),
-                                        new SetCurrentArmState(ArmState.State.PREPARE_SPECIMEN_HIGH)
+                                        new SetCurrentArmState(ArmState.State.SPECIMEN_PREPARE)
                                 )
 
                         ),
-                        () -> !ArmState.isCurrentState(ArmState.State.PREPARE_SPECIMEN_HIGH)
+                        () -> !ArmState.isCurrentState(ArmState.State.SPECIMEN_PREPARE)
                 ),
                 new SetClawAngle(CLAW_ANGLE)
         );

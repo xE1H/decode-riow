@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.helpers.controls;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.List;
@@ -41,6 +42,11 @@ public class DriverControls {
      * Handler for vibrations
      */
     Supplier<Boolean> vibration;
+
+    protected final GamepadKeys.Button TRIANGLE = GamepadKeys.Button.Y;
+    protected final GamepadKeys.Button SQUARE = GamepadKeys.Button.X;
+    protected final GamepadKeys.Button CROSS = GamepadKeys.Button.A;
+    protected final GamepadKeys.Button CIRCLE = GamepadKeys.Button.B;
 
     /**
      * Constructs a DriverControls object.

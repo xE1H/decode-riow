@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 
 public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawConfiguration {
     private Servo angleServo, twistServo, grabServos;
-    private AnalogInput analogLeft, analogRight;
 
     private VerticalRotation targetAngle = VerticalRotation.UP;
     private GripperState clawState = GripperState.CLOSED;
@@ -27,9 +26,6 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         twistServo = hardwareMap.get(Servo.class, TWIST_SERVO);
         grabServos = hardwareMap.get(Servo.class, GRAB_SERVO);
 
-        analogLeft = hardwareMap.get(AnalogInput.class, ANALOG_ENCODER_LEFT);
-        analogRight = hardwareMap.get(AnalogInput.class, ANALOG_ENCODER_RIGHT);
-
         setTargetAngle(VerticalRotation.UP);
         setHorizontalRotation(HorizontalRotation.NORMAL);
         setTargetState(GripperState.CLOSED);
@@ -41,7 +37,7 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         angleServo.setPosition(rotation.pos);
     }
 
-    public void setTargetAngle(double pos){
+    public void setTargetAngle(double pos) {
         angleServo.setPosition(pos);
     }
 
@@ -57,17 +53,8 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         twistServo.setPosition(clamp((1 + rotationPos) * 0.5, HORIZONTAL_ROTATION_MIN, HORIZONTAL_ROTATION_MAX));
     }
 
-
     public void setTargetState(GripperState state) {
         clawState = state;
         grabServos.setPosition(state.pos);
-    }
-
-    public boolean isSamplePresent() {
-        return analogLeft.getVoltage() > analog_voltage_left && analogRight.getVoltage() > analog_voltage_right;
-    }
-
-    @Override
-    public void periodic() {
     }
 }

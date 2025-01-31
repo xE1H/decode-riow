@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmOverrideState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.ResetRotatorMotor;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.ScoreSampleHigh;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.ScoreSample;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.IntakeSample;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
@@ -20,37 +20,29 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.ToggleClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.ToggleClawState;
 
-import java.sql.SQLOutput;
-
 /**
  * Abstraction for secondary driver controls. All controls will be defined here.
  * For this to work well, all subsystems will be defined as singletons.
  */
 public class SecondaryDriverTeleOpControls extends DriverControls {
     ClawSubsystem claw;
-    CommandScheduler cs;
-
-    GamepadKeys.Button TRIANGLE = GamepadKeys.Button.Y;
-    GamepadKeys.Button SQUARE = GamepadKeys.Button.X;
-    GamepadKeys.Button CROSS = GamepadKeys.Button.A;
-    GamepadKeys.Button CIRCLE = GamepadKeys.Button.B;
+    ArmSlideSubsystem slide;
 
     long lastInterval = System.nanoTime();
 
     public SecondaryDriverTeleOpControls(Gamepad gamepad) {
         super(new GamepadEx(gamepad));
 
-        cs = CommandScheduler.getInstance();
+        CommandScheduler cs = CommandScheduler.getInstance();
+
+        claw = VLRSubsystem.getInstance(ClawSubsystem.class);
+        slide = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
 
         add(new ButtonCtl(CROSS, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new IntakeSample())));
         add(new ButtonCtl(SQUARE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new RetractArm())));
-        add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new ScoreSampleHigh(107))));
+        add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new ScoreSample(107))));
         add(new ButtonCtl(CIRCLE, ButtonCtl.Trigger.SIMPLE, false, ArmOverrideState::set));
 
-        //add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.UP))));
-        //add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new SetClawAngle(ClawConfiguration.TargetAngle.DOWN))));
-        //add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean f) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.OPEN))));
-        //add(new ButtonCtl(GamepadKeys.Button.DPAD_RIGHT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean g) -> cs.schedule(new SetClawState(ClawConfiguration.TargetState.CLOSED))));
         add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean d) -> cs.schedule(new ToggleClawState())));
         add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean e) -> cs.schedule(new ToggleClawAngle())));
 
@@ -68,11 +60,11 @@ public class SecondaryDriverTeleOpControls extends DriverControls {
     }
 
     private void incrementSlidePosition(double input) {
-        System.out.printf("HANG SECOND: " + ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG));
-        System.out.printf("HANG INTAKE: " + (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving() && !ArmOverrideState.get()));
-        if (ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG) || (ArmState.isCurrentState(ArmState.State.INTAKE_SAMPLE) && !ArmState.isMoving() && !ArmOverrideState.get())) {
+        System.out.printf("HANG SECOND: " + ArmState.isCurrentState(ArmState.State.HANG_SECOND_STAGE));
+        System.out.printf("HANG INTAKE: " + (ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE) && !ArmState.isMoving() && !ArmOverrideState.get()));
+        if (ArmState.isCurrentState(ArmState.State.HANG_SECOND_STAGE) || (ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE) && !ArmState.isMoving() && !ArmOverrideState.get())) {
             System.out.println("HANG: IF ACCESSES");
-            VLRSubsystem.getInstance(ArmSlideSubsystem.class).incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval) * (ArmState.isCurrentState(ArmState.State.SECOND_STAGE_HANG) ? -0.5 : 0.5));
+            slide.incrementTargetPosition(input * 0.5d / 1000000 * Math.abs(System.nanoTime() - lastInterval) * (ArmState.isCurrentState(ArmState.State.HANG_SECOND_STAGE) ? -0.5 : 0.5));
         }
         lastInterval = System.nanoTime();
     }
