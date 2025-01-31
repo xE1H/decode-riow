@@ -14,6 +14,8 @@ import org.firstinspires.ftc.teamcode.auto.commands.GrabBucketSample;
 import org.firstinspires.ftc.teamcode.auto.commands.ScoreHighBucketSample;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.ScoreSampleHigh;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
@@ -73,10 +75,22 @@ public class NetCommandFactory extends CommandFactory {
         return new SequentialCommandGroup(
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 //                new FollowPath(0, toScoreHeading, new Point(20, 116)),
-                new FollowPath(0, toScoreHeading, toScore),
-                new ScoreHighBucketSample(),
+                new ParallelCommandGroup(
+                        new FollowPath(0, toScoreHeading, toScore),
+                        new SequentialCommandGroup(
+                                new WaitCommand(300),
+                                new ScoreSampleHigh(117),
+                                new WaitCommand(100)
+                        )
+                ),
 
-                new FollowPath(toScoreHeading, 0, new Point(toScoreX, toSample1Y)),
+                new ParallelCommandGroup(
+                        new SequentialCommandGroup(
+                                new WaitCommand(1000),
+                                new FollowPath(toScoreHeading, 0, new Point(toScoreX, toSample1Y))
+                        ),
+                        new RetractArm()
+                ),
                 new ParallelCommandGroup(
                         new FollowPath(0, toSample1),
                         new SequentialCommandGroup(
@@ -86,10 +100,21 @@ public class NetCommandFactory extends CommandFactory {
                 ),
 
 //                new FollowPath(0, toScoreHeading, new Point(30, 120)),
-                new FollowPath(0, toScoreHeading, toScore),
-                new ScoreHighBucketSample(),
-
-                new FollowPath(toScoreHeading, 0, new Point(toScoreX, toSample2Y)),
+                new ParallelCommandGroup(
+                        new FollowPath(0, toScoreHeading, toScore),
+                        new SequentialCommandGroup(
+                                new WaitCommand(500),
+                                new ScoreSampleHigh(117),
+                                new WaitCommand(100)
+                        )
+                ),
+                new ParallelCommandGroup(
+                        new SequentialCommandGroup(
+                                new WaitCommand(1000),
+                                new FollowPath(toScoreHeading, 0, new Point(toScoreX, toSample2Y))
+                        ),
+                        new RetractArm()
+                ),
                 new ParallelCommandGroup(
                         new FollowPath(0, toSample2),
                         new SequentialCommandGroup(
@@ -99,11 +124,22 @@ public class NetCommandFactory extends CommandFactory {
                 ),
 
 //                new FollowPath(0, toScoreHeading, new Point(30, 120)),
-                new FollowPath(0, toScoreHeading, toScore),
-                new ScoreHighBucketSample(),
+                new ParallelCommandGroup(
+                        new FollowPath(0, toScoreHeading, toScore),
+                        new SequentialCommandGroup(
+                                new WaitCommand(500),
+                                new ScoreSampleHigh(117),
+                                new WaitCommand(100)
+                        )
+                ),
 
-
-                new FollowPath(toScoreHeading, 90, new Point(43.8, 93), new Point(toSample3PrepareX, toSample3PrepareY)),
+                new ParallelCommandGroup(
+                        new SequentialCommandGroup(
+                                new WaitCommand(1000),
+                                new FollowPath(toScoreHeading, 90, new Point(43.8, 93), new Point(toSample3PrepareX, toSample3PrepareY))
+                        ),
+                        new RetractArm()
+                ),
                 new ParallelCommandGroup(
                         new FollowPath(90, new Point(toSample3X, toSample3Y)),
                         new SequentialCommandGroup(
@@ -128,7 +164,7 @@ public class NetCommandFactory extends CommandFactory {
                         VLRSubsystem.getInstance(HangSubsystem.class).setTargetPosition(UP);
                     }
                 },
-                new FollowPath(toScoreHeading, 90, new Point(72, 140), new Point(64, 89))
+                new FollowPath(toScoreHeading, -90, new Point(48, 120), new Point(64, 89))
                 //new FollowPath(toScoreHeading, toNetArea)
         );
     }
