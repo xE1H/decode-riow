@@ -31,7 +31,7 @@ public class ScoreSample extends CustomConditionalCommand {
 
     public static int ROTATOR = 117;
     public static double SLIDE_HIGH = 1.02;
-    public static double SLIDE_LOW = 0.77;
+    public static double SLIDE_LOW = 0.4;
 
     public ScoreSample(int rotator) {
         super(new SequentialCommandGroup(

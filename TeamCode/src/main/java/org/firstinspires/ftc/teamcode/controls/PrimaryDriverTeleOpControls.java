@@ -39,5 +39,7 @@ public class PrimaryDriverTeleOpControls extends DriverControls {
         add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new SetHangPosition(HangConfiguration.TargetPosition.UP))));
         add(new ButtonCtl(CROSS, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new SetHangPosition(HangConfiguration.TargetPosition.DOWN))));
         add(new ButtonCtl(CIRCLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> ArmLowState.toggle()));
+
+        addVibration(ArmLowState::wasJustToggled);
     }
 }

@@ -27,7 +27,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class);
+        VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         ArmSlideSubsystem ass = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
@@ -35,7 +35,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
         waitForStart();
         // since judges are pizdabolai
-        VLRSubsystem.initializeOne(hardwareMap, ClawSubsystem.class);
+        // VLRSubsystem.initializeOne(hardwareMap, ClawSubsystem.class);
         VLRSubsystem.initializeOne(hardwareMap, HangSubsystem.class);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
 
