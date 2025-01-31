@@ -30,16 +30,18 @@ public class NetCommandFactory extends CommandFactory {
     public static int toScoreY = 117;
 
     public static double toSample1X = 32.5;
-    public static double toSample1Y = 118;
+    public static double toSample1Y = 118.3;
 
     public static double toSample2X = 32.5;
     public static double toSample2Y = 128;
 
-    public static double toSample3PrepareX = 49;
-    public static double toSample3PrepareY = 110;
+    public static double toSample3PrepareX = 35;
+    public static double toSample3PrepareY = 120;
 
-    public static double toSample3X = 49;
-    public static double toSample3Y = 123;
+    public static int toSample3Heading = 60;
+
+    public static double toSample3X = 42;
+    public static double toSample3Y = 124.2;
 
     private final Point startingPoint;
     private final Point toScore;
@@ -75,8 +77,13 @@ public class NetCommandFactory extends CommandFactory {
         return new SequentialCommandGroup(
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 //                new FollowPath(0, toScoreHeading, new Point(20, 116)),
-                new FollowPath(0, toScoreHeading, toScore),
-                new ScoreHighBucketSample(),
+                new ParallelCommandGroup(
+                        new FollowPath(0, toScoreHeading, toScore, 0.999, false),
+                        new SequentialCommandGroup(
+                                new WaitCommand(630),
+                                new ScoreHighBucketSample()
+                        )
+                ),
 
                 new FollowPath(toScoreHeading, 0, new Point(toScoreX, toSample1Y)),
                 new ParallelCommandGroup(
@@ -89,16 +96,16 @@ public class NetCommandFactory extends CommandFactory {
 
 //                new FollowPath(0, toScoreHeading, new Point(30, 120)),
                 new ParallelCommandGroup(
-                        new FollowPath(0, toScoreHeading, toScore),
+                        new FollowPath(0, toScoreHeading, toScore, 0.999, false),
                         new SequentialCommandGroup(
-                                new WaitCommand(500),
+                                new WaitCommand(650),
                                 new ScoreSample(117),
                                 new WaitCommand(100)
                         )
                 ),
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
-                                new WaitCommand(1000),
+                                new WaitCommand(900),
                                 new FollowPath(toScoreHeading, 0, new Point(toScoreX, toSample2Y))
                         ),
                         new RetractArm()
@@ -112,36 +119,50 @@ public class NetCommandFactory extends CommandFactory {
                 ),
 
 //                new FollowPath(0, toScoreHeading, new Point(30, 120)),
-                new FollowPath(0, toScoreHeading, toScore),
-                new ScoreHighBucketSample(),
-
-
-                new FollowPath(toScoreHeading, 90, new Point(43.8, 93), new Point(toSample3PrepareX, toSample3PrepareY)),
                 new ParallelCommandGroup(
-                        new FollowPath(90, new Point(toSample3X, toSample3Y)),
+                        new FollowPath(0, toScoreHeading, toScore, 0.999, false),
                         new SequentialCommandGroup(
-                                new WaitCommand(300),
-                                new GrabBucketSample(true)
+                                new WaitCommand(500),
+                                new ScoreSample(117),
+                                new WaitCommand(100)
                         )
                 ),
-
-
-//                new FollowPath(90, toScoreHeading, new Point(30, 120)),
-                new FollowPath(90, toScoreHeading, new Point(43.8, 93), new Point(30, 120)),
-                new FollowPath(toScoreHeading, toScore),
-                new ScoreHighBucketSample(),
-//                new FollowPath(toScoreHeading, 0, toSample3),
-//                new GrabBucketSample(),
-//
-//                new FollowPath(0, toScoreHeading, toScore),
-//                new ScoreHighBucketSample(),
+                new ParallelCommandGroup(
+                        new SequentialCommandGroup(
+                                new WaitCommand(700),
+                                new FollowPath(toScoreHeading, toSample3Heading, new Point(toSample3PrepareX, toSample3PrepareY))
+                        ),
+                        new RetractArm()
+                ),
                 new InstantCommand() {
                     @Override
                     public void run() {
-                        VLRSubsystem.getInstance(HangSubsystem.class).setTargetPosition(UP);
+                        VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(0.8);
                     }
                 },
-                new FollowPath(toScoreHeading, 90, new Point(72, 140), new Point(64, 89))
+                new ParallelCommandGroup(
+                        new FollowPath(toSample3Heading, new Point(toSample3X, toSample3Y)),
+                        new SequentialCommandGroup(
+                                new WaitCommand(300),
+                                new GrabBucketSample()
+                        )
+                ),
+//                  new FollowPath(90, toScoreHeading, new Point(30, 120)),
+                new ParallelCommandGroup(
+                        new FollowPath(40, toScoreHeading, toScore, 0.999, false),
+                        new SequentialCommandGroup(
+                                new WaitCommand(650),
+                                new ScoreSample(117),
+                                new WaitCommand(100)
+                        )
+                ),
+                new ParallelCommandGroup(
+                        new SequentialCommandGroup(
+                                new WaitCommand(600),
+                                new FollowPath(toScoreHeading, -90, new Point(72, 140), new Point(64, 92))
+                        ),
+                        new RetractArm()
+                )
                 //new FollowPath(toScoreHeading, toNetArea)
         );
     }

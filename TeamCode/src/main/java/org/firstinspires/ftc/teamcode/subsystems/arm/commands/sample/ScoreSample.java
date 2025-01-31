@@ -45,9 +45,8 @@ public class ScoreSample extends CustomConditionalCommand {
                         new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 30),
                         new SetClawAngle(VerticalRotation.DOWN),
 
-                        new WaitUntilCommand(VLRSubsystem.getInstance(ArmRotatorSubsystem.class)::reachedTargetPosition),
+                        new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= rotator - 45),
                         new SetSlideExtension(ArmLowState.get() ? SLIDE_LOW : SLIDE_HIGH),
-
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition),
                         new SetClawAngle(VerticalRotation.DEPOSIT),
                         new SetCurrentArmState(ArmState.State.SAMPLE_SCORE)

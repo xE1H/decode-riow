@@ -33,7 +33,7 @@ public class RetractArm extends SequentialCommandGroup {
                     new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                     new WaitCommand(200),
                     new SetClawAngle(VerticalRotation.DEPOSIT),
-                    new WaitUntilCommand(slides::reachedTargetPosition),
+                    new WaitUntilCommand(() -> slides.getPosition() < 280),
                     new SetClawAngle(VerticalRotation.UP),
                     new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.RETRACT),
                     new WaitUntilCommand(arm::reachedTargetPosition),

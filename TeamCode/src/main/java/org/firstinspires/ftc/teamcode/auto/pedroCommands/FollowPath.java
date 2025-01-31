@@ -95,6 +95,16 @@ public class FollowPath extends CommandBase {
         lastPoint = point;
     }
 
+    public FollowPath(int startHeading, int endHeading, Point point, double tValue, boolean dontmatter) {
+        pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, point))
+                .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
+                .setPathEndHeadingConstraint(Math.toRadians(1))
+                .setPathEndTranslationalConstraint(translationalErrorConstraint)
+                .setPathEndTValueConstraint(tValue)
+                .build();
+        lastPoint = point;
+    }
+
     public FollowPath(int startHeading, int endHeading) {
         pathChain = follower.pathBuilder().addPath(new BezierLine(lastPoint, lastPoint))
                 .setLinearHeadingInterpolation(Math.toRadians(startHeading), Math.toRadians(endHeading))
