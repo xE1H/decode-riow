@@ -15,7 +15,9 @@ import java.util.List;
 
 public class Vision extends VLRSubsystem<Vision> {
     private VisionPortal portal;
-    private SampleProcessor processor = new SampleProcessor();
+    private YoloV11VisionProcessor processor = new YoloV11VisionProcessor();
+
+    private YoloV11VisionPostProcessor postProcessor = new OrientationDeterminerPostProcessor();
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
@@ -26,11 +28,9 @@ public class Vision extends VLRSubsystem<Vision> {
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                 .addProcessor(processor);
 
+        processor.setPostProcessor(postProcessor);
+
         portal = builder.build();
         portal.resumeStreaming();
-    }
-
-    public List<SampleProcessor.Detection> getDetectionResults() {
-        return processor.getLatestDetections();
     }
 }

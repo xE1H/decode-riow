@@ -53,4 +53,6 @@ dependencies {
 
     implementation 'org.team11260:fast-load:0.1.2'
 
+    implementation "org.tensorflow:tensorflow-lite:2.2.0"
+    implementation "org.tensorflow:tensorflow-lite-support:0.4.0"
 }
