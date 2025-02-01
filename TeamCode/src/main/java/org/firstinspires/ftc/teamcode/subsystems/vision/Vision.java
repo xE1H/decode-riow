@@ -14,10 +14,9 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import java.util.List;
 
 public class Vision extends VLRSubsystem<Vision> {
-    private VisionPortal portal;
-    private YoloV11VisionProcessor processor = new YoloV11VisionProcessor();
+    private final YoloV11VisionProcessor processor = new YoloV11VisionProcessor();
 
-    private YoloV11VisionPostProcessor postProcessor = new OrientationDeterminerPostProcessor();
+    private final YoloV11VisionPostProcessor postProcessor = new OrientationDeterminerPostProcessor();
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
@@ -30,7 +29,16 @@ public class Vision extends VLRSubsystem<Vision> {
 
         processor.setPostProcessor(postProcessor);
 
-        portal = builder.build();
+        VisionPortal portal = builder.build();
         portal.resumeStreaming();
+
+    }
+
+    public void setEnabled(boolean enabled) {
+        processor.setEnabled(enabled);
+    }
+
+    public boolean isFrameProcessed() {
+        return processor.isFrameProcessed();
     }
 }

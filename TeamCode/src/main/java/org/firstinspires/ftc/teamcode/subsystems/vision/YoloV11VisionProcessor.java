@@ -28,6 +28,8 @@ public class YoloV11VisionProcessor implements VisionProcessor {
     private List<YoloV11Inference.Detection> detectionList = new ArrayList<>();
     private YoloV11Inference detector;
 
+    private boolean enabled;
+    private boolean frameProcessed;
     private YoloV11VisionPostProcessor postProcessor;
 
     Mat cameraMatrix = new Mat(3, 3, CvType.CV_64F);
@@ -55,6 +57,11 @@ public class YoloV11VisionProcessor implements VisionProcessor {
 
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
+        if (!enabled) {
+            frameProcessed = false;
+            return null;
+        }
+
 //        Mat undistorted = new Mat();
 //        Calib3d.undistort(frame, undistorted, cameraMatrix, distCoeffs);
 
@@ -74,9 +81,13 @@ public class YoloV11VisionProcessor implements VisionProcessor {
             postProcessor.processDetections(frame, detectionList);
         }
 
+        frameProcessed = true;
         return null;
     }
 
+    /**
+     * @noinspection SuspiciousNameCombination
+     */
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
         for (YoloV11Inference.Detection detection : detectionList) {
@@ -138,5 +149,13 @@ public class YoloV11VisionProcessor implements VisionProcessor {
             }
         }
         return bitmap;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isFrameProcessed() {
+        return frameProcessed;
     }
 }
