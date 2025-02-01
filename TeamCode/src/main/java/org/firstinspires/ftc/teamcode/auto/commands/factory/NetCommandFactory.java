@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration.T
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.outoftheboxrobotics.photoncore.Photon;
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.vision.commands.ProcessFrame;
 
 @Config
 @Photon
@@ -159,10 +161,27 @@ public class NetCommandFactory extends CommandFactory {
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new WaitCommand(600),
-                                new FollowPath(toScoreHeading, -90, new Point(72, 140), new Point(64, 92))
+                                new FollowPath(toScoreHeading, -90, new Point(72, 140), new Point(64, 95))
                         ),
                         new RetractArm()
+                ),
+                new ParallelCommandGroup(
+                        new ProcessFrame(),
+                        new SequentialCommandGroup(
+                                new WaitCommand(100),
+                                new InstantCommand() {
+                                    @Override
+                                    public void run() {
+                                        VLRSubsystem.getInstance(ArmSlideSubsystem.class).setTargetPosition(0.35);
+                                        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.OPEN);
+                                        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.DEPOSIT);
+                                        VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(ClawConfiguration.HorizontalRotation.NORMAL);
+                                    }
+                                }
+                        )
                 )
+                // todo move to wherever the sample is & extend slides correctly
+                // todo claw down, wait, twist, wait, close, twist back, up, retract slides
                 //new FollowPath(toScoreHeading, toNetArea)
         );
     }
