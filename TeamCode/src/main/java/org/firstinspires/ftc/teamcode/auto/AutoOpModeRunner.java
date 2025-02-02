@@ -5,9 +5,9 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.auto.commands.MoveRelative;
 import org.firstinspires.ftc.teamcode.auto.commands.factory.CommandFactory;
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
-import org.firstinspires.ftc.teamcode.auto.pedroCommands.TranslateHeading;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
@@ -40,7 +40,7 @@ public class AutoOpModeRunner {
 
         FollowPath.setStartingPoint(commandFactory.getStartingPoint());
         FollowPath.setFollower(follower);
-        TranslateHeading.setFollower(follower);
+        MoveRelative.setFollower(follower);
 
         CommandScheduler.getInstance().schedule(commandFactory.getCommands());
     }

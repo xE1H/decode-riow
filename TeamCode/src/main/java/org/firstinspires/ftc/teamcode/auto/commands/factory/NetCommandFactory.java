@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.auto.commands.factory;
 
+import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.HORIZONTAL_EXTENSION_LIMIT;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_EXTENSION_IN;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.TICKS_PER_IN;
 import static org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration.TargetPosition.UP;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -8,9 +11,11 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.auto.commands.MoveRelative;
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.auto.commands.GrabBucketSample;
@@ -19,11 +24,15 @@ import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.ScoreSample;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.vision.BestSampleDeterminer;
@@ -208,7 +217,7 @@ public class NetCommandFactory extends CommandFactory {
                     }
                 },
                 new ConditionalCommand(
-                        getSubmersibleSample(),
+                        getSubmersibleSample(bestSampleOrientation[0]),
                         dontDoShit(),
                         () -> bestSampleOrientation[0] == null || time.seconds() > 25 // don't go if theres no time, better to park
                 )
@@ -216,10 +225,24 @@ public class NetCommandFactory extends CommandFactory {
     }
 
 
-    private SequentialCommandGroup getSubmersibleSample() {
+    private SequentialCommandGroup getSubmersibleSample(OrientationDeterminerPostProcessor.SampleOrientation bestSample) {
         return new SequentialCommandGroup(
-                // todo move to wherever the sample is & extend slides correctly
-                // todo claw down, wait, twist, wait, close, twist back, up, retract slides
+                // sample relative X is positive to the left; Y is positive to the front
+                new SetSlideExtension((TICKS_PER_IN * bestSample.relativeY) / HORIZONTAL_EXTENSION_LIMIT),
+                new ParallelCommandGroup(
+                        new MoveRelative(-bestSample.relativeX, 0),
+                        new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)
+                ),
+                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                new WaitCommand(300),
+                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+                new WaitCommand(300),
+                new SetClawState(ClawConfiguration.GripperState.CLOSED),
+                new WaitCommand(200),
+                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED)
+                // todo zoom to net area
         );
     }
 

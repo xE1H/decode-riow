@@ -31,6 +31,9 @@ public class VLRTeleOp extends VLRLinearOpMode {
         VLRSubsystem.requireSubsystems(Chassis.class, ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, Vision.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
+        // for testing only, remove for prod!!! this will ruin the performance of teleop
+        VLRSubsystem.getInstance(Vision.class).setEnabled(true);
+
         ArmSlideSubsystem ass = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
 
