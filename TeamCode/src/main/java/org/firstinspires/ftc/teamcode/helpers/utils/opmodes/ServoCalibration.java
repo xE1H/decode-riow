@@ -1,13 +1,14 @@
-package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
+package org.firstinspires.ftc.teamcode.helpers.utils;
 
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "Servo Position Calibration", group = "Utils")
+@TeleOp(name = "ServoCalibration", group = "Utils")
 @Photon
-public class ServoPositionCalibration extends LinearOpMode {
+public class ServoCalibration extends LinearOpMode {
+    private boolean prevState = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -22,10 +23,11 @@ public class ServoPositionCalibration extends LinearOpMode {
             telemetry.update();
 
 
-            if (gamepad1.a) {
-                 current_i++;
-                 current_i %= servoNames.length;
-                 location = 0;
+            if (gamepad1.a && !prevState) {
+                current_i++;
+                current_i %= servoNames.length;
+                location = 0;
+                prevState = gamepad1.a;
             }
 
             if (gamepad1.dpad_up) {

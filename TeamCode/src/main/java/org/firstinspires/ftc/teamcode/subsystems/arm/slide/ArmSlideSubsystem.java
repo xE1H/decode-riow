@@ -1,23 +1,15 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.slide;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-import static org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile.FeedforwardType.SINE;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem.mapToRange;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.*;
-
-import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.LowPassFilter;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
@@ -36,6 +28,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     private double lastPositionChangeTime = 0;
 
     private OperationMode operationMode = OperationMode.NORMAL;
+    private boolean overridePower = false;
+    private double feedForwardGain = FEED_FORWARD_GAIN;
 
 
     @Override
@@ -59,8 +53,20 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         extensionEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         extensionEncoder.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
-        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-        motionProfile = new MotionProfile(telemetry, "SLIDE", ACCELERATION, DECELERATION, MAX_VELOCITY, CREEP, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, FEED_FORWARD_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, SINE);
+        motionProfile = new MotionProfile(
+                FtcDashboard.getInstance().getTelemetry(),
+                "SLIDE",
+                MotionProfile.Type.JERK_LIMITED,
+                ACCELERATION_JERK,
+                DECELERATION_JERK,
+                MAX_VELOCITY,
+                CREEP,
+                FEEDBACK_PROPORTIONAL_GAIN,
+                FEEDBACK_INTEGRAL_GAIN,
+                FEEDBACK_DERIVATIVE_GAIN,
+                VELOCITY_GAIN,
+                ACCELERATION_GAIN);
+
         motionProfile.enableTelemetry(true);
     }
 
@@ -72,13 +78,9 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     public void setTargetPosition(double position) {
         lastPositionChangeTime = System.currentTimeMillis();
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
-        motionProfile.setCurrentTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
+        motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
     }
 
-    public void setUnreachablePosForCalibration(){
-        lastPositionChangeTime = System.currentTimeMillis();
-        motionProfile.setCurrentTargetPosition(-100);
-    }
 
     // This method should only be used for commands.
     // Returns true if position has been reached, or position timeout has occurred.
@@ -121,19 +123,46 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
     public void incrementTargetPosition(double increment) {
         //System.out.printf("sniegas " + clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT) + "\n");
-        motionProfile.setCurrentTargetPosition(clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT));
+        motionProfile.setTargetPosition(clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT));
     }
 
 
     public void setHangCoefficients() {
-        motionProfile.updateCoefficients(ACCELERATION_HANG, DECELERATION_HANG, MAX_VELOCITY_HANG, FEEDBACK_PROPORTIONAL_GAIN_HANG, FEEDBACK_INTEGRAL_GAIN_HANG, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN_HANG, ACCELERATION_GAIN_HANG);
-        motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN_HANG);
+        feedForwardGain = FEED_FORWARD_GAIN_HANG;
+        motionProfile.updateCoefficients(
+                ACCELERATION_HANG,
+                DECELERATION_HANG,
+                MAX_VELOCITY_HANG,
+                FEEDBACK_PROPORTIONAL_GAIN_HANG,
+                FEEDBACK_INTEGRAL_GAIN_HANG,
+                FEEDBACK_DERIVATIVE_GAIN_HANG,
+                VELOCITY_GAIN_HANG,
+                ACCELERATION_GAIN_HANG);
     }
 
 
     public void setDefaultCoefficients() {
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
-        motionProfile.setFeedForwardGain(FEED_FORWARD_GAIN);
+        feedForwardGain = FEED_FORWARD_GAIN;
+        motionProfile.updateCoefficients(
+                ACCELERATION_JERK,
+                DECELERATION_JERK,
+                MAX_VELOCITY,
+                FEEDBACK_PROPORTIONAL_GAIN,
+                FEEDBACK_INTEGRAL_GAIN,
+                FEEDBACK_DERIVATIVE_GAIN,
+                VELOCITY_GAIN,
+                ACCELERATION_GAIN);
+    }
+
+
+
+    public void setPowerOverride(boolean condition){
+        overridePower = condition;
+    }
+
+
+    public boolean getPowerOverride(){
+        return overridePower;
     }
 
 
@@ -172,33 +201,34 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         checkLimitSwitch();
 
         encoderPosition = -extensionEncoder.getCurrentPosition();
-        double power = motionProfile.getPower(getPosition(), armAngleDegrees);
+
+        double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
+        double power = motionProfile.getPower(getPosition()) + feedForwardPower;
 
 
-        if (operationMode == OperationMode.NORMAL) {
-            setDefaultCoefficients();
+        if (!overridePower) {
+            if (operationMode == OperationMode.NORMAL) {
+                setDefaultCoefficients();
 
-            if (reachedTargetPositionNoOverride()) {
-                extensionMotor0.setPower(0);
-                extensionMotor2.setPower(0);
+                if (reachedTargetPositionNoOverride()) {
+                    extensionMotor0.setPower(0);
+                    extensionMotor2.setPower(0);
 
-                if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
-                    extensionMotor1.setPower(0);
-                    extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                } else extensionMotor1.setPower(power);
+                    if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
+                        extensionMotor1.setPower(0);
+                    } else extensionMotor1.setPower(power);
 
+                } else {
+                    extensionMotor0.setPower(power);
+                    extensionMotor1.setPower(power);
+                    extensionMotor2.setPower(power);
+                }
             } else {
+                setHangCoefficients();
                 extensionMotor0.setPower(power);
                 extensionMotor1.setPower(power);
                 extensionMotor2.setPower(power);
             }
-        }
-
-        else{
-            setHangCoefficients();
-            extensionMotor0.setPower(power);
-            extensionMotor1.setPower(power);
-            extensionMotor2.setPower(power);
         }
     }
 }

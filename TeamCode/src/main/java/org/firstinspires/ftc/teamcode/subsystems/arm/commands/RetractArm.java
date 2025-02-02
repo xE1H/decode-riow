@@ -25,6 +25,7 @@ public class RetractArm extends SequentialCommandGroup {
         ArmRotatorSubsystem arm = VLRSubsystem.getInstance(ArmRotatorSubsystem.class);
         ArmSlideSubsystem slides = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
         addRequirements(arm, slides);
+
         if (ArmOverrideState.get()) {
             addCommands(
                     new SetClawState(GripperState.CLOSED),
@@ -48,11 +49,11 @@ public class RetractArm extends SequentialCommandGroup {
                 new SetIsArmMoving(),
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                                new SetClawTwist(HorizontalRotation.NORMAL),
                                 new SetClawState(GripperState.CLOSED),
-                                new WaitCommand(100),
+                                new WaitCommand(90),
                                 new SetClawAngle(VerticalRotation.UP),
-                                new WaitCommand(80),
+                                new SetClawTwist(HorizontalRotation.NORMAL),
+                                new WaitCommand(60),
                                 new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.RETRACT), // Just in case the state gets bugged
                                 new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                                 new WaitUntilCommand(slides::reachedTargetPosition),
@@ -65,9 +66,11 @@ public class RetractArm extends SequentialCommandGroup {
                         new SequentialCommandGroup(
                                 new SetClawState(GripperState.OPEN),
                                 new WaitCommand(300),
-                                new SetClawState(GripperState.CLOSED),
-                                new WaitCommand(100),
+
                                 new SetClawAngle(VerticalRotation.DOWN),
+                                new WaitCommand(50),
+                                new SetClawState(GripperState.CLOSED),
+
                                 new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                                 new WaitCommand(200),
                                 new SetClawAngle(VerticalRotation.DEPOSIT),

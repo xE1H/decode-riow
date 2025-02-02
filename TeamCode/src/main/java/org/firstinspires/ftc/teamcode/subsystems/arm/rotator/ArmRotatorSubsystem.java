@@ -1,21 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.rotator;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-import static org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile.FeedforwardType.COSINE;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.*;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
+
 
 public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     private DcMotorEx motor;
@@ -27,6 +25,11 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     private double encoderPosition = 0;
 
     private boolean motorResetEnabled = false;
+    private double feedForwardGain = FEEDFORWARD_GAIN;
+
+    private boolean reachedPosition = true;
+    private boolean prevReachedPosition = true;
+    private ElapsedTime timer = new ElapsedTime();
 
 
     public static double mapToRange(double value, double minInput, double maxInput, double minOutput, double maxOutput) {
@@ -39,7 +42,6 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
     protected void initialize(HardwareMap hardwareMap) {
         ArmState.resetAll();
-        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
         slideSubsystem = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
 
         motor = hardwareMap.get(DcMotorEx.class, MOTOR_NAME);
@@ -50,18 +52,32 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        motionProfile = new MotionProfile(telemetry, "ARM", ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN, COSINE);
+        motionProfile = new MotionProfile(
+                FtcDashboard.getInstance().getTelemetry(),
+                "ARM",
+                MotionProfile.Type.ACCELERATION_LIMITED,
+                ACCELERATION_JERK,
+                DECELERATION_JERK,
+                MAX_VELOCITY,
+                ERROR_MARGIN,
+                FEEDBACK_PROPORTIONAL_GAIN,
+                FEEDBACK_INTEGRAL_GAIN,
+                FEEDBACK_DERIVATIVE_GAIN,
+                VELOCITY_GAIN,
+                ACCELERATION_GAIN);
+
         motionProfile.enableTelemetry(true);
+        timer.reset();
     }
 
 
     public void setTargetAngle(TargetAngle targetAngle) {
-        motionProfile.setCurrentTargetPosition(clamp(targetAngle.angleDegrees, MIN_ANGLE, MAX_ANGLE));
+        motionProfile.setTargetPosition(clamp(targetAngle.angleDegrees, MIN_ANGLE, MAX_ANGLE));
     }
 
 
     public void setTargetPosition(double angleDegrees) {
-        motionProfile.setCurrentTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
+        motionProfile.setTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
     }
 
 
@@ -79,26 +95,48 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     }
 
     public void setHangCoefficients() {
-        motionProfile.updateCoefficients(ACCELERATION_HANG, DECELERATION_HANG, MAX_VELOCITY_HANG, FEEDBACK_PROPORTIONAL_GAIN_HANG, FEEDBACK_INTEGRAL_GAIN_HANG, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
-        motionProfile.setFeedForwardGain(FEEDFORWARD_GAIN_HANG);
+        feedForwardGain = FEEDFORWARD_GAIN_HANG;
+        motionProfile.updateCoefficients(
+                ACCELERATION_HANG,
+                DECELERATION_HANG,
+                MAX_VELOCITY_HANG,
+                FEEDBACK_PROPORTIONAL_GAIN_HANG,
+                FEEDBACK_INTEGRAL_GAIN_HANG,
+                FEEDBACK_DERIVATIVE_GAIN,
+                VELOCITY_GAIN,
+                ACCELERATION_GAIN);
     }
 
+
     public void setDefaultCoefficients() {
-        double slidePosition = slideSubsystem.getPosition();
-//        double p = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, FEEDBACK_PROPORTIONAL_GAIN, EXTENDED_FEEDBACK_PROPORTIONAL_GAIN);
-//        double i = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, FEEDBACK_INTEGRAL_GAIN, EXTENDED_FEEDBACK_INTEGRAL_GAIN);
-//        double d = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, FEEDBACK_DERIVATIVE_GAIN, EXTENDED_FEEDBACK_DERIVATIVE_GAIN);
-//        double v = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, VELOCITY_GAIN, EXTENDED_VELOCITY_GAIN);
-//        double a = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, ACCELERATION_GAIN, EXTENDED_ACCELERATION_GAIN);
-//
-//        double acceleration = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, ACCELERATION, EXTENDED_ACCELERATION);
-//        double deceleration = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, DECELERATION, EXTENDED_DECELERATION);
-//        double maxVelocity = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, MAX_VELOCITY, EXTENDED_MAX_VELOCITY);
-//        double feedforward = mapToRange(slidePosition, ArmSlideConfiguration.MIN_POSITION, ArmSlideConfiguration.MAX_POSITION, FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
-//
-//        motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
-//        motionProfile.setFeedForwardGain(feedforward);
-        motionProfile.updateCoefficients(ACCELERATION, DECELERATION, MAX_VELOCITY, FEEDBACK_PROPORTIONAL_GAIN, FEEDBACK_INTEGRAL_GAIN, FEEDBACK_DERIVATIVE_GAIN, VELOCITY_GAIN, ACCELERATION_GAIN);
+        feedForwardGain = FEEDFORWARD_GAIN;
+        motionProfile.updateCoefficients(
+                ACCELERATION_JERK,
+                DECELERATION_JERK,
+                MAX_VELOCITY,
+                FEEDBACK_PROPORTIONAL_GAIN,
+                FEEDBACK_INTEGRAL_GAIN,
+                FEEDBACK_DERIVATIVE_GAIN,
+                VELOCITY_GAIN,
+                ACCELERATION_GAIN);
+    }
+
+
+    public void setMappedCoefficients() {
+        double slidePosition = slideSubsystem.getExtension();
+        double p = mapToRange(slidePosition, 0, 1, FEEDBACK_PROPORTIONAL_GAIN, EXTENDED_FEEDBACK_PROPORTIONAL_GAIN);
+        double i = mapToRange(slidePosition, 0, 1, FEEDBACK_INTEGRAL_GAIN, EXTENDED_FEEDBACK_INTEGRAL_GAIN);
+        double d = mapToRange(slidePosition, 0, 1, FEEDBACK_DERIVATIVE_GAIN, EXTENDED_FEEDBACK_DERIVATIVE_GAIN);
+        double v = mapToRange(slidePosition, 0, 1, VELOCITY_GAIN, EXTENDED_VELOCITY_GAIN);
+        double a = mapToRange(slidePosition, 0, 1, ACCELERATION_GAIN, EXTENDED_ACCELERATION_GAIN);
+
+        double acceleration = mapToRange(slidePosition, 0, 1, ACCELERATION_JERK, EXTENDED_ACCELERATION_JERK);
+        double deceleration = mapToRange(slidePosition, 0, 1, DECELERATION_JERK, EXTENDED_DECELERATION_JERK);
+        double maxVelocity = mapToRange(slidePosition, 0, 1, MAX_VELOCITY, EXTENDED_MAX_VELOCITY);
+        double feedforward = mapToRange(slidePosition, 0, 1, FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
+
+        motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
+        feedForwardGain = feedforward;
     }
 
     public void disableMotor() {
@@ -118,22 +156,27 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     @Override
     public void periodic() {
         if (motorResetEnabled) return;
-        encoderPosition = thoughBoreEncoder.getCurrentPosition();
+        encoderPosition = -thoughBoreEncoder.getCurrentPosition();
 
         double currentAngle = getAngleDegrees();
 
-        FtcDashboard.getInstance().getTelemetry().addData("Rotator Angle", currentAngle);
-        double power = motionProfile.getPower(currentAngle);
+        double feedForwardPower = Math.cos(Math.toRadians(currentAngle)) * feedForwardGain;
+        double power = motionProfile.getPower(currentAngle) + feedForwardPower;
 
         if (slideSubsystem.getOperationMode() == ArmSlideConfiguration.OperationMode.NORMAL) {
             setDefaultCoefficients();
 
-            if (motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && reachedTargetPosition()) {
+            boolean reachedTarget = reachedTargetPosition();
+            if (!reachedTarget || !prevReachedPosition){
+                timer.reset();
+            }
+            prevReachedPosition = reachedTarget;
+
+            if (reachedTarget && motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && timer.seconds() > 3){
                 power = 0;
             }
-        } else {
-            setHangCoefficients();
         }
+
         motor.setPower(power);
         slideSubsystem.periodic(currentAngle);
     }
