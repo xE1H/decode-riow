@@ -45,6 +45,7 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
 
 
                 new WaitUntilCommand(gamepadCondition),
+
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG),
                 new InstantCommand(() -> VLRSubsystem.getRotator().setHangCoefficients()),
 
@@ -54,28 +55,19 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new SetRotatorAngle(92),
                 new SetHangPosition(HangConfiguration.TargetPosition.UP),
 
-                new WaitUntilCommand(() -> VLRSubsystem.getInstance(HangSubsystem.class).analogFeedbackThresholdReached()),
+                new WaitUntilCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).analogFeedbackThresholdReached()),
+                new WaitCommand(50),
 
-//                new ParallelRaceGroup(
-//                        new WaitUntilCommand(()-> VLRSubsystem.getSlides().reachedTargetPosition()),
-//                ),
-//
 
                 new SetSlideExtension(0.3),
+                new WaitUntilCommand(() -> (VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
+
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.NORMAL),
+                new InstantCommand(()-> VLRSubsystem.getRotator().setDefaultCoefficients()),
+
                 new SetRotatorAngle(90),
-
-
-                new WaitCommand(100000000),
-
-
-                new InstantCommand(() -> VLRSubsystem.getRotator().setDefaultCoefficients()),
                 new WaitCommand(100),
 
-                new SetSlideExtension(0.29),
-                new WaitCommand(300),
-
-                new WaitCommand(1000),
 
                 new SetSlideExtension(0.881),
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().reachedTargetPosition()).withTimeout(1500),
