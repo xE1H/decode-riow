@@ -3,17 +3,20 @@ package org.firstinspires.ftc.teamcode.auto.commands.factory;
 import static org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration.TargetPosition.UP;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.outoftheboxrobotics.photoncore.Photon;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.auto.commands.GrabBucketSample;
 import org.firstinspires.ftc.teamcode.auto.commands.ScoreHighBucketSample;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
+import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.ScoreSample;
@@ -23,7 +26,12 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.vision.BestSampleDeterminer;
+import org.firstinspires.ftc.teamcode.subsystems.vision.OrientationDeterminerPostProcessor;
+import org.firstinspires.ftc.teamcode.subsystems.vision.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.vision.commands.ProcessFrame;
+
+import java.util.function.Supplier;
 
 @Config
 @Photon
@@ -54,7 +62,14 @@ public class NetCommandFactory extends CommandFactory {
 
     public static int toScoreHeading = -50;
 
-    public NetCommandFactory() {
+    private final Alliance alliance;
+
+    private final ElapsedTime time;
+
+    public NetCommandFactory(Alliance alliance, ElapsedTime time) {
+        this.alliance = alliance;
+        this.time = time;
+
         startingPoint = new Point(10, 111.5);
         toScore = new Point(toScoreX, toScoreY);
         toSample1 = new Point(toSample1X, toSample1Y);
@@ -76,6 +91,10 @@ public class NetCommandFactory extends CommandFactory {
 
     @Override
     public SequentialCommandGroup getCommands() {
+        // funny things happening here because the variable is accessed from an inner class
+        // so it has to be final - intellisense is suggesting this
+        final OrientationDeterminerPostProcessor.SampleOrientation[] bestSampleOrientation = {null};
+
         return new SequentialCommandGroup(
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 //                new FollowPath(0, toScoreHeading, new Point(20, 116)),
@@ -179,10 +198,37 @@ public class NetCommandFactory extends CommandFactory {
                                     }
                                 }
                         )
+                ),
+                new InstantCommand() {
+                    @Override
+                    public void run() {
+                        bestSampleOrientation[0] = BestSampleDeterminer.determineBestSample(VLRSubsystem.getInstance(Vision.class).getSampleOrientations(), alliance);
+                        // log for debug
+                        System.out.println("Going for sample: " + bestSampleOrientation[0].color + " in X: " + bestSampleOrientation[0].relativeX + " Y: " + bestSampleOrientation[0].relativeY);
+                    }
+                },
+                new ConditionalCommand(
+                        getSubmersibleSample(),
+                        dontDoShit(),
+                        () -> bestSampleOrientation[0] == null || time.seconds() > 25 // don't go if theres no time, better to park
                 )
+        );
+    }
+
+
+    private SequentialCommandGroup getSubmersibleSample() {
+        return new SequentialCommandGroup(
                 // todo move to wherever the sample is & extend slides correctly
                 // todo claw down, wait, twist, wait, close, twist back, up, retract slides
-                //new FollowPath(toScoreHeading, toNetArea)
+        );
+    }
+
+    /**
+     * Park if there's no time left
+     */
+    private SequentialCommandGroup dontDoShit() {
+        return new SequentialCommandGroup(
+                // todo
         );
     }
 }

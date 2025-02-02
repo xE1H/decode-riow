@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.vision;
+package org.firstinspires.ftc.teamcode.subsystems.vision.utils;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;

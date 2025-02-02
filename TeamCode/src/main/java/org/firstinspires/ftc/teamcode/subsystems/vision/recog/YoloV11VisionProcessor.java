@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.subsystems.vision;
+package org.firstinspires.ftc.teamcode.subsystems.vision.recog;
 
 import static org.firstinspires.ftc.teamcode.subsystems.vision.VisionConfiguration.*;
-import static org.firstinspires.ftc.teamcode.subsystems.vision.YoloV11VisionProcessorConfig.LABELS;
-import static org.firstinspires.ftc.teamcode.subsystems.vision.YoloV11VisionProcessorConfig.LABEL_COLORS;
-import static org.firstinspires.ftc.teamcode.subsystems.vision.YoloV11VisionProcessorConfig.CONFIDENCE_THRESHOLD;
-import static org.firstinspires.ftc.teamcode.subsystems.vision.YoloV11VisionProcessorConfig.MODEL_FILE_PATH;
-import static org.firstinspires.ftc.teamcode.subsystems.vision.YoloV11VisionProcessorConfig.MODEL_INPUT_SIZE;
-import static org.firstinspires.ftc.teamcode.subsystems.vision.YoloV11VisionProcessorConfig.Y_OFFSET;
+import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.LABELS;
+import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.LABEL_COLORS;
+import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.CONFIDENCE_THRESHOLD;
+import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.MODEL_FILE_PATH;
+import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.MODEL_INPUT_SIZE;
+import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.Y_OFFSET;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -15,7 +15,6 @@ import android.graphics.Paint;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.android.Utils;
-import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;

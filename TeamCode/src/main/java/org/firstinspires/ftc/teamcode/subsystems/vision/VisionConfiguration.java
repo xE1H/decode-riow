@@ -57,6 +57,8 @@ public class VisionConfiguration {
 
     public static double LEFT_ANGLE = 13.2; // radians
     public static double DOWN_ANGLE = -100; // radians
+
+    public static double MAX_REL_Y = 12; // inches todo
 //
 //    public static double ROT_Y = -Math.PI / 2; // radians roll angle 90DEG
 //    public static double ROT_Z = Math.PI / 18; // radians left/right angle from straight 10DEG

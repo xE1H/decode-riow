@@ -4,6 +4,10 @@ import static org.firstinspires.ftc.teamcode.subsystems.vision.VisionConfigurati
 
 import android.graphics.Canvas;
 
+import org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11Inference;
+import org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionPostProcessor;
+import org.firstinspires.ftc.teamcode.subsystems.vision.utils.Point3d;
+import org.firstinspires.ftc.teamcode.subsystems.vision.utils.RayGroundIntersectionProcessor;
 import org.opencv.core.Mat;
 
 import java.util.ArrayList;
@@ -21,11 +25,16 @@ public class OrientationDeterminerPostProcessor extends YoloV11VisionPostProcess
 
         public boolean isVerticallyOriented;
 
-        public SampleOrientation(double relativeX, double relativeY, double relativeZ, boolean isVerticallyOriented) {
+        public String color;
+
+
+        public SampleOrientation(double relativeX, double relativeY, double relativeZ, boolean isVerticallyOriented, String label) {
             this.relativeX = relativeX;
             this.relativeY = relativeY;
             this.relativeZ = relativeZ;
             this.isVerticallyOriented = isVerticallyOriented;
+
+            this.color = label.replace("sample", "");
         }
     }
 
@@ -36,6 +45,7 @@ public class OrientationDeterminerPostProcessor extends YoloV11VisionPostProcess
     @Override
     public void processDetections(Mat undistorted, List<YoloV11Inference.Detection> detectionList) {
         for (YoloV11Inference.Detection detection : detectionList) {
+            // Have to turn them back since the model was not trained on rotated images
             int[] point1 = turnBackPoint((int) detection.x1, (int) detection.y1);
             int[] point2 = turnBackPoint((int) detection.x2, (int) detection.y2);
 
@@ -47,11 +57,14 @@ public class OrientationDeterminerPostProcessor extends YoloV11VisionPostProcess
 
             int width = x2 - x1;
             int height = y2 - y1;
+
+            // Very simple check for orientation. Is bound to fail if the sample is not near the
+            // center of the image, but will probably work well enough for our use case.
             boolean isVerticallyOriented = width < height;
 
             Point3d coords = rgip.getWorldCoordinates(x1 + width / 2.0, y1 + height / 2.0);
 
-            samples.add(new SampleOrientation(coords.x, coords.y, coords.z, isVerticallyOriented));
+            samples.add(new SampleOrientation(coords.x, coords.y, coords.z, isVerticallyOriented, detection.label));
         }
     }
 
