@@ -22,15 +22,15 @@ public class ArmSlideConfiguration {
     public static double ACCELERATION_GAIN = 0.000016;
 
 
-    public static double ACCELERATION_HANG = 70000;
-    public static double DECELERATION_HANG = 48000;
+    public static double ACCELERATION_HANG = 7000;
+    public static double DECELERATION_HANG = 4800;
     public static double MAX_VELOCITY_HANG = 50;
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.04;
-    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.000000;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.023;
+    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.000001;
     public static double FEEDBACK_DERIVATIVE_GAIN_HANG = 0.0003;
-    public static double FEED_FORWARD_GAIN_HANG = -0.85; //-0.5;
-    public static double VELOCITY_GAIN_HANG = 0.04;
-    public static double ACCELERATION_GAIN_HANG = 0.00008;
+    public static double FEED_FORWARD_GAIN_HANG = -0.68;
+    public static double VELOCITY_GAIN_HANG = 0.05;
+    public static double ACCELERATION_GAIN_HANG = 0.00001;
 
     public static double CREEP = 60;
 
