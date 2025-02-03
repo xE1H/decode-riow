@@ -51,12 +51,12 @@ public class VisionConfiguration {
 //    public static double CAMERA_BACKWARD_OFFSET = 4.3307; // inches from the front of the robot 11CM
 //    public static double CAMERA_LEFT_OFFSET = 3.7401; // inches right from robot center 9.5CM
 
-    public static double POS_Z = 7.5984; // inches from the ground 19.3 CM
-    public static double POS_X = 3.7401; // inches right from robot center 9.5CM
-    public static double POS_Y = -4.3307; // inches from the front of the robot 11CM
+    public static double POS_Z = 6.4; // inches from the ground 21 CM 20.6
+    public static double POS_X = 3.799; // inches right from robot center 9CM 9.65
+    public static double POS_Y = -4.21; // inches from the front of the robot 9.5CM 10.7
 
-    public static double LEFT_ANGLE = 13.2; // radians
-    public static double DOWN_ANGLE = -100; // radians
+    public static double LEFT_ANGLE = 12; // radians
+    public static double DOWN_ANGLE = -105; // radians 15
 
     public static double MAX_REL_Y = 12; // inches todo
 //

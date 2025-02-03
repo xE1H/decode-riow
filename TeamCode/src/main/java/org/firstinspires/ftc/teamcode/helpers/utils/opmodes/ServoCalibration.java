@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.helpers.utils;
+package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;

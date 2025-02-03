@@ -22,18 +22,18 @@ public class GrabBucketSample extends SequentialCommandGroup {
         addCommands(
                 new IntakeSample(SLIDE),
                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                new WaitCommand(300),
+                new WaitCommand(100),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
                                 new SetClawTwist(ClawConfiguration.HorizontalRotation.FLIPPED),
-                                new WaitCommand(200)
+                                new WaitCommand(350)
                         ),
                         () -> clawTwisted
                 ),
-                new WaitCommand(200),
+                new WaitCommand(120),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                new WaitCommand(200),
+                new WaitCommand(100),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new WaitCommand(50),
                 new RetractArm()
