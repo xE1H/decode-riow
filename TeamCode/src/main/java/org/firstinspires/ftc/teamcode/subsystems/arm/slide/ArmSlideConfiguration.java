@@ -11,15 +11,15 @@ public class ArmSlideConfiguration {
 
     public static String LIMIT_SW_NAME = "SlideLimit";
 
-    public static double ACCELERATION_JERK = 700000;
-    public static double DECELERATION_JERK = 480000;
-    public static double MAX_VELOCITY = 3100;
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.0255;
+    public static double ACCELERATION_JERK = 350000;
+    public static double DECELERATION_JERK = 240000;
+    public static double MAX_VELOCITY = 2500;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.012;
     public static double FEEDBACK_INTEGRAL_GAIN = 0.000001;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0004;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0002;
     public static double FEED_FORWARD_GAIN = 0.1;
-    public static double VELOCITY_GAIN = 0.0002;
-    public static double ACCELERATION_GAIN = 0.000016;
+    public static double VELOCITY_GAIN = 0.00023;
+    public static double ACCELERATION_GAIN = 0.000014;
 
 
     public static double ACCELERATION_HANG = 70000;

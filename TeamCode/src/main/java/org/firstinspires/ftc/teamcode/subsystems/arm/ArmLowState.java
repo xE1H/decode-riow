@@ -18,4 +18,8 @@ public class ArmLowState {
         wasJustToggled = false;
         return oldToggled;
     }
+
+    public static void set(boolean value) {
+        isLowScoring = value;
+    }
 }

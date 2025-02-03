@@ -35,6 +35,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
         VLRSubsystem.getInstance(Vision.class).setEnabled(true);
 
         ArmSlideSubsystem ass = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
+        System.out.println(ass);
         primaryDriver = new PrimaryDriverTeleOpControls(gamepad1);
 
         waitForStart();

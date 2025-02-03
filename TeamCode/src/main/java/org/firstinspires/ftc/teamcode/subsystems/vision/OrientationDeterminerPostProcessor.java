@@ -44,6 +44,7 @@ public class OrientationDeterminerPostProcessor extends YoloV11VisionPostProcess
 
     @Override
     public void processDetections(Mat undistorted, List<YoloV11Inference.Detection> detectionList) {
+        samples.clear();
         for (YoloV11Inference.Detection detection : detectionList) {
             // Have to turn them back since the model was not trained on rotated images
             int[] point1 = turnBackPoint((int) detection.x1, (int) detection.y1);
@@ -55,14 +56,15 @@ public class OrientationDeterminerPostProcessor extends YoloV11VisionPostProcess
             int x2 = point2[0];
             int y2 = point2[1];
 
-            int width = x2 - x1;
-            int height = y2 - y1;
+            int width = Math.abs(x2 - x1);
+            int height = Math.abs(y2 - y1);
 
             // Very simple check for orientation. Is bound to fail if the sample is not near the
             // center of the image, but will probably work well enough for our use case.
-            boolean isVerticallyOriented = width < height;
-
-            Point3d coords = rgip.getWorldCoordinates(x1 + width / 2.0, y1 + height / 2.0);
+            boolean isVerticallyOriented = width > height;
+            // rgip x negative when left
+            Point3d coords = rgip.getWorldCoordinates(RESOLUTION.getWidth() - ((x1 + x2) / 2.0), (y1 + y2) / 2.0);
+            System.out.println("Corrected pixel coordinates: x: " +  ((x1 + x2) / 2.0) + " y: " + ((y1 + y2) / 2.0));
 
             samples.add(new SampleOrientation(coords.x, coords.y, coords.z, isVerticallyOriented, detection.label));
         }
@@ -81,6 +83,6 @@ public class OrientationDeterminerPostProcessor extends YoloV11VisionPostProcess
 
 
     private int[] turnBackPoint(int x, int y) {
-        return new int[]{y, RESOLUTION.getWidth() - x};
+        return new int[]{RESOLUTION.getWidth() - y, x};
     }
 }

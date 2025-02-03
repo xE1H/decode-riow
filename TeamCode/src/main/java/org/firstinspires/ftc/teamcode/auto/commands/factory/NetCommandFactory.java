@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.auto.commands.factory;
 
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.HORIZONTAL_EXTENSION_LIMIT;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_EXTENSION_IN;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_POSITION;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.TICKS_PER_IN;
 import static org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration.TargetPosition.UP;
 
@@ -38,6 +39,7 @@ import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.vision.BestSampleDeterminer;
 import org.firstinspires.ftc.teamcode.subsystems.vision.OrientationDeterminerPostProcessor;
 import org.firstinspires.ftc.teamcode.subsystems.vision.Vision;
+import org.firstinspires.ftc.teamcode.subsystems.vision.VisionConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.vision.commands.ProcessFrame;
 
 import java.util.function.Supplier;
@@ -48,19 +50,19 @@ public class NetCommandFactory extends CommandFactory {
     public static int toScoreX = 27;
     public static int toScoreY = 117;
 
-    public static double toSample1X = 32.5;
-    public static double toSample1Y = 118.3;
+    public static double toSample1X = 33.5;
+    public static double toSample1Y = 118.7;
 
-    public static double toSample2X = 32.5;
-    public static double toSample2Y = 128;
+    public static double toSample2X = 33.5;
+    public static double toSample2Y = 128.7;
 
     public static double toSample3PrepareX = 35;
     public static double toSample3PrepareY = 120;
 
     public static int toSample3Heading = 60;
 
-    public static double toSample3X = 42;
-    public static double toSample3Y = 124.2;
+    public static double toSample3X = 40;
+    public static double toSample3Y = 125.7;
 
     private final Point startingPoint;
     private final Point toScore;
@@ -74,6 +76,10 @@ public class NetCommandFactory extends CommandFactory {
     private final Alliance alliance;
 
     private final ElapsedTime time;
+
+    private SequentialCommandGroup samplePickup = new SequentialCommandGroup();
+
+    final OrientationDeterminerPostProcessor.SampleOrientation[] bestSampleOrientation = {null};
 
     public NetCommandFactory(Alliance alliance, ElapsedTime time) {
         this.alliance = alliance;
@@ -94,7 +100,7 @@ public class NetCommandFactory extends CommandFactory {
 
     @Override
     public Class<? extends VLRSubsystem<?>>[] getRequiredSubsystems() {
-        return new Class[]{ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, HangSubsystem.class};
+        return new Class[]{ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, HangSubsystem.class, Vision.class};
     }
 
 
@@ -102,15 +108,15 @@ public class NetCommandFactory extends CommandFactory {
     public SequentialCommandGroup getCommands() {
         // funny things happening here because the variable is accessed from an inner class
         // so it has to be final - intellisense is suggesting this
-        final OrientationDeterminerPostProcessor.SampleOrientation[] bestSampleOrientation = {null};
 
         return new SequentialCommandGroup(
+                new SetSlideExtension(0.1),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 //                new FollowPath(0, toScoreHeading, new Point(20, 116)),
                 new ParallelCommandGroup(
                         new FollowPath(0, toScoreHeading, toScore, 0.999, false),
                         new SequentialCommandGroup(
-                                new WaitCommand(630),
+                                new WaitCommand(450),
                                 new ScoreHighBucketSample()
                         )
                 ),
@@ -170,6 +176,7 @@ public class NetCommandFactory extends CommandFactory {
                         VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(0.8);
                     }
                 },
+                new WaitCommand(100),
                 new ParallelCommandGroup(
                         new FollowPath(toSample3Heading, new Point(toSample3X, toSample3Y)),
                         new SequentialCommandGroup(
@@ -200,7 +207,7 @@ public class NetCommandFactory extends CommandFactory {
                                 new InstantCommand() {
                                     @Override
                                     public void run() {
-                                        VLRSubsystem.getInstance(ArmSlideSubsystem.class).setTargetPosition(0.35);
+                                        //VLRSubsystem.getInstance(ArmSlideSubsystem.class).setTargetPosition(0.35);
                                         VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.OPEN);
                                         VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.DEPOSIT);
                                         VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(ClawConfiguration.HorizontalRotation.NORMAL);
@@ -216,34 +223,43 @@ public class NetCommandFactory extends CommandFactory {
                         System.out.println("Going for sample: " + bestSampleOrientation[0].color + " in X: " + bestSampleOrientation[0].relativeX + " Y: " + bestSampleOrientation[0].relativeY);
                     }
                 },
+                new InstantCommand() {
+                    @Override
+                    public void run() {
+                        generateSubmersibleSampleCommand();
+                    }
+                },
                 new ConditionalCommand(
-                        getSubmersibleSample(bestSampleOrientation[0]),
+                        getSubmersibleSample(),
                         dontDoShit(),
                         () -> bestSampleOrientation[0] == null || time.seconds() > 25 // don't go if theres no time, better to park
                 )
         );
     }
 
-
-    private SequentialCommandGroup getSubmersibleSample(OrientationDeterminerPostProcessor.SampleOrientation bestSample) {
-        return new SequentialCommandGroup(
-                // sample relative X is positive to the left; Y is positive to the front
-                new SetSlideExtension((TICKS_PER_IN * bestSample.relativeY) / HORIZONTAL_EXTENSION_LIMIT),
+    private void generateSubmersibleSampleCommand() {
+        samplePickup.addCommands(
+                // sample relative X is positive to the right; Y is positive to the front
+                new SetSlideExtension((TICKS_PER_IN * (bestSampleOrientation[0].relativeY + 1.5)) / MAX_POSITION),
                 new ParallelCommandGroup(
-                        new MoveRelative(-bestSample.relativeX, 0),
+                        new MoveRelative(-bestSampleOrientation[0].relativeX, 0),
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)
-                ),
+                ).withTimeout(600),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
-                new WaitCommand(300),
-                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                new WaitCommand(300),
+                new WaitCommand(150),
+                new SetClawTwist(bestSampleOrientation[0].isVerticallyOriented ? ClawConfiguration.HorizontalRotation.NORMAL : ClawConfiguration.HorizontalRotation.FLIPPED),
+                new WaitCommand(150),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                new WaitCommand(200),
+                new WaitCommand(150),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED)
                 // todo zoom to net area
         );
+    }
+
+    private SequentialCommandGroup getSubmersibleSample() {
+        return samplePickup;
     }
 
     /**

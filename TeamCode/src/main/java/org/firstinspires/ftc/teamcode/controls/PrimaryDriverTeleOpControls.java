@@ -28,6 +28,8 @@ public class PrimaryDriverTeleOpControls extends DriverControls {
 
         Chassis chassis = VLRSubsystem.getInstance(Chassis.class);
 
+        ArmLowState.set(false);
+
         addBothSticksHandler(
                 (Double leftY, Double leftX, Double rightY, Double rightX) -> {
                     chassis.drive(leftY, -leftX, -rightX);

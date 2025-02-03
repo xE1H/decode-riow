@@ -76,6 +76,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     }
 
     public void setTargetPosition(double position) {
+        System.out.print("Setting target to");
+        System.out.println(position);
         lastPositionChangeTime = System.currentTimeMillis();
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
         motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
@@ -199,6 +201,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
     public void periodic(double armAngleDegrees) {
         checkLimitSwitch();
+        System.out.println("slide periodic funning");
 
         encoderPosition = -extensionEncoder.getCurrentPosition();
 

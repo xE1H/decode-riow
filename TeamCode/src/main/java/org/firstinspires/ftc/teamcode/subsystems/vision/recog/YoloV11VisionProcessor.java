@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11Visi
 import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.CONFIDENCE_THRESHOLD;
 import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.MODEL_FILE_PATH;
 import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.MODEL_INPUT_SIZE;
+import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.X_OFFSET;
 import static org.firstinspires.ftc.teamcode.subsystems.vision.recog.YoloV11VisionProcessorConfig.Y_OFFSET;
 
 import android.graphics.Bitmap;
@@ -15,6 +16,7 @@ import android.graphics.Paint;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.android.Utils;
+import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -27,7 +29,7 @@ public class YoloV11VisionProcessor implements VisionProcessor {
     private List<YoloV11Inference.Detection> detectionList = new ArrayList<>();
     private YoloV11Inference detector;
 
-    private boolean enabled;
+    private boolean enabled = false;
     private boolean frameProcessed;
     private YoloV11VisionPostProcessor postProcessor;
 
@@ -36,7 +38,7 @@ public class YoloV11VisionProcessor implements VisionProcessor {
 
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
-        detector = new YoloV11Inference(MODEL_FILE_PATH, MODEL_INPUT_SIZE, CONFIDENCE_THRESHOLD, LABELS, Math.max(width, height), Y_OFFSET);
+        detector = new YoloV11Inference(MODEL_FILE_PATH, MODEL_INPUT_SIZE, CONFIDENCE_THRESHOLD, LABELS, Math.max(width, height), Y_OFFSET, X_OFFSET);
 
         double[] calibrationData = new double[]{
                 FX, 0, CX,
@@ -61,11 +63,11 @@ public class YoloV11VisionProcessor implements VisionProcessor {
             return null;
         }
 
-//        Mat undistorted = new Mat();
-//        Calib3d.undistort(frame, undistorted, cameraMatrix, distCoeffs);
+        Mat undistorted = new Mat();
+        Calib3d.undistort(frame, undistorted, cameraMatrix, distCoeffs);
 
         Mat rotated = new Mat();
-        Core.rotate(frame, rotated, Core.ROTATE_90_COUNTERCLOCKWISE);
+        Core.rotate(undistorted, rotated, Core.ROTATE_90_COUNTERCLOCKWISE);
 
 
         Bitmap bitmap = getBitmap(rotated);
@@ -77,7 +79,7 @@ public class YoloV11VisionProcessor implements VisionProcessor {
         }
 
         if (postProcessor != null) {
-            postProcessor.processDetections(frame, detectionList);
+            postProcessor.processDetections(undistorted, detectionList);
         }
 
         frameProcessed = true;
@@ -95,9 +97,9 @@ public class YoloV11VisionProcessor implements VisionProcessor {
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(5);
 
-            float newX1 = detection.y1;
+            float newX1 = RESOLUTION.getWidth() - detection.y1;
             float newY1 = detection.x1;
-            float newX2 = detection.y2;
+            float newX2 = RESOLUTION.getWidth() - detection.y2;
             float newY2 = detection.x2;
 
             canvas.drawRect(
