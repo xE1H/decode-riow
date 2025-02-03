@@ -28,7 +28,6 @@ public class MotionProfile {
     private boolean isTelemetryEnabled = false;
 
     private final PIDController pid;
-    private boolean reachedPosition = false;
 
     private Type profileType;
 
@@ -65,23 +64,22 @@ public class MotionProfile {
 
 
     public void updateCoefficients(double acceleration, double deceleration, double maxVelocity, double p, double i, double d, double v, double a) {
-        if (reachedPosition) {
-            this.maxVelocity = maxVelocity;
-            this.pid.setPID(p, i, d);
-            this.velocityGain = v;
-            this.accelerationGain = a;
+        this.maxVelocity = maxVelocity;
+        this.pid.setPID(p, i, d);
+        this.velocityGain = v;
+        this.accelerationGain = a;
 
-            switch (profileType){
-                case ACCELERATION_LIMITED:
-                    this.acceleration = acceleration;
-                    this.deceleration = deceleration;
-                    break;
+        switch (profileType){
+            case ACCELERATION_LIMITED:
+                this.acceleration = acceleration;
+                this.deceleration = deceleration;
+                break;
 
-                case JERK_LIMITED:
-                    this.jerkAcceleration = acceleration;
-                    this.jerkDeceleration = deceleration;
-                    break;
-            }
+            case JERK_LIMITED:
+                this.jerkAcceleration = acceleration;
+                this.jerkDeceleration = deceleration;
+                break;
+
         }
     }
 
@@ -127,8 +125,6 @@ public class MotionProfile {
         else motionState = new MotionState(Math.abs(positionError), 0, 0);
 
         double positionSetPoint = initialPosition + Math.signum(positionError) * motionState.position;
-
-        reachedPosition = positionSetPoint == targetPosition;
 
         double positionPower = pid.calculate(currentPosition, positionSetPoint);
         double velocityPower = motionState.velocity * velocityGain * Math.signum(positionError);
