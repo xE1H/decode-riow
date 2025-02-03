@@ -162,6 +162,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
         double feedForwardPower = Math.cos(Math.toRadians(currentAngle)) * feedForwardGain;
         double power = motionProfile.getPower(currentAngle) + feedForwardPower;
+        power = clamp(power, -1, 1);
 
         if (slideSubsystem.getOperationMode() == ArmSlideConfiguration.OperationMode.NORMAL) {
             setDefaultCoefficients();
@@ -172,7 +173,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
             }
             prevReachedPosition = reachedTarget;
 
-            if (reachedTarget && motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && timer.seconds() > 3){
+            if (reachedTarget && motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && timer.seconds() > 1){
                 power = 0;
             }
         }

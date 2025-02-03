@@ -65,23 +65,21 @@ public class MotionProfile {
 
 
     public void updateCoefficients(double acceleration, double deceleration, double maxVelocity, double p, double i, double d, double v, double a) {
-        if (reachedPosition) {
-            this.maxVelocity = maxVelocity;
-            this.pid.setPID(p, i, d);
-            this.velocityGain = v;
-            this.accelerationGain = a;
+        this.maxVelocity = maxVelocity;
+        this.pid.setPID(p, i, d);
+        this.velocityGain = v;
+        this.accelerationGain = a;
 
-            switch (profileType){
-                case ACCELERATION_LIMITED:
-                    this.acceleration = acceleration;
-                    this.deceleration = deceleration;
-                    break;
+        switch (profileType){
+            case ACCELERATION_LIMITED:
+                this.acceleration = acceleration;
+                this.deceleration = deceleration;
+                break;
 
-                case JERK_LIMITED:
-                    this.jerkAcceleration = acceleration;
-                    this.jerkDeceleration = deceleration;
-                    break;
-            }
+            case JERK_LIMITED:
+                this.jerkAcceleration = acceleration;
+                this.jerkDeceleration = deceleration;
+                break;
         }
     }
 

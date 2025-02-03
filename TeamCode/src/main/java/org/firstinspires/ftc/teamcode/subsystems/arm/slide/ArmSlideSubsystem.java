@@ -45,7 +45,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         extensionMotor1.setDirection(DcMotorEx.Direction.FORWARD);
         extensionMotor2.setDirection(DcMotorEx.Direction.FORWARD);
 
-        extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -56,9 +56,9 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         motionProfile = new MotionProfile(
                 FtcDashboard.getInstance().getTelemetry(),
                 "SLIDE",
-                MotionProfile.Type.JERK_LIMITED,
-                ACCELERATION_JERK,
-                DECELERATION_JERK,
+                MotionProfile.Type.ACCELERATION_LIMITED,
+                ACCELERATION,
+                DECELERATION,
                 MAX_VELOCITY,
                 CREEP,
                 FEEDBACK_PROPORTIONAL_GAIN,
@@ -127,6 +127,20 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     }
 
 
+    public void setHangCoefficientsFast() {
+        feedForwardGain = FEED_FORWARD_GAIN_HANG;
+        motionProfile.updateCoefficients(
+                ACCELERATION_HANG_FAST,
+                DECELERATION_HANG_FAST,
+                MAX_VELOCITY_HANG_FAST,
+                FEEDBACK_PROPORTIONAL_GAIN_HANG_FAST,
+                FEEDBACK_INTEGRAL_GAIN_HANG_FAST,
+                FEEDBACK_DERIVATIVE_GAIN_HANG,
+                VELOCITY_GAIN_HANG_FAST,
+                ACCELERATION_GAIN_HANG);
+    }
+
+
     public void setHangCoefficients() {
         feedForwardGain = FEED_FORWARD_GAIN_HANG;
         motionProfile.updateCoefficients(
@@ -144,8 +158,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     public void setDefaultCoefficients() {
         feedForwardGain = FEED_FORWARD_GAIN;
         motionProfile.updateCoefficients(
-                ACCELERATION_JERK,
-                DECELERATION_JERK,
+                ACCELERATION,
+                DECELERATION,
                 MAX_VELOCITY,
                 FEEDBACK_PROPORTIONAL_GAIN,
                 FEEDBACK_INTEGRAL_GAIN,
@@ -204,6 +218,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;
+        power = clamp(power, -1, 1);
 
 
         if (!overridePower) {
@@ -212,23 +227,23 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
                 if (reachedTargetPositionNoOverride()) {
                     extensionMotor0.setPower(0);
-                    extensionMotor2.setPower(0);
 
                     if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
                         extensionMotor1.setPower(0);
-                    } else extensionMotor1.setPower(power);
+                        extensionMotor2.setPower(0);
+
+                    } else{
+                        extensionMotor1.setPower(power);
+                        extensionMotor2.setPower(power);
+                    }
 
                 } else {
-                    extensionMotor0.setPower(power);
-                    extensionMotor1.setPower(power);
-                    extensionMotor2.setPower(power);
+                    setMotorPower(power);
                 }
             } else {
-                setHangCoefficients();
-                extensionMotor0.setPower(power);
-                extensionMotor1.setPower(power);
-                extensionMotor2.setPower(power);
+                setMotorPower(power);
             }
         }
+
     }
 }
