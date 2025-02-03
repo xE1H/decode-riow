@@ -20,26 +20,26 @@ public class NetAuto extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        AutoConfigurator configurator = new AutoConfigurator(telemetry, gamepad1);
+        ElapsedTime opModeTime = new ElapsedTime();
         Alliance alliance;
+
+        AutoConfigurator configurator = new AutoConfigurator(telemetry, gamepad1);
 
         AutoConfigurator.Choice choice = configurator.multipleChoice("Select alliance:",
                 new AutoConfigurator.Choice("Red"),
                 new AutoConfigurator.Choice("Blue"));
-
         alliance = choice.text.equals("Red") ? Alliance.RED : Alliance.BLUE;
-
 
         configurator.review("Alliance: " + alliance);
 
-        ElapsedTime time = new ElapsedTime();
 
-        AutoOpModeRunner runner = new AutoOpModeRunner(new NetCommandFactory(alliance, time));
+        AutoOpModeRunner runner = new AutoOpModeRunner(new NetCommandFactory(alliance, opModeTime));
         runner.initialize(hardwareMap);
 
         waitForStart();
 
-        time.reset();
+        opModeTime.reset(); // Reset on start for accurate time
+
         runner.run(this::opModeIsActive, false);
     }
 }

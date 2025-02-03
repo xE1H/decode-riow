@@ -130,7 +130,7 @@ public class FollowPath extends CommandBase {
 
     @Override
     public void initialize() {
-        follower.followPath(pathChain);
+        follower.followPath(pathChain, true);
     }
 
     @Override
