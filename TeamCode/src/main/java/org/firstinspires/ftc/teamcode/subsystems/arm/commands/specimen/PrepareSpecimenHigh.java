@@ -24,24 +24,20 @@ public class PrepareSpecimenHigh extends ParallelCommandGroup {
     public static double SLIDE = 0.3;
     public static double CLAW_ANGLE = 0.4;
 
-    public PrepareSpecimenHigh(double setX, double setY) {
+    public PrepareSpecimenHigh() {
         addCommands(
-                new FollowPath(0, new Point(setX, setY)),
                 new CustomConditionalCommand(
-                        new SequentialCommandGroup(
-                                new ParallelCommandGroup(
-                                        new SetRotatorAngle(ROTATOR),
-                                        new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                                        new SequentialCommandGroup(
-                                                new SetSlideExtension(SLIDE),
-                                                new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)),
-                                        new SetCurrentArmState(ArmState.State.SPECIMEN_PREPARE)
-                                )
-
+                        new ParallelCommandGroup(
+                                new SetClawAngle(CLAW_ANGLE),
+                                new SetRotatorAngle(ROTATOR),
+                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+                                new SequentialCommandGroup(
+                                        new SetSlideExtension(SLIDE),
+                                        new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)),
+                                new SetCurrentArmState(ArmState.State.SPECIMEN_PREPARE)
                         ),
                         () -> !ArmState.isCurrentState(ArmState.State.SPECIMEN_PREPARE)
-                ),
-                new SetClawAngle(CLAW_ANGLE)
+                )
         );
 
     }

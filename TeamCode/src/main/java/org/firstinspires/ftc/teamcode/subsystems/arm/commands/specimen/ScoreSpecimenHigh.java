@@ -42,8 +42,8 @@ public class ScoreSpecimenHigh extends CustomConditionalCommand {
                         ),
                         new WaitCommand(300),
                         new SetClawState(ClawConfiguration.GripperState.OPEN),
-                        new SetCurrentArmState(ArmState.State.SAMPLE_SCORE)
+                        new SetCurrentArmState(ArmState.State.SPECIMEN_SCORE)
                 ),
-                () -> (ArmState.get() != ArmState.State.SAMPLE_SCORE));
+                () -> (ArmState.get() != ArmState.State.SPECIMEN_SCORE));
     }
 }

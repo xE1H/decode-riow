@@ -68,7 +68,8 @@ public class ObservationCommandFactory extends CommandFactory {
     public SequentialCommandGroup getCommands() {
         return new SequentialCommandGroup(
                 // Score preload
-                new PrepareSpecimenHigh(toScoreX, toScoreY),
+                new FollowPath(0, new Point(toScoreX, toScoreY)),
+                new PrepareSpecimenHigh(),
                 new ScoreSpecimenHigh(),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
 
@@ -98,7 +99,8 @@ public class ObservationCommandFactory extends CommandFactory {
                         new FollowPath(180, new Point(30, toScoreY)),
                         new SetSlideExtension(0)
                 ),
-                new PrepareSpecimenHigh(toScoreX, toScoreY - 3),
+                new FollowPath(0, new Point(toScoreX, toScoreY - 3)),
+                new PrepareSpecimenHigh(),
                 new ScoreSpecimenHigh(),
 
                 // Prepare Sample
@@ -143,7 +145,8 @@ public class ObservationCommandFactory extends CommandFactory {
                         new FollowPath(180, new Point(30, toScoreY)),
                         new SetSlideExtension(0)
                 ),
-                new PrepareSpecimenHigh(toScoreX, toScoreY - 6),
+                new FollowPath(0, new Point(toScoreX, toScoreY - 6)),
+                new PrepareSpecimenHigh(),
                 new ScoreSpecimenHigh(),
 
                 new RetractArm(),
