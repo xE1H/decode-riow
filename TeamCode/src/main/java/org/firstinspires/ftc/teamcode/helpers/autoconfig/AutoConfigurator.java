@@ -149,5 +149,9 @@ public class AutoConfigurator {
         gamepad.rumble(0, 0, 0);
         telemetry.clearAll();
         telemetry.update();
+
+        telemetry.addLine("Review:");
+        Arrays.stream(lines).forEach(telemetry::addLine);
+        telemetry.update();
     }
 }

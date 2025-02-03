@@ -8,12 +8,11 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
 
 @Config
-public class HangSpecimen extends SequentialCommandGroup {
+public class HangSpecimenTeleOp extends SequentialCommandGroup {
 
-    public HangSpecimen() {
+    public HangSpecimenTeleOp() {
         addCommands(
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
