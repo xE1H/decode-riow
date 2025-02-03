@@ -63,8 +63,12 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new InstantCommand(()-> VLRSubsystem.getRotator().setDefaultCoefficients()),
 
 
+                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.NORMAL),
+                new InstantCommand(()-> VLRSubsystem.getRotator().setDefaultCoefficients()),
+
                 new SetSlideExtension(0.31),
                 new SetRotatorAngle(85),
+
 
 
                 new SetSlideExtension(0.881),

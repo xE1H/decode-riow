@@ -28,7 +28,6 @@ public class MotionProfile {
     private boolean isTelemetryEnabled = false;
 
     private final PIDController pid;
-    private boolean reachedPosition = false;
 
     private Type profileType;
 
@@ -80,6 +79,7 @@ public class MotionProfile {
                 this.jerkAcceleration = acceleration;
                 this.jerkDeceleration = deceleration;
                 break;
+
         }
     }
 
@@ -125,8 +125,6 @@ public class MotionProfile {
         else motionState = new MotionState(Math.abs(positionError), 0, 0);
 
         double positionSetPoint = initialPosition + Math.signum(positionError) * motionState.position;
-
-        reachedPosition = positionSetPoint == targetPosition;
 
         double positionPower = pid.calculate(currentPosition, positionSetPoint);
         double velocityPower = motionState.velocity * velocityGain * Math.signum(positionError);

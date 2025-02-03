@@ -52,9 +52,6 @@ public class ArmSlideConfiguration {
     public static double VELOCITY_GAIN_HANG_FAST = 0.00017;
 
 
-
-
-
     public static double CREEP = 60;
 
     public static double ERROR_MARGIN = 20;
