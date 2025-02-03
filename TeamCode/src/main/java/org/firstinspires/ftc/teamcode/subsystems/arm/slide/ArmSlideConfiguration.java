@@ -11,26 +11,46 @@ public class ArmSlideConfiguration {
 
     public static String LIMIT_SW_NAME = "SlideLimit";
 
-    public static double ACCELERATION_JERK = 700000;
-    public static double DECELERATION_JERK = 480000;
-    public static double MAX_VELOCITY = 3100;
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.0255;
-    public static double FEEDBACK_INTEGRAL_GAIN = 0.000001;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0004;
+//    public static double ACCELERATION_JERK = 700000;
+//    public static double DECELERATION_JERK = 480000;
+//    public static double MAX_VELOCITY = 3100;
+//    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.0255;
+//    public static double FEEDBACK_INTEGRAL_GAIN = 0.000001;
+//    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0004;
+//    public static double FEED_FORWARD_GAIN = 0.1;
+//    public static double VELOCITY_GAIN = 0.0002;
+//    public static double ACCELERATION_GAIN = 0.000016;
+
+
+    public static double ACCELERATION = 26000;
+    public static double DECELERATION = 16000;
+    public static double MAX_VELOCITY = 2100;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.0085;
+    public static double FEEDBACK_INTEGRAL_GAIN = 0;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0003;
     public static double FEED_FORWARD_GAIN = 0.1;
-    public static double VELOCITY_GAIN = 0.0002;
-    public static double ACCELERATION_GAIN = 0.000016;
+    public static double VELOCITY_GAIN = 0.0001;
+    public static double ACCELERATION_GAIN = 0.00001;
 
 
-    public static double ACCELERATION_HANG = 7000;
-    public static double DECELERATION_HANG = 4800;
-    public static double MAX_VELOCITY_HANG = 50;
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.023;
-    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.000001;
+    public static double ACCELERATION_HANG = 600;
+    public static double DECELERATION_HANG = 500;
+    public static double MAX_VELOCITY_HANG = 120;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.021;
     public static double FEEDBACK_DERIVATIVE_GAIN_HANG = 0.0003;
-    public static double FEED_FORWARD_GAIN_HANG = -0.68;
-    public static double VELOCITY_GAIN_HANG = 0.05;
+    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.000001;
+    public static double FEED_FORWARD_GAIN_HANG = -0.7;
+    public static double VELOCITY_GAIN_HANG = 0.00017;
     public static double ACCELERATION_GAIN_HANG = 0.00001;
+
+
+    public static double ACCELERATION_HANG_FAST = 2600;
+    public static double DECELERATION_HANG_FAST = 2200;
+    public static double MAX_VELOCITY_HANG_FAST = 1200;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG_FAST = 0.035;
+    public static double FEEDBACK_INTEGRAL_GAIN_HANG_FAST = 0.00001;
+    public static double VELOCITY_GAIN_HANG_FAST = 0.00017;
+
 
     public static double CREEP = 60;
 

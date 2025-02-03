@@ -23,35 +23,35 @@ public class ArmRotatorConfiguration {
 
     //JERK PROFILE CONSTANTS:
     public static double ACCELERATION_JERK = 25000;
-    public static double DECELERATION_JERK = 20000;
-    public static double MAX_VELOCITY = 370;
+    public static double DECELERATION_JERK = 22000;
+    public static double MAX_VELOCITY = 375;
 
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.07;
-    public static double FEEDBACK_INTEGRAL_GAIN = 0;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.002;
-    public static double VELOCITY_GAIN = 0.002;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.049;
+    public static double FEEDBACK_INTEGRAL_GAIN = 0.0018;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0025;
+    public static double VELOCITY_GAIN = 0.00185;
     public static double ACCELERATION_GAIN = 0.00008;
-    public static double FEEDFORWARD_GAIN = 0.13;
+    public static double FEEDFORWARD_GAIN = 0.12;
 
 
     public static double EXTENDED_ACCELERATION_JERK = 2000;
-    public static double EXTENDED_DECELERATION_JERK = 900;
-    public static double EXTENDED_MAX_VELOCITY = 70;
-    public static double EXTENDED_FEEDBACK_PROPORTIONAL_GAIN = 0.068;
-    public static double EXTENDED_FEEDBACK_INTEGRAL_GAIN = 0.00001;
+    public static double EXTENDED_DECELERATION_JERK = 800;
+    public static double EXTENDED_MAX_VELOCITY = 65;
+    public static double EXTENDED_FEEDBACK_PROPORTIONAL_GAIN = 0.045;
+    public static double EXTENDED_FEEDBACK_INTEGRAL_GAIN = 0.0001;
     public static double EXTENDED_FEEDBACK_DERIVATIVE_GAIN = 0.0038;
-    public static double EXTENDED_VELOCITY_GAIN = 0.00045;
+    public static double EXTENDED_VELOCITY_GAIN = 0.0004;
     public static double EXTENDED_ACCELERATION_GAIN = 0.00005;
     public static double EXTENDED_FEEDFORWARD_GAIN = 0.3;
 
 
 
-    public static double ACCELERATION_HANG = 1000;
-    public static double DECELERATION_HANG = 500;
-    public static double MAX_VELOCITY_HANG = 50;
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.3;
+    public static double ACCELERATION_HANG = 900;
+    public static double DECELERATION_HANG = 400;
+    public static double MAX_VELOCITY_HANG = 40;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.11;
     public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0;//.0001;
-    public static double FEEDFORWARD_GAIN_HANG = -0;//.1;
+    public static double FEEDFORWARD_GAIN_HANG = -0.1;//.1;
 
 
 
