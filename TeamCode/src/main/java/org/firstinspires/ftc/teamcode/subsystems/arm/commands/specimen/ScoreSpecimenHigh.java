@@ -28,7 +28,7 @@ public class ScoreSpecimenHigh extends CustomConditionalCommand {
     }
 
     public static double CLAW_ANGLE = 0.93;
-    public static double ROTATOR_ANGLE = 50;
+    public static double ROTATOR_ANGLE = 30;
     public static int ROTATOR_TIMEOUT = 400;
 
     public ScoreSpecimenHigh() {
@@ -44,6 +44,6 @@ public class ScoreSpecimenHigh extends CustomConditionalCommand {
                         new SetClawState(ClawConfiguration.GripperState.OPEN),
                         new SetCurrentArmState(ArmState.State.SPECIMEN_SCORE)
                 ),
-                () -> (ArmState.get() != ArmState.State.SPECIMEN_SCORE));
+                () -> (!ArmState.isCurrentState(ArmState.State.SPECIMEN_SCORE)));
     }
 }

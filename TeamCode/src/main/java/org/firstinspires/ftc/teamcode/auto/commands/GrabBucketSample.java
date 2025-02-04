@@ -6,7 +6,9 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.IntakeSample;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
@@ -33,10 +35,9 @@ public class GrabBucketSample extends SequentialCommandGroup {
                 ),
                 new WaitCommand(120),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                new WaitCommand(100),
+                new WaitCommand(200),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                new WaitCommand(50),
-                new RetractArm()
+                new SetCurrentArmState(ArmState.State.IN_ROBOT)
         );
     }
 

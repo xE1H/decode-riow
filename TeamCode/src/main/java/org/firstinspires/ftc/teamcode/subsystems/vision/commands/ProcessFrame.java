@@ -18,16 +18,17 @@ public class ProcessFrame extends CommandBase {
 
     @Override
     public void execute() {
+        System.out.println("Vision started");
         vision.setEnabled(true);
     }
 
     @Override
-    public void end(boolean interrupted) {
-        vision.setEnabled(false);
-    }
-
-    @Override
     public boolean isFinished() {
-        return vision.isFrameProcessed();
+        if (vision.isFrameProcessed()) {
+            System.out.println("Vision finished");
+            vision.setEnabled(false);
+            return true;
+        }
+        return false;
     }
 }

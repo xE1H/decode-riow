@@ -20,17 +20,17 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 public class ObservationAuto extends VLRLinearOpMode {
     @Override
     public void run() {
-        ElapsedTime opModeTime = new ElapsedTime();
-        Alliance alliance;
-
-        AutoConfigurator configurator = new AutoConfigurator(telemetry, gamepad1);
-
-        AutoConfigurator.Choice choice = configurator.multipleChoice("Select alliance:",
-                new AutoConfigurator.Choice("Red"),
-                new AutoConfigurator.Choice("Blue"));
-        alliance = choice.text.equals("Red") ? Alliance.RED : Alliance.BLUE;
-
-        configurator.review("Alliance: " + alliance);
+//        ElapsedTime opModeTime = new ElapsedTime();
+//        Alliance alliance;
+//
+//        AutoConfigurator configurator = new AutoConfigurator(telemetry, gamepad1);
+//
+//        AutoConfigurator.Choice choice = configurator.multipleChoice("Select alliance:",
+//                new AutoConfigurator.Choice("Red"),
+//                new AutoConfigurator.Choice("Blue"));
+//        alliance = choice.text.equals("Red") ? Alliance.RED : Alliance.BLUE;
+//
+//        configurator.review("Alliance: " + alliance);
 
         AutoOpModeRunner runner = new AutoOpModeRunner(new ObservationCommandFactory());
         runner.initialize(hardwareMap);
