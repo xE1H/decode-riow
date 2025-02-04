@@ -21,6 +21,8 @@ public class FollowPath extends CommandBase {
 
     private ElapsedTime et;
 
+    private int pathLength = 1;
+
 
     public FollowPath(int constantHeading, Point point) {
         pathChain = follower.pathBuilder().addPath(
@@ -66,6 +68,7 @@ public class FollowPath extends CommandBase {
     }
 
     public FollowPath(int startHeading, int endHeading, Point... points) {
+        pathLength = points.length;
         pathChain = follower.pathBuilder().addPath(new BezierCurve(
                         prependPoint(lastPoint, points)
                 ))
@@ -142,7 +145,7 @@ public class FollowPath extends CommandBase {
         // This is what the *official* library now uses to determine if the path is finished
         // Not even the isbusy thing anymore, so this might work better.
         // todo Constants are defined inline for now, fix
-        if (et.milliseconds() > 500 || (Math.abs(follower.headingError) < Math.PI / 360 && follower.getCurrentTValue() >= 0.99)) {
+        if (follower.getCurrentPathNumber() == pathLength - 1 && ( et.milliseconds() > 500 || (Math.abs(follower.headingError) < Math.PI / 360 && follower.getCurrentTValue() >= 0.995))) {
             return true;
         }
         return false;

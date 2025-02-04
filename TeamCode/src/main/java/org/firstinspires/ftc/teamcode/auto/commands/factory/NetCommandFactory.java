@@ -48,7 +48,7 @@ import java.util.function.Supplier;
 @Photon
 public class NetCommandFactory extends CommandFactory {
     public static int toScoreX = 27;
-    public static int toScoreY = 117;
+    public static int toScoreY = 119;
 
     public static double toSample1X = 33.5;
     public static double toSample1Y = 118.7;
@@ -110,7 +110,6 @@ public class NetCommandFactory extends CommandFactory {
         // so it has to be final - intellisense is suggesting this
 
         return new SequentialCommandGroup(
-                new SetSlideExtension(0.1),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 //                new FollowPath(0, toScoreHeading, new Point(20, 116)),
                 new ParallelCommandGroup(
