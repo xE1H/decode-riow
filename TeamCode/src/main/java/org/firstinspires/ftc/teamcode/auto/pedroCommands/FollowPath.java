@@ -51,7 +51,6 @@ public class FollowPath extends CommandBase {
     }
 
 
-
     public FollowPath(int constantHeading, Point... points) {
         pathChain = follower.pathBuilder().addPath(new BezierCurve(
                         prependPoint(lastPoint, points)
@@ -135,6 +134,12 @@ public class FollowPath extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return !follower.isBusy();
+        // This is what the *official* library uses to determine if the path is finished
+        // Not even the isbusy thing anymore, so this might work better.
+        // todo Constants are defined inline for now, fix
+        if (Math.abs(follower.headingError) < Math.PI / 360 && follower.getCurrentTValue() >= 0.99) {
+            return true;
+        }
+        return false;
     }
 }
