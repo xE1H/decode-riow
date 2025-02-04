@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.auto.pedroCommands;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.auto.pedroPathing.localization.Pose;
@@ -17,6 +18,8 @@ public class FollowPath extends CommandBase {
     private static Point lastPoint;
     public static double translationalErrorConstraint = 0.1;
     public static double headingErrorConstraint = Math.PI / (360 * 2);
+
+    private ElapsedTime et;
 
 
     public FollowPath(int constantHeading, Point point) {
@@ -130,14 +133,16 @@ public class FollowPath extends CommandBase {
     @Override
     public void initialize() {
         follower.followPath(pathChain, true);
+        et = new ElapsedTime();
+        et.reset();
     }
 
     @Override
     public boolean isFinished() {
-        // This is what the *official* library uses to determine if the path is finished
+        // This is what the *official* library now uses to determine if the path is finished
         // Not even the isbusy thing anymore, so this might work better.
         // todo Constants are defined inline for now, fix
-        if (Math.abs(follower.headingError) < Math.PI / 360 && follower.getCurrentTValue() >= 0.99) {
+        if (et.milliseconds() > 500 || (Math.abs(follower.headingError) < Math.PI / 360 && follower.getCurrentTValue() >= 0.99)) {
             return true;
         }
         return false;
