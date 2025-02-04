@@ -27,7 +27,7 @@ public class ScoreSpecimenHigh extends CustomConditionalCommand {
         addRequirements(VLRSubsystem.getInstance(ArmRotatorSubsystem.class), VLRSubsystem.getInstance(ArmSlideSubsystem.class));
     }
 
-    public static double CLAW_ANGLE = 0.8;
+    public static double CLAW_ANGLE = 0.93;
     public static double ROTATOR_ANGLE = 50;
     public static int ROTATOR_TIMEOUT = 400;
 
