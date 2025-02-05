@@ -17,7 +17,7 @@ public class FollowPath extends CommandBase {
     private static Point lastPoint;
     public static double translationalErrorConstraint = 0.1;
     public static double headingErrorConstraint = Math.PI / (360 * 2);
-    private int PATH_TIMEOUT = 500;
+    private int PATH_TIMEOUT = 0;
     private ElapsedTime currentTime = new ElapsedTime();
     private boolean TIMER_HAS_BEEN_RESET = false;
 

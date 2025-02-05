@@ -10,6 +10,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelRaceGroup;
+import com.arcrobotics.ftclib.command.PrintCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -100,7 +101,7 @@ public class NetCommandFactory extends CommandFactory {
 
     @Override
     public Class<? extends VLRSubsystem<?>>[] getRequiredSubsystems() {
-        return new Class[]{ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, HangSubsystem.class, Vision.class};
+        return new Class[]{ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, Vision.class};
     }
 
 
@@ -120,9 +121,9 @@ public class NetCommandFactory extends CommandFactory {
                         )
                 ),
 
-                new FollowPath(toScoreHeading, 0, new Point(toScoreX, toSample1Y)),
+                new FollowPath(toScoreHeading, 0, new Point(toScoreX, toSample1Y)).withTimeout(0),
                 new ParallelCommandGroup(
-                        new FollowPath(0, toSample1),
+                        new FollowPath(0, toSample1).withTimeout(0),
                         new SequentialCommandGroup(
                                 new WaitCommand(300),
                                 new GrabBucketSample()
@@ -185,6 +186,7 @@ public class NetCommandFactory extends CommandFactory {
                 ),
 //                  new FollowPath(90, toScoreHeading, new Point(30, 120)),
                 new ParallelCommandGroup(
+                        new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                         new FollowPath(40, toScoreHeading, toScore, 0.999, false),
                         new SequentialCommandGroup(
                                 new WaitCommand(650),
@@ -198,8 +200,9 @@ public class NetCommandFactory extends CommandFactory {
                                 new FollowPath(toScoreHeading, -90, new Point(72, 140), new Point(64, 95))
                         ),
                         new RetractArm()
-                ),
+                ).withTimeout(2000),
                 new ParallelCommandGroup(
+                        new PrintCommand("eikit nahui"),
                         new ProcessFrame(),
                         new SequentialCommandGroup(
                                 new WaitCommand(100),
