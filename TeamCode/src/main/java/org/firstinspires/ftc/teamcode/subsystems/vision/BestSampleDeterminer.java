@@ -32,7 +32,13 @@ public class BestSampleDeterminer {
         SampleOrientation bestSample = null;
         double bestCoef = Double.MAX_VALUE;
 
+        System.out.println("Bing bang " + samples.size());
+
         for (SampleOrientation sample : samples) {
+            System.out.println("sempluojam " + sample.color);
+            System.out.println("X: " + sample.relativeX);
+            System.out.println("Y: " + sample.relativeY);
+
             if (sample == null) continue;
             if (sample.relativeY > MAX_REL_Y) continue;
 

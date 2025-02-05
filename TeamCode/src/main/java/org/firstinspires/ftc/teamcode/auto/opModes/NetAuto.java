@@ -28,6 +28,7 @@ public class NetAuto extends VLRLinearOpMode {
         AutoConfigurator.Choice choice = configurator.multipleChoice("Select alliance:",
                 new AutoConfigurator.Choice("Red"),
                 new AutoConfigurator.Choice("Blue"));
+
         alliance = choice.text.equals("Red") ? Alliance.RED : Alliance.BLUE;
 
         configurator.review("Alliance: " + alliance);

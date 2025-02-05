@@ -68,6 +68,9 @@ public class OrientationDeterminerPostProcessor extends YoloV11VisionPostProcess
 
             samples.add(new SampleOrientation(coords.x, coords.y, coords.z, isVerticallyOriented, detection.label));
         }
+        for (SampleOrientation sample : samples) {
+            System.out.println("Sample: " + sample.color + " at " + sample.relativeX + ", " + sample.relativeY + ", " + sample.relativeZ + " is " + (sample.isVerticallyOriented ? "vertically" : "horizontally") + " oriented");
+        }
     }
 
     public List<SampleOrientation> getSamples() {
@@ -76,9 +79,6 @@ public class OrientationDeterminerPostProcessor extends YoloV11VisionPostProcess
 
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
-        for (SampleOrientation sample : samples) {
-            System.out.println("Sample: " + sample.color + " at " + sample.relativeX + ", " + sample.relativeY + ", " + sample.relativeZ + " is " + (sample.isVerticallyOriented ? "vertically" : "horizontally") + " oriented");
-        }
     }
 
 

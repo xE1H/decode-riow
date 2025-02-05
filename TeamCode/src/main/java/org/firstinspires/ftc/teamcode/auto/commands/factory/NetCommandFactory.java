@@ -43,6 +43,7 @@ import org.firstinspires.ftc.teamcode.subsystems.vision.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.vision.VisionConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.vision.commands.ProcessFrame;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @Config
@@ -114,7 +115,7 @@ public class NetCommandFactory extends CommandFactory {
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 //                new FollowPath(0, toScoreHeading, new Point(20, 116)),
                 new ParallelCommandGroup(
-                        new FollowPath(0, toScoreHeading, toScore, 0.999, false),
+                        new FollowPath(0, toScoreHeading, new Point(toScoreX - 2, toScoreY - 2), 0.999, false),
                         new SequentialCommandGroup(
                                 new WaitCommand(450),
                                 new ScoreHighBucketSample()
@@ -187,7 +188,7 @@ public class NetCommandFactory extends CommandFactory {
 //                  new FollowPath(90, toScoreHeading, new Point(30, 120)),
                 new ParallelCommandGroup(
                         new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                        new FollowPath(40, toScoreHeading, toScore, 0.999, false),
+                        new FollowPath(40, toScoreHeading, toScore, 0.999, false).withTimeout(300),
                         new SequentialCommandGroup(
                                 new WaitCommand(650),
                                 new ScoreSample(117),
@@ -198,29 +199,33 @@ public class NetCommandFactory extends CommandFactory {
                         new SequentialCommandGroup(
                                 new WaitCommand(600),
                                 new FollowPath(toScoreHeading, -90, new Point(72, 140), new Point(64, 95))
-                        ),
-                        new RetractArm()
-                ).withTimeout(2000),
+                        ).withTimeout(2000),
+                        new RetractArm().withTimeout(1500),
+                        new WaitCommand(2500)
+                ),
                 new ParallelCommandGroup(
                         new PrintCommand("eikit nahui"),
-                        new ProcessFrame(),
-                        new SequentialCommandGroup(
-                                new WaitCommand(100),
-                                new InstantCommand() {
-                                    @Override
-                                    public void run() {
-                                        //VLRSubsystem.getInstance(ArmSlideSubsystem.class).setTargetPosition(0.35);
-                                        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.OPEN);
-                                        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.DEPOSIT);
-                                        VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(ClawConfiguration.HorizontalRotation.NORMAL);
-                                    }
-                                }
-                        )
+                        new ProcessFrame()
+//                        new SequentialCommandGroup(
+//                                new WaitCommand(100),
+//                                new InstantCommand() {
+//                                    @Override
+//                                    public void run() {
+//                                        //VLRSubsystem.getInstance(ArmSlideSubsystem.class).setTargetPosition(0.35);
+//                                        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.OPEN);
+//                                        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.DEPOSIT);
+//                                        VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(ClawConfiguration.HorizontalRotation.NORMAL);
+//                                    }
+//                                }
+//                        )
                 ),
                 new InstantCommand() {
                     @Override
                     public void run() {
-                        bestSampleOrientation[0] = BestSampleDeterminer.determineBestSample(VLRSubsystem.getInstance(Vision.class).getSampleOrientations(), alliance);
+                        System.out.println("vatafak epel meps");
+                        List<OrientationDeterminerPostProcessor.SampleOrientation> samples = VLRSubsystem.getInstance(Vision.class).getSampleOrientations();
+                        System.out.println("vatafak gogol meps");
+                        bestSampleOrientation[0] = BestSampleDeterminer.determineBestSample(samples, alliance);
                         // log for debug
                         System.out.println("Going for sample: " + bestSampleOrientation[0].color + " in X: " + bestSampleOrientation[0].relativeX + " Y: " + bestSampleOrientation[0].relativeY);
                     }
@@ -229,17 +234,19 @@ public class NetCommandFactory extends CommandFactory {
                     @Override
                     public void run() {
                         generateSubmersibleSampleCommand();
+                        System.out.println(bestSampleOrientation[0] == null);
                     }
                 },
                 new ConditionalCommand(
                         getSubmersibleSample(),
                         dontDoShit(),
-                        () -> bestSampleOrientation[0] == null || time.seconds() > 25 // don't go if theres no time, better to park
+                        () -> bestSampleOrientation[0] != null //|| time.seconds() > 25 // don't go if theres no time, better to park
                 )
         );
     }
 
     private void generateSubmersibleSampleCommand() {
+        System.out.println("generating sub grab cmd");
         samplePickup.addCommands(
                 // sample relative X is positive to the right; Y is positive to the front
                 new SetSlideExtension((TICKS_PER_IN * (bestSampleOrientation[0].relativeY + 1.5)) / MAX_POSITION),
@@ -261,6 +268,7 @@ public class NetCommandFactory extends CommandFactory {
     }
 
     private SequentialCommandGroup getSubmersibleSample() {
+        System.out.println("getting cmd");
         return samplePickup;
     }
 
@@ -270,6 +278,7 @@ public class NetCommandFactory extends CommandFactory {
     private SequentialCommandGroup dontDoShit() {
         return new SequentialCommandGroup(
                 // todo
+                new PrintCommand("gavno gavno gavno")
         );
     }
 }

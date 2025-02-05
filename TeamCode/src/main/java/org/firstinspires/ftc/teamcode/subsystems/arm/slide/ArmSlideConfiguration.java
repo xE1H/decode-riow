@@ -23,7 +23,7 @@ public class ArmSlideConfiguration {
 
 
     public static double ACCELERATION = 26000;
-    public static double DECELERATION = 16000;
+    public static double DECELERATION = 12000;
     public static double MAX_VELOCITY = 2100;
     public static double FEEDBACK_PROPORTIONAL_GAIN = 0.0085;
     public static double FEEDBACK_INTEGRAL_GAIN = 0;
