@@ -25,7 +25,6 @@ public class SetHangPosition extends CommandBase {
     @Override
     public void initialize(){
         timer = new ElapsedTime();
-        hang.setMoving(true);
 
         switch (targetPosition){
             case DOWN:
@@ -61,8 +60,6 @@ public class SetHangPosition extends CommandBase {
                     break;
             }
         }
-        hang.resetMovedConditions();
-        hang.setMoving(false);
     }
 
 
