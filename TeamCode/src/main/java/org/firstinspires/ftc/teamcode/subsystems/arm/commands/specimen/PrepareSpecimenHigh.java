@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.arm.commands.specimen;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
 import org.firstinspires.ftc.teamcode.auto.pedroCommands.FollowPath;
@@ -19,25 +20,34 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
 @Config
-public class PrepareSpecimenHigh extends ParallelCommandGroup {
-    public static double ROTATOR = 60;
-    public static double SLIDE = 0.3;
+public class PrepareSpecimenHigh extends CustomConditionalCommand {
+    // prev values, no idea why they dont work anymore
+//    public static double ROTATOR = 60;
+//    public static double SLIDE = 0.3;
+//    public static double CLAW_ANGLE = 0.4;
+
+    public static double ROTATOR = 55;
+    public static double SLIDE = 0.45;
     public static double CLAW_ANGLE = 0.4;
 
     public PrepareSpecimenHigh() {
-        addCommands(
-                new CustomConditionalCommand(
+        super(
+                new SequentialCommandGroup(
+                        new SetClawAngle(CLAW_ANGLE),
                         new ParallelCommandGroup(
-                                new SetClawAngle(CLAW_ANGLE),
-                                new SetRotatorAngle(ROTATOR),
+                                new SequentialCommandGroup(
+                                        new SetRotatorAngle(ROTATOR),
+                                        new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)
+                                ),
                                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                                 new SequentialCommandGroup(
                                         new SetSlideExtension(SLIDE),
-                                        new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)),
-                                new SetCurrentArmState(ArmState.State.SPECIMEN_PREPARE)
+                                        new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)
+                                )
                         ),
-                        () -> !ArmState.isCurrentState(ArmState.State.SPECIMEN_PREPARE)
-                )
+                        new SetCurrentArmState(ArmState.State.SPECIMEN_PREPARE)
+                ),
+                () -> !ArmState.isCurrentState(ArmState.State.SPECIMEN_PREPARE)
         );
 
     }
