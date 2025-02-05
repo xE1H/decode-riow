@@ -46,57 +46,56 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new InstantCommand(()-> VLRSubsystem.getRotator().setHangCoefficients()),
                 new InstantCommand(()-> VLRSubsystem.getSlides().setHangCoefficients()),
 
-
-                new SetSlideExtension(0.12),
-                new WaitCommand(150),
+                new SetHangPosition(HangConfiguration.TargetPosition.UP),
+                new SetSlideExtension(0.2),
+                new WaitCommand(50),
 
                 new SetRotatorAngle(92),
-                new SetHangPosition(HangConfiguration.TargetPosition.UP),
+                new WaitCommand(50),
 
                 new WaitUntilCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).analogFeedbackThresholdReached()),
 
+                new WaitCommand(1000000),
+
                 new SetRotatorAngle(90),
-                new SetSlideExtension(0.29),
+                new SetSlideExtension(0.22),
 
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.NORMAL),
                 new InstantCommand(()-> VLRSubsystem.getRotator().setDefaultCoefficients()),
-
-
-                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.NORMAL),
                 new InstantCommand(()-> VLRSubsystem.getRotator().setDefaultCoefficients()),
 
-                new SetSlideExtension(0.31),
+
                 new SetRotatorAngle(85),
-
-
-
                 new SetSlideExtension(0.881),
-                new WaitUntilCommand(()-> VLRSubsystem.getSlides().reachedTargetPosition()).withTimeout(1500),
+                new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
                 new InstantCommand(()-> VLRSubsystem.getRotator().setMappedCoefficients()),
 
-                new SetRotatorAngle(98.2),
-                new WaitUntilCommand(()-> VLRSubsystem.getRotator().reachedTargetPosition()).withTimeout(1000),
+                new SetRotatorAngle(101),
+                new WaitCommand(1000),
+
+                new SetRotatorAngle(98),
+                new SetSlideExtension(0.878),
+
 
 
                 new WaitUntilCommand(gamepadCondition),
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG),
                 new InstantCommand(()-> VLRSubsystem.getRotator().setHangCoefficients()),
-                new InstantCommand(()-> VLRSubsystem.getSlides().setHangCoefficients()),
-
+                new InstantCommand(()-> VLRSubsystem.getSlides().setHangCoefficientsFast()),
 
                 new SetSlideExtension(0.04),
-                new InstantCommand(()-> VLRSubsystem.getSlides().setHangCoefficientsFast()),
-                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.71),
-                new SetRotatorAngle(142),
-                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.38),
+                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.79),
+                new SetRotatorAngle(145),
+                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.45),
                 new SetHangPosition(HangConfiguration.TargetPosition.DOWN),
-                new SetRotatorAngle(38),
-                new WaitUntilCommand(() -> VLRSubsystem.getSlides().reachedTargetPosition()).withTimeout(5000),
+
+                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.34),
+                new SetRotatorAngle(35),
+                new WaitUntilCommand(() -> VLRSubsystem.getSlides().reachedTargetPosition()).withTimeout(3000),
 
 
                 new WaitUntilCommand(gamepadCondition),
-                new SetRotatorAngle(130),
-                new WaitCommand(100000)
+                new SetRotatorAngle(120)
         );
     }
 }

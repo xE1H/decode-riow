@@ -38,7 +38,6 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
                 new WaitUntilCommand(gamepadCondition),
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG),
                 new SetSlideExtension(0.5),
-                new SetHangPosition(HangConfiguration.TargetPosition.HALF),
                 new WaitCommand(500),
                 new SetRotatorAngle(160),
                 // release off 2nd, hang on 1st
