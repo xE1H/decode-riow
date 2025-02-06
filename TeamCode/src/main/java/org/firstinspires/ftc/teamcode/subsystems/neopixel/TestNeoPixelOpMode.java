@@ -42,6 +42,11 @@ public class TestNeoPixelOpMode extends VLRLinearOpMode {
             neoPixelSubsystem.setEffectTime(effectTime);
             neoPixelSubsystem.setBrightness(brightness);
             neoPixelSubsystem.setTrailLength(trailLength);
+            if(isStopRequested()){
+                neoPixelSubsystem.clear();
+                neoPixelSubsystem.periodic();
+            }
         }
+
     }
 }

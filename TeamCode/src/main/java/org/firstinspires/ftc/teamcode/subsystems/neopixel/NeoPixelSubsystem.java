@@ -23,6 +23,12 @@ public class NeoPixelSubsystem extends VLRSubsystem<NeoPixelSubsystem> implement
         neoPixel = hardwareMap.get(NeoPixelDriver.class, NeoPixelName);
     }
 
+    public void clear(){
+        System.out.println("LED: CLEAR");
+        this.effect = Effect.SOLID_COLOR;
+        this.brightness = 0;
+    }
+
     public void setColor(Colour colour) {
         if (this.colour == colour) return;
         this.colour = colour;
