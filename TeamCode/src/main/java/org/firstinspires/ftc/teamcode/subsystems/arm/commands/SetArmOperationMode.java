@@ -1,15 +1,35 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.commands;
 
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 
+import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 
-public class SetArmOperationMode extends InstantCommand {
+public class SetArmOperationMode extends SequentialCommandGroup {
     public SetArmOperationMode(ArmSlideConfiguration.OperationMode operationMode){
-        super(()-> VLRSubsystem.getInstance(ArmSlideSubsystem.class).setOperationMode(operationMode));
+        addCommands(
+                new InstantCommand(()-> VLRSubsystem.getSlides().setOperationMode(operationMode)),
+                new WaitCommand(5),
+
+                new CustomConditionalCommand(
+                        new SequentialCommandGroup(
+                                new InstantCommand(()-> VLRSubsystem.getRotator().setHangCoefficients()),
+                                new InstantCommand(()-> VLRSubsystem.getSlides().setHangCoefficients())
+                        ),
+                        ()-> operationMode == ArmSlideConfiguration.OperationMode.HANG_SLOW
+                ),
+
+                new CustomConditionalCommand(
+                        new SequentialCommandGroup(
+                                new InstantCommand(()-> VLRSubsystem.getRotator().setHangCoefficients()),
+                                new InstantCommand(()-> VLRSubsystem.getSlides().setHangCoefficientsFast())
+                ),
+                ()-> operationMode == ArmSlideConfiguration.OperationMode.HANG_FAST
+        )
+
+        );
     }
 }

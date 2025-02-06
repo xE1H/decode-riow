@@ -10,14 +10,11 @@ public interface HangConfiguration {
     String LEFT_ANALOG = "leftAnalog";
     String RIGHT_ANALOG = "rightAnalog";
 
-    double leftAnalogThreshold = 238.5;
-    double rightAnalogThreshold = 121.5;
+    double leftAnalogThreshold = 258;
+    double rightAnalogThreshold = 120.25;
 
     enum TargetPosition {
-        DOWN (0),
-        HALF(0.75),
-        UP (1);
-        public final double pos;
-        TargetPosition(double pos) {this.pos = pos;}
+        DOWN,
+        UP
     }
 }

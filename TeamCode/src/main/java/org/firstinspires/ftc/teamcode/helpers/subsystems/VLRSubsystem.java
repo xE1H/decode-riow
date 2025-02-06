@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,10 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
 
     public static ArmSlideSubsystem getSlides() {
         return VLRSubsystem.getInstance(ArmSlideSubsystem.class);
+    }
+
+    public static HangSubsystem getHang() {
+        return VLRSubsystem.getInstance(HangSubsystem.class);
     }
 
     /**
