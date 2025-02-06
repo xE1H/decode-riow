@@ -84,19 +84,23 @@ public class NeoPixelSubsystem extends VLRSubsystem<NeoPixelSubsystem> implement
                 break;
             case CHASE_FORWARD:
                 double phaseForward = (timer.seconds() % effectTime) / effectTime;
-                int headForward = (int)(phaseForward * NeoPixelConfiguration.ledCount) + 1;
+                double headPositionForward = phaseForward * NeoPixelConfiguration.ledCount; // 0-based floating-point
                 for (int i = 1; i <= NeoPixelConfiguration.ledCount; i++) {
-                    int distance = Math.abs(headForward - i);
-                    double intensity = Math.max(0, 1.0 - (double) distance / trailLength);
+                    double ledPos = i - 1; // Convert to 0-based
+                    double delta = Math.abs(headPositionForward - ledPos);
+                    delta = Math.min(delta, NeoPixelConfiguration.ledCount - delta); // Circular wrap
+                    double intensity = Math.max(0, 1.0 - delta / trailLength);
                     neoPixel.setColor(i, (int)(brightness * colour.r * intensity), (int)(brightness * colour.g * intensity), (int)(brightness * colour.b * intensity));
                 }
                 break;
             case CHASE_BACKWARD:
                 double phaseBackward = (timer.seconds() % effectTime) / effectTime;
-                int headBackward = NeoPixelConfiguration.ledCount - (int)(phaseBackward * NeoPixelConfiguration.ledCount);
+                double headPositionBackward = NeoPixelConfiguration.ledCount - (phaseBackward * NeoPixelConfiguration.ledCount); // 0-based floating-point
                 for (int i = 1; i <= NeoPixelConfiguration.ledCount; i++) {
-                    int distance = Math.abs(headBackward - i);
-                    double intensity = Math.max(0, 1.0 - (double) distance / trailLength);
+                    double ledPos = i - 1; // Convert to 0-based
+                    double delta = Math.abs(headPositionBackward - ledPos);
+                    delta = Math.min(delta, NeoPixelConfiguration.ledCount - delta); // Circular wrap
+                    double intensity = Math.max(0, 1.0 - delta / trailLength);
                     neoPixel.setColor(i, (int)(brightness * colour.r * intensity), (int)(brightness * colour.g * intensity), (int)(brightness * colour.b * intensity));
                 }
                 break;
