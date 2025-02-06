@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.vision;
 
 import static org.firstinspires.ftc.teamcode.subsystems.vision.VisionConfiguration.MAX_REL_Y;
+import static org.firstinspires.ftc.teamcode.subsystems.vision.VisionConfiguration.MIN_REL_Y;
 
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.subsystems.vision.OrientationDeterminerPostProcessor.SampleOrientation;
@@ -41,6 +42,7 @@ public class BestSampleDeterminer {
 
             if (sample == null) continue;
             if (sample.relativeY > MAX_REL_Y) continue;
+            if (sample.relativeY < MIN_REL_Y) continue;
 
             if (!sample.color.equals("yellow") && !sample.color.equals(alliance.name)) continue;
 

@@ -55,10 +55,11 @@ public class VisionConfiguration {
     public static double POS_X = 3.799; // inches right from robot center 9CM 9.65
     public static double POS_Y = -4.21; // inches from the front of the robot 9.5CM 10.7
 
-    public static double LEFT_ANGLE = 12; // radians
-    public static double DOWN_ANGLE = -10; // radians 15
+    public static double LEFT_ANGLE = 15; // radians
+    public static double DOWN_ANGLE = -106; // radians 15
 
     public static double MAX_REL_Y = 14; // inches todo
+    public static double MIN_REL_Y = 5; // inches todo
 //
 //    public static double ROT_Y = -Math.PI / 2; // radians roll angle 90DEG
 //    public static double ROT_Z = Math.PI / 18; // radians left/right angle from straight 10DEG

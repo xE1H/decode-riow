@@ -26,8 +26,8 @@ public class PrepareSpecimenHigh extends CustomConditionalCommand {
 //    public static double SLIDE = 0.3;
 //    public static double CLAW_ANGLE = 0.4;
 
-    public static double ROTATOR = 55;
-    public static double SLIDE = 0.45;
+    public static double ROTATOR = 60;
+    public static double SLIDE = 0.3;
     public static double CLAW_ANGLE = 0.4;
 
     public PrepareSpecimenHigh() {
