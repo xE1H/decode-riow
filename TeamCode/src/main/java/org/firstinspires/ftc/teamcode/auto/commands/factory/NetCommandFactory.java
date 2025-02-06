@@ -42,6 +42,10 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetBrightness;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
 import org.firstinspires.ftc.teamcode.subsystems.vision.BestSampleDeterminer;
 import org.firstinspires.ftc.teamcode.subsystems.vision.OrientationDeterminerPostProcessor;
 import org.firstinspires.ftc.teamcode.subsystems.vision.Vision;
@@ -246,6 +250,10 @@ public class NetCommandFactory extends CommandFactory {
                         bestSampleOrientation[0] = BestSampleDeterminer.determineBestSample(samples, alliance);
                         // log for debug
                         System.out.println("Going for sample: " + bestSampleOrientation[0].color + " in X: " + bestSampleOrientation[0].relativeX + " Y: " + bestSampleOrientation[0].relativeY);
+                        NeoPixelSubsystem np = VLRSubsystem.getInstance(NeoPixelSubsystem.class);
+                        np.setColor(bestSampleOrientation[0].color.equals("yellow") ? NeoPixelConfiguration.Colour.YELLOW : bestSampleOrientation[0].color.equals("blue") ? NeoPixelConfiguration.Colour.BLUE : NeoPixelConfiguration.Colour.RED);
+                        np.setEffect(NeoPixelConfiguration.Effect.BLINK);
+                        np.setEffectTime(0.5);
                     }
                 },
                 new InstantCommand() {
@@ -277,6 +285,15 @@ public class NetCommandFactory extends CommandFactory {
                 new SetClawTwist(bestSampleOrientation[0].isVerticallyOriented ? ClawConfiguration.HorizontalRotation.NORMAL : ClawConfiguration.HorizontalRotation.FLIPPED),
                 new WaitCommand(250),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
+                new InstantCommand() {
+                    @Override
+                    public void run() {
+                        NeoPixelSubsystem np = VLRSubsystem.getInstance(NeoPixelSubsystem.class);
+                        np.setColor(bestSampleOrientation[0].color.equals("yellow") ? NeoPixelConfiguration.Colour.YELLOW : bestSampleOrientation[0].color.equals("blue") ? NeoPixelConfiguration.Colour.BLUE : NeoPixelConfiguration.Colour.RED);
+                        np.setEffect(NeoPixelConfiguration.Effect.SOLID_COLOR);
+                        np.setEffectTime(0.5);
+                    }
+                },
                 new WaitCommand(150),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
