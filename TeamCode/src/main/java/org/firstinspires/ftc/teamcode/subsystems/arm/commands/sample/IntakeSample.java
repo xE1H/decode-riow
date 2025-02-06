@@ -38,13 +38,17 @@ public class IntakeSample extends CustomConditionalCommand {
 
                         new SetClawAngle(VerticalRotation.UP),
                         new SetSlideExtension(extension),
-                        new WaitUntilCommand(VLRSubsystem.getInstance(ArmRotatorSubsystem.class)::reachedTargetPosition),
+                        new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition),
                         new SetClawAngle(VerticalRotation.DEPOSIT),
                         new SetClawState(GripperState.CLOSED),
                         new SetCurrentArmState(ArmState.State.SAMPLE_INTAKE)
                 ),
                 () -> (!ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE) && !ArmState.isMoving()) || ArmOverrideState.get()
         );
+        System.out.println("INTAKE NAHUI");
+        System.out.println(ArmState.get());
+        System.out.println(ArmState.isMoving());
+
     }
 
     public IntakeSample() {

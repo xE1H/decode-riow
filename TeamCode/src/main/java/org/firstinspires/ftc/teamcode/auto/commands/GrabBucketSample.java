@@ -6,7 +6,9 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.IntakeSample;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
@@ -20,23 +22,24 @@ public class GrabBucketSample extends SequentialCommandGroup {
 
     public GrabBucketSample(boolean clawTwisted) {
         addCommands(
-                new IntakeSample(SLIDE),
-                new SetClawState(ClawConfiguration.GripperState.OPEN),
-                new WaitCommand(300),
-                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                                new SetClawTwist(ClawConfiguration.HorizontalRotation.FLIPPED),
-                                new WaitCommand(200)
+                                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                new WaitCommand(100),
+                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                                new WaitCommand(150)
                         ),
                         () -> clawTwisted
                 ),
-                new WaitCommand(200),
+                new IntakeSample(SLIDE),
+                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                new WaitCommand(100),
+                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                new WaitCommand(120),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
                 new WaitCommand(200),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                new WaitCommand(50),
-                new RetractArm()
+                new SetCurrentArmState(ArmState.State.IN_ROBOT)
         );
     }
 

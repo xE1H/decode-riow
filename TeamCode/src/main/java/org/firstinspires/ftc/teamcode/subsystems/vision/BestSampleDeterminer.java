@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.vision;
 
 import static org.firstinspires.ftc.teamcode.subsystems.vision.VisionConfiguration.MAX_REL_Y;
+import static org.firstinspires.ftc.teamcode.subsystems.vision.VisionConfiguration.MIN_REL_Y;
 
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.subsystems.vision.OrientationDeterminerPostProcessor.SampleOrientation;
@@ -32,9 +33,16 @@ public class BestSampleDeterminer {
         SampleOrientation bestSample = null;
         double bestCoef = Double.MAX_VALUE;
 
+        System.out.println("Bing bang " + samples.size());
+
         for (SampleOrientation sample : samples) {
+            System.out.println("sempluojam " + sample.color);
+            System.out.println("X: " + sample.relativeX);
+            System.out.println("Y: " + sample.relativeY);
+
             if (sample == null) continue;
             if (sample.relativeY > MAX_REL_Y) continue;
+            if (sample.relativeY < MIN_REL_Y) continue;
 
             if (!sample.color.equals("yellow") && !sample.color.equals(alliance.name)) continue;
 

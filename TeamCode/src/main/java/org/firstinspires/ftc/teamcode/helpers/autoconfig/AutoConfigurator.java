@@ -19,6 +19,11 @@ public class AutoConfigurator {
             this.text = text;
             this.action = action;
         }
+
+        public Choice(String text) {
+            this.text = text;
+            this.action = () -> System.out.println("picked" + text);
+        }
     }
 
     public AutoConfigurator(Telemetry telemetry, Gamepad gamepad) {
@@ -26,7 +31,7 @@ public class AutoConfigurator {
         this.gamepad = gamepad;
     }
 
-    public void multipleChoice(String question, Choice... choices) {
+    public Choice multipleChoice(String question, Choice... choices) {
         if (choices.length == 0) {
             throw new IllegalArgumentException("Must have at least one choice");
         }
@@ -53,7 +58,8 @@ public class AutoConfigurator {
             telemetry.addLine("Use left stick to navigate up/down.");
             telemetry.addLine("Hold left stick to the right to accept.");
             if (isAccepting) {
-                int acceptProgress = (int) (10 * Math.round((System.currentTimeMillis() - startTime) / 1000.0));
+
+                int acceptProgress = (int) Math.round((System.currentTimeMillis() - startTime) / 100.0);
                 telemetry.addLine();
                 // some java bs to repeat a string n times...
                 telemetry.addLine("Accepting [" +
@@ -117,6 +123,8 @@ public class AutoConfigurator {
         gamepad.rumble(0, 0, 0);
         telemetry.clearAll();
         telemetry.update();
+
+        return currentChoice;
     }
 
     public void review(String... lines) {
@@ -136,8 +144,8 @@ public class AutoConfigurator {
                     break;
                 }
                 telemetry.addLine("Accepting [" +
-                        String.join("", Collections.nCopies((int) (10 * Math.round(timeElapsed / 1000.0)), "=")) +
-                        String.join("", Collections.nCopies(10 - (int) (10 * Math.round(timeElapsed / 1000.0)), "_")) +
+                        String.join("", Collections.nCopies((int) (Math.round(timeElapsed / 100.0)), "=")) +
+                        String.join("", Collections.nCopies(10 - (int) (Math.round(timeElapsed / 100.0)), "_")) +
                         "]");
             } else {
                 gamepad.rumble(0, 0, Gamepad.RUMBLE_DURATION_CONTINUOUS);
@@ -148,6 +156,9 @@ public class AutoConfigurator {
 
         gamepad.rumble(0, 0, 0);
         telemetry.clearAll();
+
+        telemetry.addLine("Review:");
+        Arrays.stream(lines).forEach(telemetry::addLine);
         telemetry.update();
     }
 }

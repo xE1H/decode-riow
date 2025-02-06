@@ -11,4 +11,8 @@ public class SetClawTwist extends InstantCommand {
     public SetClawTwist(ClawConfiguration.HorizontalRotation twist) {
         super(() -> VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(twist));
     }
+
+    public SetClawTwist(double twist) {
+        super(() -> VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(twist));
+    }
 }

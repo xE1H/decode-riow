@@ -21,6 +21,7 @@ public class YoloV11Inference {
     private final String[] labels;
     private final float scaleCoef;
     private final int yOffset;
+    private final int xOffset;
 
     public static class Detection {
         public float x1, y1, x2, y2;
@@ -37,7 +38,7 @@ public class YoloV11Inference {
         }
     }
 
-    public YoloV11Inference(String modelFilePath, int modelInputSize, float confidenceThreshold, String[] labels, float scaleCoef, int yOffset) { //  = {"bluesample", "redsample", "yellowsample"}
+    public YoloV11Inference(String modelFilePath, int modelInputSize, float confidenceThreshold, String[] labels, float scaleCoef, int yOffset, int xOffset) { //  = {"bluesample", "redsample", "yellowsample"}
         try {
             Context context = AppUtil.getInstance().getApplication().getApplicationContext();
 
@@ -47,6 +48,7 @@ public class YoloV11Inference {
             this.labels = labels;
             this.scaleCoef = scaleCoef;
             this.yOffset = yOffset;
+            this.xOffset = xOffset;
 
             MappedByteBuffer model = FileUtil.loadMappedFile(context, modelFilePath); // "best_float32.tflite"
             if (model == null) {
@@ -164,7 +166,7 @@ public class YoloV11Inference {
                 float h = outputBuffer[0][3][i] * scaleCoef;  // height
 
                 // Convert center/width/height to corners without any scaling
-                float x1 = x - w / 2;
+                float x1 = x - w / 2 + xOffset;
                 float y1 = y - h / 2 + yOffset;
                 float x2 = x1 + w;
                 float y2 = y1 + h;

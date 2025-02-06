@@ -55,7 +55,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         motionProfile = new MotionProfile(
                 FtcDashboard.getInstance().getTelemetry(),
                 "ARM",
-                MotionProfile.Type.ACCELERATION_LIMITED,
+                MotionProfile.Type.JERK_LIMITED,
                 ACCELERATION_JERK,
                 DECELERATION_JERK,
                 MAX_VELOCITY,
@@ -155,6 +155,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
     @Override
     public void periodic() {
+        System.out.println("rotator periodic");
         if (motorResetEnabled) return;
         encoderPosition = -thoughBoreEncoder.getCurrentPosition();
 

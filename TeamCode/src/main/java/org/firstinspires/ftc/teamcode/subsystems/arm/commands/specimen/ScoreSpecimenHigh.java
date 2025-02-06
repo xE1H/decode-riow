@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
+import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
@@ -28,22 +29,34 @@ public class ScoreSpecimenHigh extends CustomConditionalCommand {
     }
 
     public static double CLAW_ANGLE = 0.8;
-    public static double ROTATOR_ANGLE = 50;
+    public static double ROTATOR_ANGLE = 45;
     public static int ROTATOR_TIMEOUT = 400;
 
     public ScoreSpecimenHigh() {
         super(new SequentialCommandGroup(
                         new SetClawAngle(CLAW_ANGLE),
                         new WaitCommand(200),
+                        new InstantCommand() {
+                            @Override
+                            public void run() {
+                                VLRSubsystem.getInstance(ArmRotatorSubsystem.class).setHangCoefficients();
+                            }
+                        },
                         new SetRotatorAngle(ROTATOR_ANGLE),
                         new ParallelRaceGroup(
                                 new WaitUntilCommand(VLRSubsystem.getInstance(ArmRotatorSubsystem.class)::reachedTargetPosition),
                                 new WaitCommand(ROTATOR_TIMEOUT)
                         ),
-                        new WaitCommand(300),
+                        new InstantCommand() {
+                            @Override
+                            public void run() {
+                                VLRSubsystem.getInstance(ArmRotatorSubsystem.class).setDefaultCoefficients();
+                            }
+                        },
+                        new WaitCommand(400),
                         new SetClawState(ClawConfiguration.GripperState.OPEN),
-                        new SetCurrentArmState(ArmState.State.SAMPLE_SCORE)
+                        new SetCurrentArmState(ArmState.State.SPECIMEN_SCORE)
                 ),
-                () -> (ArmState.get() != ArmState.State.SAMPLE_SCORE));
+                () -> (!ArmState.isCurrentState(ArmState.State.SPECIMEN_SCORE)));
     }
 }

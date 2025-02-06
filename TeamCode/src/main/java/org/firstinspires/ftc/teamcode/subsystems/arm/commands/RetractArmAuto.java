@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
-public class RetractArm extends SequentialCommandGroup {
-    public RetractArm() {
+public class RetractArmAuto extends SequentialCommandGroup {
+    public RetractArmAuto() {
         if (ArmState.isMoving() && !ArmOverrideState.get()) return;
         ArmRotatorSubsystem arm = VLRSubsystem.getInstance(ArmRotatorSubsystem.class);
         ArmSlideSubsystem slides = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
@@ -70,8 +70,7 @@ public class RetractArm extends SequentialCommandGroup {
                                 new SetClawAngle(VerticalRotation.DOWN),
                                 new WaitCommand(50),
                                 new SetClawState(GripperState.CLOSED),
-
-                                new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
+                                new SetSlideExtension(0.2),
                                 new WaitCommand(200),
                                 new SetClawAngle(VerticalRotation.DEPOSIT),
                                 new WaitUntilCommand(slides::reachedTargetPosition),
