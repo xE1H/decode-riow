@@ -55,4 +55,5 @@ dependencies {
 
     implementation "org.tensorflow:tensorflow-lite:2.2.0"
     implementation "org.tensorflow:tensorflow-lite-support:0.4.0"
+    implementation "org.apache.commons:commons-lang3:3.17.0"
 }
