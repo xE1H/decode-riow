@@ -28,10 +28,10 @@ public class SetHangPosition extends CommandBase {
 
         switch (targetPosition){
             case DOWN:
-                hang.setPower(-0.1);
+                hang.setPower(-0.12);
                 break;
             case UP:
-                hang.setPower(0.3);
+                hang.setPower(0.45);
                 break;
         }
     }
@@ -53,7 +53,7 @@ public class SetHangPosition extends CommandBase {
         else {
             switch (targetPosition) {
                 case UP:
-                    hang.setPower(0.22);
+                    hang.setPower(0.25);
                     break;
                 case DOWN:
                     hang.setPower(0);

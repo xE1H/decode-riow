@@ -22,7 +22,7 @@ import java.util.function.BooleanSupplier;
 
 public class ThirdStageHangCommand extends SequentialCommandGroup {
     public ThirdStageHangCommand(BooleanSupplier gamepadCondition) {
-        addRequirements(VLRSubsystem.getRotator(), VLRSubsystem.getSlides());
+        addRequirements(VLRSubsystem.getRotator(), VLRSubsystem.getSlides(), VLRSubsystem.getHang());
         addCommands(
                 new CustomConditionalCommand(
                         new RetractArm(),
@@ -41,47 +41,42 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
 
 
                 new WaitUntilCommand(gamepadCondition),
+                new SetSlideExtension(0.27),
+                new WaitCommand(300),
 
-                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG),
-                new InstantCommand(()-> VLRSubsystem.getRotator().setHangCoefficients()),
-                new InstantCommand(()-> VLRSubsystem.getSlides().setHangCoefficients()),
-
-                new SetHangPosition(HangConfiguration.TargetPosition.UP),
+                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_SLOW),
                 new SetSlideExtension(0.2),
-                new WaitCommand(50),
+                new WaitCommand(100),
 
-                new SetRotatorAngle(92),
+                new SetRotatorAngle(92.5),
+                new SetHangPosition(HangConfiguration.TargetPosition.UP),
                 new WaitCommand(50),
 
                 new WaitUntilCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).analogFeedbackThresholdReached()),
 
-                new WaitCommand(1000000),
-
-                new SetRotatorAngle(90),
-                new SetSlideExtension(0.22),
-
+                new InstantCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).setPower(0)),
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.NORMAL),
-                new InstantCommand(()-> VLRSubsystem.getRotator().setDefaultCoefficients()),
-                new InstantCommand(()-> VLRSubsystem.getRotator().setDefaultCoefficients()),
 
+                new SetSlideExtension(0.3),
+                new WaitCommand(100),
 
+                new SetSlideExtension(0.888),
+                new WaitCommand(150),
                 new SetRotatorAngle(85),
-                new SetSlideExtension(0.881),
+
                 new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
                 new InstantCommand(()-> VLRSubsystem.getRotator().setMappedCoefficients()),
 
-                new SetRotatorAngle(101),
-                new WaitCommand(1000),
+                new SetRotatorAngle(102),
+                new WaitCommand(360),
 
-                new SetRotatorAngle(98),
-                new SetSlideExtension(0.878),
-
+                new SetSlideExtension(0.83),
+                new WaitCommand(300),
+                new SetRotatorAngle(99),
 
 
                 new WaitUntilCommand(gamepadCondition),
-                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG),
-                new InstantCommand(()-> VLRSubsystem.getRotator().setHangCoefficients()),
-                new InstantCommand(()-> VLRSubsystem.getSlides().setHangCoefficientsFast()),
+                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_FAST),
 
                 new SetSlideExtension(0.04),
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.79),
@@ -89,7 +84,7 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.45),
                 new SetHangPosition(HangConfiguration.TargetPosition.DOWN),
 
-                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.34),
+                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.4),
                 new SetRotatorAngle(35),
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().reachedTargetPosition()).withTimeout(3000),
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.hang;
 
+import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.LowPassFilter;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -16,14 +17,17 @@ public class HangSubsystem extends VLRSubsystem<HangSubsystem> implements HangCo
     private CRServo left, right;
     private AnalogInput analogLeft, analogRight;
 
+    private LowPassFilter leftFilter = new LowPassFilter(0.93);
+    private LowPassFilter rightFilter = new LowPassFilter(0.93);
+
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
         left = hardwareMap.get(CRServo.class, LEFT_AXON);
         right = hardwareMap.get(CRServo.class, RIGHT_AXON);
 
-        left.setDirection(DcMotorSimple.Direction.REVERSE);
-        right.setDirection(DcMotorSimple.Direction.REVERSE);
+        left.setDirection(DcMotorSimple.Direction.FORWARD);
+        right.setDirection(DcMotorSimple.Direction. REVERSE);
 
         analogLeft = hardwareMap.get(AnalogInput.class, LEFT_ANALOG);
         analogRight = hardwareMap.get(AnalogInput.class, RIGHT_ANALOG);
@@ -53,8 +57,8 @@ public class HangSubsystem extends VLRSubsystem<HangSubsystem> implements HangCo
 
     public boolean analogFeedbackThresholdReached(){
         return (
-                getAngle(analogLeft.getVoltage()) > leftAnalogThreshold &&
-                getAngle(analogRight.getVoltage()) < rightAnalogThreshold
+                leftFilter.estimate(getAngle(analogLeft.getVoltage())) > leftAnalogThreshold &&
+                rightFilter.estimate(getAngle(analogRight.getVoltage())) < rightAnalogThreshold
         );
     }
 }
