@@ -45,7 +45,7 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new WaitCommand(300),
 
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_SLOW),
-                new SetSlideExtension(0.2),
+                //new SetSlideExtension(0.2),
                 new WaitCommand(100),
 
                 new SetRotatorAngle(92.5),
@@ -53,6 +53,7 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new WaitCommand(50),
 
                 new WaitUntilCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).analogFeedbackThresholdReached()),
+                new WaitCommand(1000000000),
 
                 new InstantCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).setPower(0)),
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.NORMAL),

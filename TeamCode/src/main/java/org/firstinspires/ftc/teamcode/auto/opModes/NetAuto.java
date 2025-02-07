@@ -44,6 +44,7 @@ public class NetAuto extends VLRLinearOpMode {
         VLRSubsystem.initializeOne(hardwareMap, NeoPixelSubsystem.class);
 
         NeoPixelSubsystem np = VLRSubsystem.getInstance(NeoPixelSubsystem.class);
+
         np.setBrightness(1);
         np.setColor(alliance == Alliance.BLUE ? NeoPixelConfiguration.Colour.BLUE : NeoPixelConfiguration.Colour.RED);
         np.setEffect(NeoPixelConfiguration.Effect.BREATHE);
@@ -52,7 +53,15 @@ public class NetAuto extends VLRLinearOpMode {
         AutoOpModeRunner runner = new AutoOpModeRunner(new NetCommandFactory(alliance, opModeTime));
         runner.initialize(hardwareMap);
 
-        waitForStart();
+        while(!isStarted()) {
+            np.periodic();
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
 
         opModeTime.reset(); // Reset on start for accurate time
 

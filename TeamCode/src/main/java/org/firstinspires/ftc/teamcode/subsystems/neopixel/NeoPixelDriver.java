@@ -6,7 +6,9 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
+
 import org.apache.commons.lang3.SerializationUtils;
+
 import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -37,7 +39,7 @@ public class NeoPixelDriver extends I2cDeviceSynchDevice<I2cDeviceSynch> {
     private int currentMax = 0;
 
     // I2C communication buffers
-    private final byte[] buffLengthData = new byte[4];  // Increased to 4 bytes to handle 16-bit length
+    private final byte[] buffLengthData = new byte[3];
     private byte[][] bufferData;
     private byte[][] prevBufferData;
     private int packageCount = 0;
@@ -47,6 +49,7 @@ public class NeoPixelDriver extends I2cDeviceSynchDevice<I2cDeviceSynch> {
 
     /**
      * Sets the NeoPixel data pin on the microcontroller
+     *
      * @param pin Pin number to use
      */
     public void setPin(int pin) {
@@ -56,10 +59,11 @@ public class NeoPixelDriver extends I2cDeviceSynchDevice<I2cDeviceSynch> {
 
     /**
      * Sets the color for a specific pixel
+     *
      * @param pixel Pixel index (1-based)
-     * @param r Red value (0-255)
-     * @param g Green value (0-255)
-     * @param b Blue value (0-255)
+     * @param r     Red value (0-255)
+     * @param g     Green value (0-255)
+     * @param b     Blue value (0-255)
      * @throws IllegalArgumentException if pixel index is invalid
      */
     public void setColor(int pixel, int r, int g, int b) {
@@ -87,9 +91,8 @@ public class NeoPixelDriver extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         // Prepare the buffer length command (16-bit value)
         int totalLength = PACKET_SIZE * packageCount;
         buffLengthData[0] = (byte) BUF_LENGTH;
-        buffLengthData[1] = 0;  // Reserved byte
-        buffLengthData[2] = (byte) (totalLength & 0xFF);  // Low byte
-        buffLengthData[3] = (byte) ((totalLength >> 8) & 0xFF);  // High byte
+        buffLengthData[1] = (byte) (totalLength & 0xFF);  // Low byte
+        buffLengthData[2] = (byte) ((totalLength >> 8) & 0xFF);  // High byte  // High byte
 
         // Initialize buffer data array
         bufferData = new byte[packageCount][PACKET_SIZE + 3];
