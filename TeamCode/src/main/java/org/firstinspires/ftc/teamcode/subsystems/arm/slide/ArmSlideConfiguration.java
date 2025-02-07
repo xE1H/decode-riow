@@ -47,7 +47,7 @@ public class ArmSlideConfiguration {
     public static double ACCELERATION_HANG_FAST = 3000;
     public static double DECELERATION_HANG_FAST = 2600;
     public static double MAX_VELOCITY_HANG_FAST = 1500;
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG_FAST = 0.038;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG_FAST = 0.041;
     public static double FEEDBACK_INTEGRAL_GAIN_HANG_FAST = 0.00002;
     public static double VELOCITY_GAIN_HANG_FAST = 0.0015;
 

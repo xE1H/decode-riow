@@ -24,7 +24,6 @@ public class NeoPixelSubsystem extends VLRSubsystem<NeoPixelSubsystem> implement
     }
 
     public void clear(){
-        System.out.println("LED: CLEAR");
         this.effect = Effect.SOLID_COLOR;
         this.brightness = 0;
     }

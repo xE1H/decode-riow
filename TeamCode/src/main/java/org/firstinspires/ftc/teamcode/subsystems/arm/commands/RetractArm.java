@@ -18,6 +18,9 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.GripperS
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetEffect;
 
 public class RetractArm extends SequentialCommandGroup {
     public RetractArm() {
@@ -49,6 +52,9 @@ public class RetractArm extends SequentialCommandGroup {
                 new SetIsArmMoving(),
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
+                                new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
+                                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+
                                 new SetClawState(GripperState.CLOSED),
                                 new WaitCommand(90),
                                 new SetClawAngle(VerticalRotation.UP),
@@ -64,6 +70,9 @@ public class RetractArm extends SequentialCommandGroup {
 
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
+                                new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
+                                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+
                                 new SetClawState(GripperState.OPEN),
                                 new WaitCommand(300),
 

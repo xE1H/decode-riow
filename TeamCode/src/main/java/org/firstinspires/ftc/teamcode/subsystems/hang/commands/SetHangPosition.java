@@ -53,7 +53,7 @@ public class SetHangPosition extends CommandBase {
         else {
             switch (targetPosition) {
                 case UP:
-                    hang.setPower(0.25);
+                    hang.setPower(0.5);
                     break;
                 case DOWN:
                     hang.setPower(0);
