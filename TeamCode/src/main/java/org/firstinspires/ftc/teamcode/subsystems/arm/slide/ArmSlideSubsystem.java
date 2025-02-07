@@ -215,13 +215,13 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
     public void periodic(double armAngleDegrees) {
         checkLimitSwitch();
-        System.out.println("slide periodic funning");
+        //System.out.println("slide periodic funning");
 
         encoderPosition = -extensionEncoder.getCurrentPosition();
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;
-        power = clamp(power, -1, 1);
+        power = clamp(power, -0.9, 0.9);
 
 
         if (!overridePower) {

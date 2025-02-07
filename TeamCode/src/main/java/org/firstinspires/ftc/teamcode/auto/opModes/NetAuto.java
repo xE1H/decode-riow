@@ -29,6 +29,8 @@ public class NetAuto extends VLRLinearOpMode {
 
     @Override
     public void run() {
+        //VLRSubsystem.initializeOne(hardwareMap, NeoPixelSubsystem.class);
+
         ElapsedTime opModeTime = new ElapsedTime();
         Alliance alliance;
 
@@ -62,7 +64,8 @@ public class NetAuto extends VLRLinearOpMode {
             }
 
         }
-
+        np.setEffect(NeoPixelConfiguration.Effect.SOLID_COLOR);
+        np.setColor(NeoPixelConfiguration.Colour.GREEN);
         opModeTime.reset(); // Reset on start for accurate time
 
         runner.run(this::opModeIsActive, false);

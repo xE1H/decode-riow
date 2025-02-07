@@ -43,8 +43,8 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
 
                 //LEDS:
-                new SetColour(NeoPixelConfiguration.Colour.RED),
-                new SetEffect(NeoPixelConfiguration.Effect.SOLID_COLOR),
+                //new SetColour(NeoPixelConfiguration.Colour.RED),
+                //new SetEffect(NeoPixelConfiguration.Effect.SOLID_COLOR),
 
 
                 new WaitUntilCommand(gamepadCondition),
@@ -60,10 +60,10 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new WaitCommand(50),
 
                 new WaitUntilCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).analogFeedbackThresholdReached()),
-                new WaitCommand(1000000000),
+                //new WaitCommand(1000000000),
 
                 //LEDS:
-                new SetColour(NeoPixelConfiguration.Colour.GREEN),
+                //new SetColour(NeoPixelConfiguration.Colour.GREEN),
 
 
                 new InstantCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).setPower(0)),
@@ -88,8 +88,8 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
 
 
                 new WaitUntilCommand(gamepadCondition),
-                new SetEffect(NeoPixelConfiguration.Effect.CHASE_FORWARD),
-                new SetColour(NeoPixelConfiguration.Colour.PURPLE),
+                //new SetEffect(NeoPixelConfiguration.Effect.CHASE_FORWARD),
+                //new SetColour(NeoPixelConfiguration.Colour.PURPLE),
 
 
 
@@ -105,8 +105,8 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().reachedTargetPosition()).withTimeout(3000),
 
 
-                new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
-                new SetColour(NeoPixelConfiguration.Colour.GREEN),
+                //new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
+                //new SetColour(NeoPixelConfiguration.Colour.GREEN),
 
 
                 new WaitUntilCommand(gamepadCondition),
