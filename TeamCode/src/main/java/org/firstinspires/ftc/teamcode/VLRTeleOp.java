@@ -48,7 +48,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
         waitForStart();
         // since judges are pizdabolai
         // VLRSubsystem.initializeOne(hardwareMap, ClawSubsystem.class);
-        // VLRSubsystem.initializeOne(hardwareMap, HangSubsystem.class);
+         VLRSubsystem.initializeOne(hardwareMap, HangSubsystem.class);
         secondaryDriver = new SecondaryDriverTeleOpControls(gamepad2);
 
         ass.setMotorPower(-0.4);
