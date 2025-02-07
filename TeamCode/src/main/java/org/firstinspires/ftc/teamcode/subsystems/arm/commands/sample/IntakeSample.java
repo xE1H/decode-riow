@@ -18,6 +18,9 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.Vertical
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.GripperState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetEffect;
 
 public class IntakeSample extends CustomConditionalCommand {
     {
@@ -36,6 +39,10 @@ public class IntakeSample extends CustomConditionalCommand {
                                 () -> !ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE, ArmState.State.IN_ROBOT)
                         ),
 
+                        new SetEffect(NeoPixelConfiguration.Effect.CHASE_FORWARD),
+                        new SetColour(NeoPixelConfiguration.Colour.YELLOW),
+
+
                         new SetClawAngle(VerticalRotation.UP),
                         new SetSlideExtension(extension),
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition),
@@ -45,7 +52,7 @@ public class IntakeSample extends CustomConditionalCommand {
                 ),
                 () -> (!ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE) && !ArmState.isMoving()) || ArmOverrideState.get()
         );
-        System.out.println("INTAKE NAHUI");
+
         System.out.println(ArmState.get());
         System.out.println(ArmState.isMoving());
 

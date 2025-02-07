@@ -17,6 +17,9 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetEffect;
 
 import java.util.function.BooleanSupplier;
 
@@ -34,10 +37,14 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
 
                 //new ForceCalibrateSlides(),
 
-                new SetRotatorAngle(101),
+                new SetRotatorAngle(102.5),
                 new WaitUntilCommand(()-> VLRSubsystem.getRotator().getAngleDegrees() >= 60),
                 new SetSlideExtension(0.314),
                 new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
+
+                //LEDS:
+                new SetColour(NeoPixelConfiguration.Colour.RED),
+                new SetEffect(NeoPixelConfiguration.Effect.SOLID_COLOR),
 
 
                 new WaitUntilCommand(gamepadCondition),
@@ -48,12 +55,16 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 //new SetSlideExtension(0.2),
                 new WaitCommand(100),
 
-                new SetRotatorAngle(92.5),
+                new SetRotatorAngle(89.75),
                 new SetHangPosition(HangConfiguration.TargetPosition.UP),
                 new WaitCommand(50),
 
                 new WaitUntilCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).analogFeedbackThresholdReached()),
                 new WaitCommand(1000000000),
+
+                //LEDS:
+                new SetColour(NeoPixelConfiguration.Colour.GREEN),
+
 
                 new InstantCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).setPower(0)),
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.NORMAL),
@@ -77,17 +88,25 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
 
 
                 new WaitUntilCommand(gamepadCondition),
+                new SetEffect(NeoPixelConfiguration.Effect.CHASE_FORWARD),
+                new SetColour(NeoPixelConfiguration.Colour.PURPLE),
+
+
+
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_FAST),
 
                 new SetSlideExtension(0.04),
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.79),
-                new SetRotatorAngle(145),
-                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.45),
+                new SetRotatorAngle(133),
+                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.28),
                 new SetHangPosition(HangConfiguration.TargetPosition.DOWN),
 
-                new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.4),
                 new SetRotatorAngle(35),
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().reachedTargetPosition()).withTimeout(3000),
+
+
+                new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
+                new SetColour(NeoPixelConfiguration.Colour.GREEN),
 
 
                 new WaitUntilCommand(gamepadCondition),
