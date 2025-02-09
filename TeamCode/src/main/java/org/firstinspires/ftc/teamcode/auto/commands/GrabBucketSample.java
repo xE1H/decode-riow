@@ -40,7 +40,7 @@ public class GrabBucketSample extends SequentialCommandGroup {
                 new WaitCommand(120),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
 
-                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                //new SetColour(NeoPixelConfiguration.Colour.CYAN),
 
                 new WaitCommand(200),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),

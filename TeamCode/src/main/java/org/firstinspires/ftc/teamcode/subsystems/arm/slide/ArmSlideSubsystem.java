@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems.arm.slide;
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem.mapToRange;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.*;
+
+import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.LowPassFilter;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -30,6 +32,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     private OperationMode operationMode = OperationMode.NORMAL;
     private boolean overridePower = false;
     private double feedForwardGain = FEED_FORWARD_GAIN;
+
+    private LowPassFilter whateverMan = new LowPassFilter(0.95);
 
 
     @Override
@@ -76,8 +80,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     }
 
     public void setTargetPosition(double position) {
-        System.out.print("Setting target to");
-        System.out.println(position);
+        //System.out.print("Setting target to");
+        //System.out.println(position);
         lastPositionChangeTime = System.currentTimeMillis();
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
         motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
@@ -221,7 +225,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;
-        power = clamp(power, -0.9, 0.9);
+        power = clamp(power, -1, 1);
 
 
         if (!overridePower) {

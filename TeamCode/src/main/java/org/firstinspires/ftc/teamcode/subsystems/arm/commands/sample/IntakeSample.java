@@ -39,7 +39,7 @@ public class IntakeSample extends CustomConditionalCommand {
                                 () -> !ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE, ArmState.State.IN_ROBOT)
                         ),
 
-                        new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                        //new SetColour(NeoPixelConfiguration.Colour.CYAN),
 
 
                         new SetClawAngle(VerticalRotation.UP),

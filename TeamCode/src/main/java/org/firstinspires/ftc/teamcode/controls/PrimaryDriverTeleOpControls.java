@@ -35,13 +35,33 @@ public class PrimaryDriverTeleOpControls extends DriverControls {
                     chassis.drive(leftY, -leftX, -rightX);
                 }
         );
-        add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new ThirdStageHangCommand(() -> (gamepad.left_bumper && gamepad.right_bumper)))));
+        add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new ThirdStageHangCommand(() -> (gamepad.left_bumper && gamepad.right_bumper), ()-> gamepad.left_trigger > 0.9))));
+        add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> cs.schedule(new SecondStageHangCommand(() -> (gamepad.left_bumper && gamepad.right_bumper)))));
         add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean b) -> cs.schedule(new RetractArm())));
+
+        //stewpid hang motor disable
+        add(new ButtonCtl(GamepadKeys.Button.DPAD_RIGHT, ButtonCtl.Trigger.SIMPLE, false, this::hangDisable));
+
+
 
         add(new ButtonCtl(TRIANGLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new SetHangPosition(HangConfiguration.TargetPosition.UP))));
         add(new ButtonCtl(CROSS, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> cs.schedule(new SetHangPosition(HangConfiguration.TargetPosition.DOWN))));
         add(new ButtonCtl(CIRCLE, ButtonCtl.Trigger.WAS_JUST_PRESSED, true, (Boolean c) -> ArmLowState.toggle()));
 
         addVibration(ArmLowState::wasJustToggled);
+    }
+
+    private boolean lastState = false;
+
+    private void hangDisable(Boolean pressed) {
+        if (lastState != pressed) {
+            lastState = pressed;
+
+            if (lastState) {
+                VLRSubsystem.getRotator().deactivateRotatorForHang();
+            } else {
+                VLRSubsystem.getRotator().reenableMotorForHang();
+            }
+        }
     }
 }

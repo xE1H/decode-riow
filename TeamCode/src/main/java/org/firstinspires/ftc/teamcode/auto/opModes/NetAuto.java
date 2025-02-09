@@ -65,7 +65,7 @@ public class NetAuto extends VLRLinearOpMode {
 
         }
         np.setEffect(NeoPixelConfiguration.Effect.SOLID_COLOR);
-        np.setColor(NeoPixelConfiguration.Colour.GREEN);
+        np.setColor(NeoPixelConfiguration.Colour.YELLOW);
         opModeTime.reset(); // Reset on start for accurate time
 
         runner.run(this::opModeIsActive, false);

@@ -52,14 +52,14 @@ import java.util.List;
 @Config
 @Photon
 public class NetCommandFactory extends CommandFactory {
-    public static int toScoreX = 27;
-    public static int toScoreY = 119;
+    public static int toScoreX = 26;
+    public static int toScoreY = 118;
 
-    public static double toSample1X = 33.5;
+    public static double toSample1X = 32.3;
     public static double toSample1Y = 118.7;
 
-    public static double toSample2X = 33.5;
-    public static double toSample2Y = 128.7;
+    public static double toSample2X = 32.3;
+    public static double toSample2Y = 129;
 
     public static double toSample3PrepareX = 35;
     public static double toSample3PrepareY = 120;
@@ -115,8 +115,8 @@ public class NetCommandFactory extends CommandFactory {
         // so it has to be final - intellisense is suggesting this
 
         return new SequentialCommandGroup(
-                new SetBrightness(1),
-                new SetEffect(NeoPixelConfiguration.Effect.SOLID_COLOR),
+                //new SetBrightness(1),
+                //new SetEffect(NeoPixelConfiguration.Effect.SOLID_COLOR),
 
 
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
@@ -134,7 +134,7 @@ public class NetCommandFactory extends CommandFactory {
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 //new SetLiftDownLed(NeoPixelConfiguration.Colour.YELLOW),
-                                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                                //new SetColour(NeoPixelConfiguration.Colour.CYAN),
                                 new RetractArmAuto()
                                 //new SetTargetLed(NeoPixelConfiguration.Colour.YELLOW)
                         ),
@@ -144,7 +144,7 @@ public class NetCommandFactory extends CommandFactory {
                         new FollowPath(0, toSample1).withTimeout(0),
                         new SequentialCommandGroup(
                                 new WaitCommand(300),
-                                new SetColour(NeoPixelConfiguration.Colour.YELLOW),
+                                //new SetColour(NeoPixelConfiguration.Colour.YELLOW),
                                 new GrabBucketSample()
                         )
                 ),
@@ -166,13 +166,13 @@ public class NetCommandFactory extends CommandFactory {
                         ),
                         new SequentialCommandGroup(
                                 //new SetLiftDownLed(NeoPixelConfiguration.Colour.YELLOW),
-                                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                                //new SetColour(NeoPixelConfiguration.Colour.CYAN),
                                 new RetractArmAuto()
                                 //new SetTargetLed(NeoPixelConfiguration.Colour.YELLOW)
                         )
                 ),
                 new ParallelCommandGroup(
-                        new SetColour(NeoPixelConfiguration.Colour.YELLOW),
+                        //new SetColour(NeoPixelConfiguration.Colour.YELLOW),
 
                         new FollowPath(0, toSample2),
                         new SequentialCommandGroup(
@@ -198,7 +198,7 @@ public class NetCommandFactory extends CommandFactory {
                         ),
                         new SequentialCommandGroup(
                                 //new SetLiftDownLed(NeoPixelConfiguration.Colour.YELLOW),
-                                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                                //new SetColour(NeoPixelConfiguration.Colour.CYAN),
                                 new RetractArmAuto()
                                 //new SetTargetLed(NeoPixelConfiguration.Colour.YELLOW)
                         )
@@ -211,7 +211,7 @@ public class NetCommandFactory extends CommandFactory {
                 },
                 new WaitCommand(100),
                 new ParallelCommandGroup(
-                        new SetColour(NeoPixelConfiguration.Colour.YELLOW),
+                        //new SetColour(NeoPixelConfiguration.Colour.YELLOW),
 
                         new FollowPath(toSample3Heading, new Point(toSample3X, toSample3Y)),
                         new SequentialCommandGroup(
@@ -225,7 +225,7 @@ public class NetCommandFactory extends CommandFactory {
                                 new WaitCommand(300),
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
 
-                                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                                //new SetColour(NeoPixelConfiguration.Colour.CYAN),
 
                                 new WaitCommand(200),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
@@ -253,14 +253,14 @@ public class NetCommandFactory extends CommandFactory {
                                 //new SetLiftDownLed(NeoPixelConfiguration.Colour.YELLOW),
                                 new SetCurrentArmState(ArmState.State.SAMPLE_SCORE),
 
-                                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                                //new SetColour(NeoPixelConfiguration.Colour.CYAN),
                                 new RetractArm()
                         ),
                         new WaitCommand(3500)
                 ),
                 new ParallelCommandGroup(
                         //new PrintCommand("eikit nahui"),
-                        new SetBrightness(0),
+                        //new SetBrightness(0),
 
                         new ProcessFrame(),
                         new SequentialCommandGroup(
@@ -286,11 +286,11 @@ public class NetCommandFactory extends CommandFactory {
                         // log for debug
                         System.out.println("Going for sample: " + bestSampleOrientation[0].color + " in X: " + bestSampleOrientation[0].relativeX + " Y: " + bestSampleOrientation[0].relativeY);
 
-                        NeoPixelSubsystem np = VLRSubsystem.getInstance(NeoPixelSubsystem.class);
-                        np.setColor(bestSampleOrientation[0].color.equals("yellow") ? NeoPixelConfiguration.Colour.YELLOW : bestSampleOrientation[0].color.equals("blue") ? NeoPixelConfiguration.Colour.BLUE : NeoPixelConfiguration.Colour.RED);
+                        //NeoPixelSubsystem np = VLRSubsystem.getInstance(NeoPixelSubsystem.class);
+                        //np.setColor(bestSampleOrientation[0].color.equals("yellow") ? NeoPixelConfiguration.Colour.YELLOW : bestSampleOrientation[0].color.equals("blue") ? NeoPixelConfiguration.Colour.BLUE : NeoPixelConfiguration.Colour.RED);
                         //np.setEffect(NeoPixelConfiguration.Effect.BLINK);
                         //np.setEffectTime(0.5);
-                        np.setBrightness(1);
+                        //np.setBrightness(1);
                     }
                 },
                 new InstantCommand() {
@@ -335,7 +335,7 @@ public class NetCommandFactory extends CommandFactory {
                                         new InstantCommand() {
                                             @Override
                                             public void run() {
-                                                NeoPixelSubsystem np = VLRSubsystem.getInstance(NeoPixelSubsystem.class);
+                                                //NeoPixelSubsystem np = VLRSubsystem.getInstance(NeoPixelSubsystem.class);
                                                 //np.setColor(bestSampleOrientation[0].color.equals("yellow") ? NeoPixelConfiguration.Colour.YELLOW : bestSampleOrientation[0].color.equals("blue") ? NeoPixelConfiguration.Colour.BLUE : NeoPixelConfiguration.Colour.RED);
                                                 //np.setEffect(NeoPixelConfiguration.Effect.CHASE_FORWARD);
                                                 //np.setEffectTime(1);
@@ -350,7 +350,7 @@ public class NetCommandFactory extends CommandFactory {
                                         new InstantCommand() {
                                             @Override
                                             public void run() {
-                                                NeoPixelSubsystem np = VLRSubsystem.getInstance(NeoPixelSubsystem.class);
+                                                //NeoPixelSubsystem np = VLRSubsystem.getInstance(NeoPixelSubsystem.class);
                                                 //np.setColor(bestSampleOrientation[0].color.equals("yellow") ? NeoPixelConfiguration.Colour.YELLOW : bestSampleOrientation[0].color.equals("blue") ? NeoPixelConfiguration.Colour.BLUE : NeoPixelConfiguration.Colour.RED);
                                                 //np.setEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD);
                                                 //np.setEffectTime(1);
@@ -358,9 +358,9 @@ public class NetCommandFactory extends CommandFactory {
                                             }
                                         },
 
-                                        new SetColour(NeoPixelConfiguration.Colour.CYAN),
-                                        new RetractArm(),
-                                        new SetSolidLed(alliance == Alliance.BLUE ? NeoPixelConfiguration.Colour.BLUE : NeoPixelConfiguration.Colour.RED)
+                                        //new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                                        new RetractArm()
+                                        //new SetSolidLed(alliance == Alliance.BLUE ? NeoPixelConfiguration.Colour.BLUE : NeoPixelConfiguration.Colour.RED)
                                        // new PrintCommand("fein2")
                                 )
                         ),

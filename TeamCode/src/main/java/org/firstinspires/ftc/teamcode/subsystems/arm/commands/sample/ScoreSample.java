@@ -46,7 +46,7 @@ public class ScoreSample extends CustomConditionalCommand {
 
                         //new SetEffect(NeoPixelConfiguration.Effect.CHASE_FORWARD),
                         //new SetColour(NeoPixelConfiguration.Colour.CYAN),
-                        new SetColour(NeoPixelConfiguration.Colour.YELLOW),
+                        //new SetColour(NeoPixelConfiguration.Colour.YELLOW),
 
 
                         new SetRotatorAngle(rotator),

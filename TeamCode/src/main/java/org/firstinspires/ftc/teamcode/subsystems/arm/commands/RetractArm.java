@@ -52,8 +52,8 @@ public class RetractArm extends SequentialCommandGroup {
                 new SetIsArmMoving(),
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                                new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
-                                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                                //new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
+                                //new SetColour(NeoPixelConfiguration.Colour.CYAN),
 
                                 new SetClawState(GripperState.CLOSED),
                                 new WaitCommand(90),
@@ -70,8 +70,8 @@ public class RetractArm extends SequentialCommandGroup {
 
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                                new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
-                                new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                                //new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
+                                //new SetColour(NeoPixelConfiguration.Colour.CYAN),
 
                                 new SetClawState(GripperState.OPEN),
                                 new WaitCommand(300),

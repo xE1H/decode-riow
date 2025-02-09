@@ -25,10 +25,10 @@ public class ArmSlideConfiguration {
     public static double ACCELERATION = 26000;
     public static double DECELERATION = 12000;
     public static double MAX_VELOCITY = 2100;
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.0085;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.008;
     public static double FEEDBACK_INTEGRAL_GAIN = 0;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0003;
-    public static double FEED_FORWARD_GAIN = 0.1;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0002;
+    public static double FEED_FORWARD_GAIN = 0.05;
     public static double VELOCITY_GAIN = 0.0001;
     public static double ACCELERATION_GAIN = 0.00001;
 
@@ -39,17 +39,17 @@ public class ArmSlideConfiguration {
     public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.023;
     public static double FEEDBACK_DERIVATIVE_GAIN_HANG = 0.0003;
     public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.000002;
-    public static double FEED_FORWARD_GAIN_HANG = -0.78;
+    public static double FEED_FORWARD_GAIN_HANG = -0.6;
     public static double VELOCITY_GAIN_HANG = 0.0002;
     public static double ACCELERATION_GAIN_HANG = 0.00001;
 
 
-    public static double ACCELERATION_HANG_FAST = 3000;
-    public static double DECELERATION_HANG_FAST = 2600;
+    public static double ACCELERATION_HANG_FAST = 15000;
+    public static double DECELERATION_HANG_FAST = 10000;
     public static double MAX_VELOCITY_HANG_FAST = 1500;
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG_FAST = 0.041;
-    public static double FEEDBACK_INTEGRAL_GAIN_HANG_FAST = 0.00002;
-    public static double VELOCITY_GAIN_HANG_FAST = 0.0015;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG_FAST = 0.025;
+    public static double FEEDBACK_INTEGRAL_GAIN_HANG_FAST = 0.0000;
+    public static double VELOCITY_GAIN_HANG_FAST = 0.0008;
 
 
     public static double CREEP = 60;
