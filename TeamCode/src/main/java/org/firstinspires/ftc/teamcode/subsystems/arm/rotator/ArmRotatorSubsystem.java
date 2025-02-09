@@ -25,6 +25,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     private double encoderPosition = 0;
 
     private boolean motorResetEnabled = false;
+    private boolean disableMotorForHang = false;
     private double feedForwardGain = FEEDFORWARD_GAIN;
 
     private boolean reachedPosition = true;
@@ -153,13 +154,32 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
+    public void deactivateRotatorForHang(){
+        motor.setMotorDisable();
+        disableMotorForHang = true;
+    }
+
+    public void reenableMotorForHang(){
+        disableMotorForHang = false;
+        motor.setMotorEnable();
+    }
+
+
     @Override
     public void periodic() {
-        System.out.println("rotator periodic");
-        if (motorResetEnabled) return;
         encoderPosition = -thoughBoreEncoder.getCurrentPosition();
 
         double currentAngle = getAngleDegrees();
+
+        //System.out.println("rotator periodic");
+        if (motorResetEnabled){
+            return;
+        }
+        else if (disableMotorForHang){
+            motor.setPower(0);
+            slideSubsystem.periodic(currentAngle);
+            return;
+        }
 
         double feedForwardPower = Math.cos(Math.toRadians(currentAngle)) * feedForwardGain;
         double power = motionProfile.getPower(currentAngle) + feedForwardPower;

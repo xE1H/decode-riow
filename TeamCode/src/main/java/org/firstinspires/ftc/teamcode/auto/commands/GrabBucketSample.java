@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
 
 @Config
 public class GrabBucketSample extends SequentialCommandGroup {
@@ -37,6 +39,9 @@ public class GrabBucketSample extends SequentialCommandGroup {
                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                 new WaitCommand(120),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
+
+                //new SetColour(NeoPixelConfiguration.Colour.CYAN),
+
                 new WaitCommand(200),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetCurrentArmState(ArmState.State.IN_ROBOT)

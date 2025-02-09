@@ -106,6 +106,6 @@ public class NeoPixelSubsystem extends VLRSubsystem<NeoPixelSubsystem> implement
             default:
                 break;
         }
-        //neoPixel.show();
+        neoPixel.show();
     }
 }

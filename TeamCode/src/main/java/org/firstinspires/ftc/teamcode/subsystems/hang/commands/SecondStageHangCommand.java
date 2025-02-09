@@ -1,54 +1,60 @@
 package org.firstinspires.ftc.teamcode.subsystems.hang.commands;
 
+import static org.firstinspires.ftc.teamcode.subsystems.arm.ArmState.State.HANG_SECOND_STAGE;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmOperationMode;
-import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetArmOperationMode;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
-import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
+import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetEffect;
 
 import java.util.function.BooleanSupplier;
 
 public class SecondStageHangCommand extends SequentialCommandGroup {
-    public SecondStageHangCommand(BooleanSupplier gamepadCondition){
+    public SecondStageHangCommand(BooleanSupplier gamepadCondition) {
+        addRequirements(VLRSubsystem.getRotator(), VLRSubsystem.getSlides(), VLRSubsystem.getHang());
         addCommands(
                 new CustomConditionalCommand(
                         new RetractArm(),
-                        () -> !ArmState.isCurrentState(ArmState.State.IN_ROBOT, ArmState.State.HANG_SECOND_STAGE)
+                        () -> !ArmState.isCurrentState(ArmState.State.IN_ROBOT, ArmState.State.HANG_THIRD_STAGE, HANG_SECOND_STAGE)
                 ),
-
+                //new SetCurrentArmState(SECOND_STAGE_HANG),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                new SetRotatorAngle(105),
-                new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 60),
-                new SetSlideExtension(0.942),
-                new WaitUntilCommand(()-> VLRSubsystem.getInstance(ArmSlideSubsystem.class).reachedTargetPosition()),
-                new SetCurrentArmState(ArmState.State.HANG_SECOND_STAGE),
-                // hang off 2nd
+
+
+                //new ForceCalibrateSlides(),
+
+                new SetRotatorAngle(102.5),
+                new WaitUntilCommand(()-> VLRSubsystem.getRotator().getAngleDegrees() >= 60),
+                new SetSlideExtension(0.314),
+                new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
+
+                //LEDS:
+                //new SetColour(NeoPixelConfiguration.Colour.RED),
+                //new SetEffect(NeoPixelConfiguration.Effect.SOLID_COLOR),
+
+
                 new WaitUntilCommand(gamepadCondition),
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_SLOW),
-                new SetSlideExtension(0.5),
-                new WaitCommand(500),
-                new SetRotatorAngle(160),
-                // release off 2nd, hang on 1st
-                new WaitUntilCommand(gamepadCondition),
-                new SetRotatorAngle(160),
-                new SetHangPosition(HangConfiguration.TargetPosition.UP),
-                new WaitCommand(500),
-                //new SetDefaultCoefficients(),
-                new SetSlideExtension(0.88)
-            );
 
-        addRequirements(VLRSubsystem.getInstance(ArmRotatorSubsystem.class), VLRSubsystem.getInstance(ArmSlideSubsystem.class));
+                new SetSlideExtension(0.1),
+                new WaitCommand(2000),
+
+
+                new SetRotatorAngle(50)
+        );
     }
 }

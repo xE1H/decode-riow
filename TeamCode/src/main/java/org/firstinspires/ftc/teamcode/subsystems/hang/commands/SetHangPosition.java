@@ -47,10 +47,6 @@ public class SetHangPosition extends CommandBase {
 
     @Override
     public void end(boolean interrupted){
-        if (interrupted){
-            hang.setPower(0);
-        }
-        else {
             switch (targetPosition) {
                 case UP:
                     hang.setPower(0.5);
@@ -59,7 +55,6 @@ public class SetHangPosition extends CommandBase {
                     hang.setPower(0);
                     break;
             }
-        }
     }
 
 

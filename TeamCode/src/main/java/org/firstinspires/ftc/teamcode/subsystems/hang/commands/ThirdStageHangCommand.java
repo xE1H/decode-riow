@@ -24,18 +24,15 @@ import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetEffect;
 import java.util.function.BooleanSupplier;
 
 public class ThirdStageHangCommand extends SequentialCommandGroup {
-    public ThirdStageHangCommand(BooleanSupplier gamepadCondition) {
+    public ThirdStageHangCommand(BooleanSupplier gamepadCondition, BooleanSupplier interruptCondition) {
         addRequirements(VLRSubsystem.getRotator(), VLRSubsystem.getSlides(), VLRSubsystem.getHang());
         addCommands(
                 new CustomConditionalCommand(
                         new RetractArm(),
                         () -> !ArmState.isCurrentState(ArmState.State.IN_ROBOT, ArmState.State.HANG_THIRD_STAGE, HANG_SECOND_STAGE)
                 ),
-                //new SetCurrentArmState(SECOND_STAGE_HANG),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
 
-
-                //new ForceCalibrateSlides(),
 
                 new SetRotatorAngle(102.5),
                 new WaitUntilCommand(()-> VLRSubsystem.getRotator().getAngleDegrees() >= 60),
@@ -43,38 +40,31 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
 
                 //LEDS:
-                new SetColour(NeoPixelConfiguration.Colour.RED),
-                new SetEffect(NeoPixelConfiguration.Effect.SOLID_COLOR),
+                //new SetColour(NeoPixelConfiguration.Colour.RED),
+                //new SetEffect(NeoPixelConfiguration.Effect.SOLID_COLOR),
 
 
                 new WaitUntilCommand(gamepadCondition),
-                new SetSlideExtension(0.27),
-                new WaitCommand(300),
-
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_SLOW),
-                //new SetSlideExtension(0.2),
-                new WaitCommand(100),
 
-                new SetRotatorAngle(89.75),
-                new SetHangPosition(HangConfiguration.TargetPosition.UP),
-                new WaitCommand(50),
-
-                new WaitUntilCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).analogFeedbackThresholdReached()),
-                new WaitCommand(1000000000),
-
-                //LEDS:
-                new SetColour(NeoPixelConfiguration.Colour.GREEN),
+                new SequentialCommandGroup(
+                    new SetSlideExtension(0.2),  //208
+                    new WaitCommand(200),
+                    new SetHangPosition(HangConfiguration.TargetPosition.UP),
+                    new SetRotatorAngle(85),
+                    new WaitCommand(10000000)
+                ).interruptOn(interruptCondition),
 
 
-                new InstantCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).setPower(0)),
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.NORMAL),
 
                 new SetSlideExtension(0.3),
-                new WaitCommand(100),
+                new InstantCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).setPower(0)),
+
 
                 new SetSlideExtension(0.888),
-                new WaitCommand(150),
-                new SetRotatorAngle(85),
+                new WaitCommand(100),
+                new SetRotatorAngle(80),
 
                 new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
                 new InstantCommand(()-> VLRSubsystem.getRotator().setMappedCoefficients()),
@@ -88,29 +78,40 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
 
 
                 new WaitUntilCommand(gamepadCondition),
-                new SetEffect(NeoPixelConfiguration.Effect.CHASE_FORWARD),
-                new SetColour(NeoPixelConfiguration.Colour.PURPLE),
 
 
 
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_FAST),
+//                new InstantCommand(()-> VLRSubsystem.getSlides().setPowerOverride(true)),
+//                new InstantCommand(()-> VLRSubsystem.getSlides().setMotorPower(0)),
+                //new WaitCommand(500),
+
+                //new InstantCommand(()-> VLRSubsystem.getSlides().setMotorPower(-1)),
+
 
                 new SetSlideExtension(0.04),
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.79),
-                new SetRotatorAngle(133),
+
+                //new InstantCommand(()-> VLRSubsystem.getRotator().deactivateRotatorForHang()),
+
+                //new SetRotatorAngle(130),
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().getExtension() < 0.28),
                 new SetHangPosition(HangConfiguration.TargetPosition.DOWN),
 
                 new SetRotatorAngle(35),
+                new WaitCommand(200),
+                //new InstantCommand(()-> VLRSubsystem.getRotator().reenableMotorForHang()),
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().reachedTargetPosition()).withTimeout(3000),
 
-
-                new SetEffect(NeoPixelConfiguration.Effect.CHASE_BACKWARD),
-                new SetColour(NeoPixelConfiguration.Colour.GREEN),
 
 
                 new WaitUntilCommand(gamepadCondition),
                 new SetRotatorAngle(120)
         );
+    }
+
+
+    public ThirdStageHangCommand(BooleanSupplier gamepadCondition){
+        this(gamepadCondition, ()-> false);
     }
 }

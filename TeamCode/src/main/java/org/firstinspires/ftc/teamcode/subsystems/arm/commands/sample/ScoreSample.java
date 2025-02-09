@@ -44,8 +44,10 @@ public class ScoreSample extends CustomConditionalCommand {
                                 () -> !ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.IN_ROBOT)
                         ),
 
-                        new SetEffect(NeoPixelConfiguration.Effect.CHASE_FORWARD),
-                        new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                        //new SetEffect(NeoPixelConfiguration.Effect.CHASE_FORWARD),
+                        //new SetColour(NeoPixelConfiguration.Colour.CYAN),
+                        //new SetColour(NeoPixelConfiguration.Colour.YELLOW),
+
 
                         new SetRotatorAngle(rotator),
                         new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 30),
