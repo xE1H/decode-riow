@@ -16,6 +16,8 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
     // Commands
     CommandRunner commandRunner;
 
+    double startTime = 0;
+
     @Override
     public void runOpMode() {
         VLRSubsystem.clearSubsystems(); // Clear all subsystems
@@ -25,6 +27,7 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
         executorService.submit(commandRunner);
 
         this.run();
+
         CommandScheduler.getInstance().reset(); // reset command scheduler -- clear all previous commands
         executorService.shutdownNow(); // force shutdown of ALL threads
         try {
@@ -36,4 +39,24 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
     }
 
     public abstract void run();
+
+    @Override
+    public void waitForStart() {
+        super.waitForStart();
+        startTime = super.getRuntime();
+    }
+
+    /**
+     * @return the time in seconds since the opmode was initialized
+     */
+    public double getTimeSinceInit() {
+        return super.getRuntime() - startTime;
+    }
+
+    /**
+     * @return the time in seconds since the opmode was started
+     */
+    public double getTimeSinceStart() {
+        return super.getRuntime();
+    }
 }
