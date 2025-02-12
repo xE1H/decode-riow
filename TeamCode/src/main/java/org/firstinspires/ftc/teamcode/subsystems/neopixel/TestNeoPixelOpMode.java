@@ -1,17 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems.neopixel;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.command.WaitCommand;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.vision.Vision;
 @Config
 @TeleOp(name = "AAAA Test NeoPixel", group = "Test")
 public class TestNeoPixelOpMode extends VLRLinearOpMode {
