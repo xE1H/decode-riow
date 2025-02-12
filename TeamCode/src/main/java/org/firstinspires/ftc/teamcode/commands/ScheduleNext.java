@@ -22,7 +22,6 @@ public class ScheduleNext extends InstantCommand {
 
     @Override
     public void initialize() {
-        System.out.println("SCHEDULE NEXT: RUNNING");
         CommandScheduler cs = CommandScheduler.getInstance();
         controller.reportAsCompleted();
         System.out.println("SCHEDULE NEXT: REPORTED AS COMPLETED");

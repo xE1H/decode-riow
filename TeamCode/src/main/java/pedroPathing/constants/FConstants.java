@@ -2,8 +2,6 @@ package pedroPathing.constants;
 
 import com.pedropathing.localization.Localizers;
 import com.pedropathing.follower.FollowerConstants;
-import com.pedropathing.util.CustomFilteredPIDFCoefficients;
-import com.pedropathing.util.CustomPIDFCoefficients;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class FConstants {
@@ -22,32 +20,37 @@ public class FConstants {
 
         FollowerConstants.mass = 8.5;
 
-        // TODO tune everything after this from scratch
         FollowerConstants.xMovement = 81.8818;
         FollowerConstants.yMovement = 66.748;
 
         FollowerConstants.forwardZeroPowerAcceleration = -42.6719;
         FollowerConstants.lateralZeroPowerAcceleration = -64.7502;
 
-        FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.35,0.000016,0.019,0);
+        // TODO tune everything after this from scratch
+        //FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.15,0,0.008,0); // original
+        FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.25, 0, 0.0025, 0); // secondary original
         FollowerConstants.useSecondaryTranslationalPID = false;
-        FollowerConstants.secondaryTranslationalPIDFCoefficients.setCoefficients(0.1,0,0.01,0); // Not being used, @see useSecondaryTranslationalPID
+        FollowerConstants.secondaryTranslationalPIDFCoefficients.setCoefficients(0.1, 0, 0.01, 0); // Not being used, @see useSecondaryTranslationalPID
 
-        FollowerConstants.headingPIDFCoefficients.setCoefficients(4,0.008,0.3,0);
+        //FollowerConstants.headingPIDFCoefficients.setCoefficients(0.45, 0, 0.0015, 0); // original
+        FollowerConstants.headingPIDFCoefficients.setCoefficients(0.12, 0, 0.05, 0); // secondary original
         FollowerConstants.useSecondaryHeadingPID = false;
-        FollowerConstants.secondaryHeadingPIDFCoefficients.setCoefficients(2,0,0.1,0); // Not being used, @see useSecondaryHeadingPID
+        FollowerConstants.secondaryHeadingPIDFCoefficients.setCoefficients(2, 0, 0.1, 0); // Not being used, @see useSecondaryHeadingPID
 
-        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.03,0,0.0000004,0.6,0);
+        //FollowerConstants.drivePIDFCoefficients.setCoefficients(0.004,0,0.0000012,0.6,0); // original
+        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.0065, 0, 0, 0.6, 0); // secondary original
         FollowerConstants.useSecondaryDrivePID = false;
-        FollowerConstants.secondaryDrivePIDFCoefficients.setCoefficients(0.1,0,0,0.6,0); // Not being used, @see useSecondaryDrivePID
+        FollowerConstants.secondaryDrivePIDFCoefficients.setCoefficients(0.1, 0, 0, 0.6, 0); // Not being used, @see useSecondaryDrivePID
 
         FollowerConstants.zeroPowerAccelerationMultiplier = 3;
-        FollowerConstants.centripetalScaling = 0.00001;
+        FollowerConstants.centripetalScaling = 0.00025;
 
         FollowerConstants.pathEndTimeoutConstraint = 500;
         FollowerConstants.pathEndTValueConstraint = 0.995;
         FollowerConstants.pathEndVelocityConstraint = 0.1;
         FollowerConstants.pathEndTranslationalConstraint = 0.1;
         FollowerConstants.pathEndHeadingConstraint = 0.007;
+
+        FollowerConstants.useVoltageCompensationInAuto = true;
     }
 }
