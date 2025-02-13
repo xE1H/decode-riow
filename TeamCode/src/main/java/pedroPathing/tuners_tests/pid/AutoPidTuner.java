@@ -87,12 +87,24 @@ public class AutoPidTuner extends OpMode {
     public void loop() {
         switch (currentPhase) {
             case TRANSLATIONAL:
+                Follower.useTranslational = true;
+                Follower.useHeading = false;
+                Follower.useDrive = false;
+                Follower.useCentripetal = false;
                 tuneTranslationalControl();
                 break;
             case HEADING:
+                Follower.useTranslational = true;
+                Follower.useHeading = true;
+                Follower.useDrive = false;
+                Follower.useCentripetal = false;
                 tuneHeadingControl();
                 break;
             case DRIVE:
+                Follower.useTranslational = true;
+                Follower.useHeading = true;
+                Follower.useDrive = true;
+                Follower.useCentripetal = false;
                 tuneDriveControl();
                 break;
             case COMPLETE:
