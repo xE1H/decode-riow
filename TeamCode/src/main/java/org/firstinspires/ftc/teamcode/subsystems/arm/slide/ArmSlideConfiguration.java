@@ -60,8 +60,8 @@ public class ArmSlideConfiguration {
     public static double MIN_POSITION = 0;
     public static double MIN_MANUAL_ADJUST_POSITION = 160;
     public static double HORIZONTAL_EXTENSION_LIMIT = 650;
-    public static double MAX_POSITION = 1230;
-    public static double TICKS_PER_IN = 17.97 * 2.54 * 1.03;
+    public static double MAX_POSITION = 1270;
+    public static double TICKS_PER_IN = 44.88;//17.67 * 2.54 * 1.1; // 53.36
     public static double MAX_EXTENSION_IN = HORIZONTAL_EXTENSION_LIMIT / TICKS_PER_IN;
 
     public static double INTAKE_SPECIMEN = 0.05;

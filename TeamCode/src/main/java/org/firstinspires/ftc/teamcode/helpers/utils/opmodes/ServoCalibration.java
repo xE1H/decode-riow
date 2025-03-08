@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -7,13 +8,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "ServoCalibration", group = "Utils")
 @Photon
+@Config
 public class ServoCalibration extends LinearOpMode {
     private boolean prevState = false;
+    public static int current_i = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
         String[] servoNames = {"twist", "angle", "claw"};
-        int current_i = 0;
         double location = 0;
         waitForStart();
         while (opModeIsActive()) {

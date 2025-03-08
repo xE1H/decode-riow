@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 public class StrategyController {
-    private final GameStateController gameStateController;
+    public final GameStateController gameStateController;
     private State currentState;
     private State previousState;
     private int highScoreCycles = 0;
@@ -49,10 +49,10 @@ public class StrategyController {
 
         if (gameStateController.getGameStage() == GameStateController.GameStage.TELEOP) {
             double teleopTime = gameStateController.getCorrectedTimePassed();
-            if (120 - teleopTime < 15) {
-                currentState = State.HANG;
-                return;
-            }
+//            if (120 - teleopTime < 15) {
+//                currentState = State.HANG;
+//                return;
+//            }
         }
 
         switch (currentState) {
@@ -87,7 +87,7 @@ public class StrategyController {
                     double autoTime = gameStateController.getCorrectedTimePassed();
                     currentState = State.HIGH_SCORE;
                 } else if (gameStateController.getGameStage() == GameStateController.GameStage.TELEOP) {
-                    if (highScoreCycles < 10) {
+                    if (highScoreCycles < 100) {
                         currentState = State.HIGH_SCORE;
                     } else {
                         currentState = State.LOW_SCORE;
