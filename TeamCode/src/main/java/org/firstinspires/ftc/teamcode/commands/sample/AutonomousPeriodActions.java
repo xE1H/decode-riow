@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.commands;
+package org.firstinspires.ftc.teamcode.commands.sample;
 
-import static org.firstinspires.ftc.teamcode.Points.START_POSE;
-import static org.firstinspires.ftc.teamcode.Points.rad;
+import static org.firstinspires.ftc.teamcode.Points_sample.START_POSE;
+import static org.firstinspires.ftc.teamcode.Points_sample.rad;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;

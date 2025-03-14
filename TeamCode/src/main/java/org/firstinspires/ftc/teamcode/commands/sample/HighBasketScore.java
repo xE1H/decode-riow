@@ -1,22 +1,18 @@
-package org.firstinspires.ftc.teamcode.commands;
+package org.firstinspires.ftc.teamcode.commands.sample;
 
-import static org.firstinspires.ftc.teamcode.Points.BUCKET_HIGH_SCORE_POSE;
-import static org.firstinspires.ftc.teamcode.Points.SUB_GRAB_POSE;
-import static org.firstinspires.ftc.teamcode.Points.SUB_PRE_BEZIER_POSE;
+import static org.firstinspires.ftc.teamcode.Points_sample.BUCKET_HIGH_SCORE_POSE;
+import static org.firstinspires.ftc.teamcode.Points_sample.SUB_GRAB_POSE;
+import static org.firstinspires.ftc.teamcode.Points_sample.SUB_PRE_BEZIER_POSE;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
 
-import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.ScoreSample;

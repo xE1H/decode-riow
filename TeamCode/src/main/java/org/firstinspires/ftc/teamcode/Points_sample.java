@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.localization.Pose;
 
 @Config
-public class Points {
+public class Points_sample {
     public static Pose START_POSE = new Pose(10, 111.5, 0);
 
 //    public static Pose BUCKET_HIGH_SCORE_POSE = new Pose(21, 116, rad(-45));

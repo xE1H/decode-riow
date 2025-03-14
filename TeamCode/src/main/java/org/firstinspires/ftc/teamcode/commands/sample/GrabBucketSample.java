@@ -1,22 +1,16 @@
-package org.firstinspires.ftc.teamcode.commands;
+package org.firstinspires.ftc.teamcode.commands.sample;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
-import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.IntakeSample;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
 
 @Config
 public class GrabBucketSample extends SequentialCommandGroup {

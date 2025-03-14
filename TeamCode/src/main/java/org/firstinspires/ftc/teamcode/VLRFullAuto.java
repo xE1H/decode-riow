@@ -1,14 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.Points.BUCKET_HIGH_SCORE_POSE;
-import static org.firstinspires.ftc.teamcode.Points.BUCKET_HIGH_SCORE_TRUE_POSE;
-import static org.firstinspires.ftc.teamcode.Points.START_POSE;
-import static org.firstinspires.ftc.teamcode.Points.SUB_GRAB_POSE;
-import static org.firstinspires.ftc.teamcode.Points.SUB_PRE_BEZIER_POSE;
-import static org.firstinspires.ftc.teamcode.Points.SUB_PRE_PREGRAB_POSE;
+import static org.firstinspires.ftc.teamcode.Points_sample.BUCKET_HIGH_SCORE_POSE;
+import static org.firstinspires.ftc.teamcode.Points_sample.BUCKET_HIGH_SCORE_TRUE_POSE;
+import static org.firstinspires.ftc.teamcode.Points_sample.SUB_GRAB_POSE;
+import static org.firstinspires.ftc.teamcode.Points_sample.SUB_PRE_BEZIER_POSE;
+import static org.firstinspires.ftc.teamcode.Points_sample.SUB_PRE_PREGRAB_POSE;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -17,15 +15,14 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.commands.FollowPath;
-import com.pedropathing.commands.HoldPoint;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.commands.AutonomousPeriodActions;
-import org.firstinspires.ftc.teamcode.commands.HighBasketScore;
-import org.firstinspires.ftc.teamcode.commands.SubmersibleGrab;
+import org.firstinspires.ftc.teamcode.commands.sample.AutonomousPeriodActions;
+import org.firstinspires.ftc.teamcode.commands.sample.HighBasketScore;
+import org.firstinspires.ftc.teamcode.commands.sample.SubmersibleGrab;
 import org.firstinspires.ftc.teamcode.helpers.autoconfig.AutoConfigurator;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
@@ -46,10 +43,8 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
-import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.hang.commands.SecondStageHangCommand;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.Limelight;
-import org.firstinspires.ftc.teamcode.subsystems.vision.Vision;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;

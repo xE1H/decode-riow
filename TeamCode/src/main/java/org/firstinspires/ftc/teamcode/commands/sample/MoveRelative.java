@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.commands;
+package org.firstinspires.ftc.teamcode.commands.sample;
 
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 
@@ -7,7 +7,6 @@ import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.PathBuilder;
-import com.pedropathing.pathgen.PathChain;
 
 public class MoveRelative extends SequentialCommandGroup {
     public MoveRelative(Follower f, double relativeX, double relativeY) {

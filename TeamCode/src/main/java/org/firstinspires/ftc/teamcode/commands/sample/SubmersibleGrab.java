@@ -1,19 +1,13 @@
-package org.firstinspires.ftc.teamcode.commands;
+package org.firstinspires.ftc.teamcode.commands.sample;
 
-import static org.firstinspires.ftc.teamcode.Points.BUCKET_HIGH_SCORE_POSE;
-import static org.firstinspires.ftc.teamcode.Points.SUB_GRAB_POSE;
-import static org.firstinspires.ftc.teamcode.Points.SUB_PRE_BEZIER_POSE;
-import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_POSITION;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.TICKS_PER_IN;
 
-import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.PrintCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
-import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
@@ -32,9 +26,6 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.BestSampleDeterminer;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.WaitUntilNextLimelightUpdate;
-import org.firstinspires.ftc.teamcode.subsystems.vision.OrientationDeterminerPostProcessor;
-import org.firstinspires.ftc.teamcode.subsystems.vision.Vision;
-import org.firstinspires.ftc.teamcode.subsystems.vision.commands.ProcessFrame;
 
 import java.util.List;
 
