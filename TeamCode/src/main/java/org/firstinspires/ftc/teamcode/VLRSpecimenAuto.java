@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.Points_specimen.START_POSE;
+
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
@@ -22,7 +24,6 @@ public class VLRSpecimenAuto extends VLRLinearOpMode {
     CommandScheduler cs;
 
     Follower f;
-    Pose startPose = new Pose(10, 111.5, 0);
 
     /**
      * @noinspection unchecked
@@ -37,7 +38,7 @@ public class VLRSpecimenAuto extends VLRLinearOpMode {
         VLRSubsystem.initializeAll(hardwareMap);
 
         f = new Follower(hardwareMap);
-        f.setStartingPose(startPose);
+        f.setStartingPose(START_POSE);
 
         cs.schedule(new AutonomousPeriodActions(f));
 
