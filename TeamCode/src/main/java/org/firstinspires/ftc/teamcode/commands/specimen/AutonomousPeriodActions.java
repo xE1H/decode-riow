@@ -29,7 +29,7 @@ public class AutonomousPeriodActions extends SequentialCommandGroup {
 
                 //DRIVE TO BAR AND EXTEND ARM
                 new ParallelCommandGroup(
-                        new FollowPath(f, bezierPath(START_POSE, SCORE_PRELOAD)
+                        new FollowPath(f, bezierPath(START_POSE, SCORE_PRELOAD_AND_SUB_PICKUP)
                                 .setConstantHeadingInterpolation(Math.toRadians(-180)).build()),
 
                         new SequentialCommandGroup(
@@ -48,7 +48,7 @@ public class AutonomousPeriodActions extends SequentialCommandGroup {
 
                 //DRIVE TO FIRST SAMPLE-----
                 new ParallelCommandGroup(
-                        new FollowPath(f, bezierPath(SCORE_PRELOAD, CONTROL_1, CONTROL_2, PICK_UP_SAMPLE_1)
+                        new FollowPath(f, bezierPath(SCORE_PRELOAD_AND_SUB_PICKUP, CONTROL_1, CONTROL_2, PICK_UP_SAMPLE_1)
                                 .setTangentHeadingInterpolation().build()),
                         new SequentialCommandGroup(
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
@@ -87,8 +87,8 @@ public class AutonomousPeriodActions extends SequentialCommandGroup {
 
                 //DRIVE TO PICK UP FIRST SPECIMEN-----
                 new ParallelCommandGroup(
-                        new FollowPath(f, bezierPath(PICK_UP_SAMPLE_3, PICK_UP_SPECIMEN)
-                                .setLinearHeadingInterpolation(PICK_UP_SAMPLE_3.getHeading(), PICK_UP_SPECIMEN.getHeading()).build()),
+                        new FollowPath(f, bezierPath(PICK_UP_SAMPLE_3, PICK_UP_OTHER_SPECIMENS)
+                                .setLinearHeadingInterpolation(PICK_UP_SAMPLE_3.getHeading(), PICK_UP_OTHER_SPECIMENS.getHeading()).build()),
                         new SequentialCommandGroup(
                                 prepareArmForSpikeMarkSamplePickup(),
                                 new SetClawAngle(0.85)
@@ -152,13 +152,13 @@ public class AutonomousPeriodActions extends SequentialCommandGroup {
         if (specimen <= 1) throw new IllegalArgumentException("FIRST SPECIMEN IS PRELOAD, CYCLE STARTS WITH SECOND (2)");
         else if (specimen >= 7) throw new IllegalArgumentException("ARE YOU CRAZY?");
 
-        Pose targetSpecimen = SCORE_SPECIMEN;
+        Pose targetSpecimen = SCORE_OTHER_SPECIMENS;
         targetSpecimen.add(new Pose(0, 1.25d * (specimen - 2)));
 
         return new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                        new FollowPath(follower, bezierPath(PICK_UP_SPECIMEN, targetSpecimen)
-                                .setLinearHeadingInterpolation(PICK_UP_SPECIMEN.getHeading(), targetSpecimen.getHeading()).build()),
+                        new FollowPath(follower, bezierPath(PICK_UP_OTHER_SPECIMENS, targetSpecimen)
+                                .setLinearHeadingInterpolation(PICK_UP_OTHER_SPECIMENS.getHeading(), targetSpecimen.getHeading()).build()),
 
                         new SequentialCommandGroup(
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
@@ -201,8 +201,8 @@ public class AutonomousPeriodActions extends SequentialCommandGroup {
 
     ParallelCommandGroup driveToHumanPlayerZone(Follower follower, Pose targetSpecimen){
         return new ParallelCommandGroup(
-                new FollowPath(follower, bezierPath(targetSpecimen, PICK_UP_SPECIMEN)
-                        .setLinearHeadingInterpolation(targetSpecimen.getHeading(), PICK_UP_SPECIMEN.getHeading()).build()),
+                new FollowPath(follower, bezierPath(targetSpecimen, PICK_UP_OTHER_SPECIMENS)
+                        .setLinearHeadingInterpolation(targetSpecimen.getHeading(), PICK_UP_OTHER_SPECIMENS.getHeading()).build()),
                 new SequentialCommandGroup(
                         new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                         new WaitUntilCommand(()-> VLRSubsystem.getSlides().getExtension() < 0.2),
