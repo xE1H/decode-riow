@@ -13,18 +13,18 @@ public class FConstants {
         FollowerConstants.rightFrontMotorName = "MotorRightFront";
         FollowerConstants.rightRearMotorName = "MotorRightBack";
 
-        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
-        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.FORWARD;
-        FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
-        FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.REVERSE;
+        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
+        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.REVERSE;
+        FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
+        FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.FORWARD;
 
-        FollowerConstants.mass = 8.5;
+        FollowerConstants.mass = 9;
 
-        FollowerConstants.xMovement = 81.8818;
-        FollowerConstants.yMovement = 66.748;
+        FollowerConstants.xMovement = 85.414;
+        FollowerConstants.yMovement = 65.854;
 
-        FollowerConstants.forwardZeroPowerAcceleration = -42.6719;
-        FollowerConstants.lateralZeroPowerAcceleration = -64.7502;
+        FollowerConstants.forwardZeroPowerAcceleration = -45.08;
+        FollowerConstants.lateralZeroPowerAcceleration = -70.7502;
 
         // TODO tune everything after this from scratch
         //FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.15,0,0.008,0); // original
@@ -38,7 +38,7 @@ public class FConstants {
         FollowerConstants.secondaryHeadingPIDFCoefficients.setCoefficients(2, 0, 0.1, 0); // Not being used, @see useSecondaryHeadingPID
 
         //FollowerConstants.drivePIDFCoefficients.setCoefficients(0.004,0,0.0000012,0.6,0); // original
-        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.008/1.9, 0, 0.00001/3, 0, 0); // secondary original
+        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.01/1.9, 0, 0.000015/3, 0, 0); // secondary original
         FollowerConstants.driveKalmanFilterParameters.dataCovariance = 100;
         FollowerConstants.driveKalmanFilterParameters.modelCovariance = 60;
         FollowerConstants.useSecondaryDrivePID = false;
