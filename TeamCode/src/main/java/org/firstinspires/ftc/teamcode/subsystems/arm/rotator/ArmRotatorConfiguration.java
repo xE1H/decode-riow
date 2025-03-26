@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class ArmRotatorConfiguration {
 
     public static String MOTOR_NAME = "MotorRotator";
-    public static String ENCODER_NAME = "MotorLeftBack";
+    public static String ENCODER_NAME = "MotorRightBack";
 
     //ACCELERATION PROFILE CONSTANTS:
 //    public static double ACCELERATION = 8000;
@@ -22,16 +22,16 @@ public class ArmRotatorConfiguration {
 
 
     //JERK PROFILE CONSTANTS:
-    public static double ACCELERATION_JERK = 25000;
-    public static double DECELERATION_JERK = 22000;
-    public static double MAX_VELOCITY = 375;
+    public static double ACCELERATION_JERK = 30000;
+    public static double DECELERATION_JERK = 25000;
+    public static double MAX_VELOCITY = 330;
 
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.049;
-    public static double FEEDBACK_INTEGRAL_GAIN = 0.0018;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0025;
-    public static double VELOCITY_GAIN = 0.00185;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.056;
+    public static double FEEDBACK_INTEGRAL_GAIN = 0.0012;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0015;
+    public static double VELOCITY_GAIN = 0.002;
     public static double ACCELERATION_GAIN = 0.00008;
-    public static double FEEDFORWARD_GAIN = 0.12;
+    public static double FEEDFORWARD_GAIN = 0.075;
 
 
     public static double EXTENDED_ACCELERATION_JERK = 2000;

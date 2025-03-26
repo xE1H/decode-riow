@@ -36,7 +36,7 @@ public class Points_specimen {
 
     public static Pose SCORE_SECOND_SPECIMEN = new Pose(35, 55, Math.toRadians(0));
 
-    public static Pose SCORE_OTHER_SPECIMENS = new Pose(37.5, 57, Math.toRadians(-180));
+    public static Pose SCORE_OTHER_SPECIMENS = new Pose(30, 57, Math.toRadians(-180));
 
 
 

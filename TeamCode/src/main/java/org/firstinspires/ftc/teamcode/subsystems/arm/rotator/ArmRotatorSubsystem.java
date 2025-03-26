@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorCo
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 
 
 public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
-    private DcMotorEx motor;
+    private DcMotorSimple motor;
     private DcMotorEx thoughBoreEncoder;
 
     private MotionProfile motionProfile;
@@ -45,9 +46,8 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
         ArmState.resetAll();
         slideSubsystem = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
 
-        motor = hardwareMap.get(DcMotorEx.class, MOTOR_NAME);
-        motor.setDirection(DcMotorEx.Direction.REVERSE);
-        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         thoughBoreEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
         thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -143,7 +143,6 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     public void disableMotor() {
         motorResetEnabled = true;
         motor.setPower(0);
-        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     public void reenableMotor() {
@@ -151,17 +150,14 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
         thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void deactivateRotatorForHang(){
-        motor.setMotorDisable();
         disableMotorForHang = true;
     }
 
     public void reenableMotorForHang(){
         disableMotorForHang = false;
-        motor.setMotorEnable();
     }
 
 
@@ -194,7 +190,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
             }
             prevReachedPosition = reachedTarget;
 
-            if (reachedTarget && motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && timer.seconds() > 1){
+            if (reachedTarget && motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && timer.seconds() > 0.5){
                 power = 0;
             }
         }

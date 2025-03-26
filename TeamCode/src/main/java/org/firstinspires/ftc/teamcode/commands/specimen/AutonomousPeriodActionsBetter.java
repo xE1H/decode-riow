@@ -135,14 +135,18 @@ public class AutonomousPeriodActionsBetter extends SequentialCommandGroup {
                                 new SetClawAngle(0.5),
                                 new WaitUntilCommand(()-> f.getPose().getY() > 11),
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                                new WaitCommand(100),
+                                new WaitCommand(80),
                                 new SetRotatorAngle(65),
                                 new WaitUntilCommand(()-> VLRSubsystem.getRotator().reachedTargetPosition()),
-                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                                 new SetSlideExtension(0.35),
                                 new WaitUntilCommand(()-> VLRSubsystem.getSlides().reachedTargetPosition())
                         )
                 ),
+
+                new WaitCommand(100),
+                new SetRotatorAngle(70),
+                new WaitCommand(500),
 
                 //RETRACT ARM, PICK ANOTHER SAMPLE FROM SUB
                 new ParallelCommandGroup(
@@ -230,7 +234,6 @@ public class AutonomousPeriodActionsBetter extends SequentialCommandGroup {
     }
 
 
-
     SequentialCommandGroup depositSample(){
         return new SequentialCommandGroup(
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
@@ -256,7 +259,7 @@ public class AutonomousPeriodActionsBetter extends SequentialCommandGroup {
 
 
     SequentialCommandGroup cycle(Follower follower, int specimen){
-        if (specimen <= 1) throw new IllegalArgumentException("FIRST SPECIMEN IS PRELOAD, CYCLE STARTS WITH SECOND (2)");
+        if (specimen <= 1) throw new IllegalArgumentException("FIRST SPECIMEN IS PRELOAD, SECOND USES CUSTOM PATH, CYCLING STARTS WITH THIRD (3)");
         else if (specimen >= 8) throw new IllegalArgumentException("ARE YOU CRAZY?");
 
         Pose targetSpecimen = SCORE_OTHER_SPECIMENS;
@@ -272,17 +275,18 @@ public class AutonomousPeriodActionsBetter extends SequentialCommandGroup {
                                 new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                                 new WaitUntilCommand(()-> VLRSubsystem.getSlides().getExtension() < 0.15),
 
-                                new SetRotatorAngle(100),
+                                new SetRotatorAngle(110),
                                 new WaitCommand(500),
-                                new SetSlideExtension(0.15)
+                                new SetSlideExtension(0.25)
                         )
                 ),
 
                 //SCORE SPECIMEN----
                 new WaitCommand(450),
                 new SetSlideExtension(0.43),
-                new WaitUntilCommand(()-> VLRSubsystem.getSlides().reachedTargetPosition()),
+                new WaitCommand(300),
                 new SetClawState(ClawConfiguration.GripperState.OPEN),
+                new WaitCommand(120),
 
                 //DRIVE BACK
                 new ConditionalCommand(
@@ -290,7 +294,7 @@ public class AutonomousPeriodActionsBetter extends SequentialCommandGroup {
 
                         //RETRACT ARM AND DON'T DRIVE BACK IF LAST SPECIMEN
                         new SequentialCommandGroup(
-                                new SetRotatorAngle(95),
+                                new SetRotatorAngle(100),
                                 new WaitCommand(300),
 
                                 new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),

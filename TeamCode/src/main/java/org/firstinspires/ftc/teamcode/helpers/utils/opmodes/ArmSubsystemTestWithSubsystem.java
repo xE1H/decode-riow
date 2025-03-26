@@ -17,20 +17,20 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 @TeleOp()
 
 public class ArmSubsystemTestWithSubsystem extends VLRLinearOpMode {
-    ArmRotatorSubsystem armSubsystem;
+    ArmRotatorSubsystem rotator;
     ArmSlideSubsystem slides;
 
     public static ArmRotatorConfiguration.TargetAngle targetAngle = ArmRotatorConfiguration.TargetAngle.RETRACT;
     public static ArmSlideConfiguration.TargetPosition targetPosition = ArmSlideConfiguration.TargetPosition.RETRACTED;
     public static double targetArmAngle = 0;
-    public static double prevAngle = 0;
+    private double prevAngle = 0;
 
     @Override
     public void run() {
         VLRSubsystem.requireSubsystems(ArmRotatorSubsystem.class, ArmSlideSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
-        armSubsystem = VLRSubsystem.getRotator();
+        rotator = VLRSubsystem.getRotator();
         slides = VLRSubsystem.getSlides();
 
         GlobalConfig.DEBUG_MODE = true;
@@ -38,12 +38,28 @@ public class ArmSubsystemTestWithSubsystem extends VLRLinearOpMode {
         waitForStart();
 
         while(opModeIsActive()){
-            if (prevAngle != targetArmAngle){
-                armSubsystem.setTargetPosition(targetArmAngle);
-                prevAngle = targetArmAngle;
+            if (gamepad1.triangle){
+                rotator.setTargetPosition(120);
             }
+            else if (gamepad1.cross){
+                rotator.setTargetAngle(ArmRotatorConfiguration.TargetAngle.RETRACT);
+            }
+
+            else if (gamepad1.circle){
+                slides.setTargetPosition(0.9);
+            }
+
+            else if (gamepad1.square){
+                slides.setTargetPosition(0.01);
+            }
+//            if (prevAngle != targetArmAngle){
+//                armSubsystem.setTargetPosition(targetArmAngle);
+//                prevAngle = targetArmAngle;
+//            }
             //armSubsystem.setTargetAngle(targetAngle);
-            slides.setTargetPosition(targetPosition);
+            //slides.setTargetPosition(targetPosition);
+
+            telemetry.update();
         }
     }
 }
