@@ -2,14 +2,12 @@ package org.firstinspires.ftc.teamcode.commands.sample;
 
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_POSITION;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.TICKS_PER_IN;
-
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.PrintCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.pedropathing.follower.Follower;
-
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
@@ -53,13 +51,14 @@ public class SubmersibleGrab extends SequentialCommandGroup {
                         Limelight.Sample sample = BestSampleDeterminer.determineBestSample(samples, alliance, f.getPose().getX());
                         if (sample == null) {
                             System.out.println("Found nothing ts pmo");
-                            rc.doubleBlip();
+                            if (rc != null) rc.doubleBlip();
+
                             //generateRetry(f, alliance);
                         } else {
                             angle = VLRSubsystem.getInstance(Limelight.class).getAngleEstimation(sample);
                             if (angle == -360) {
                                 System.out.println("Found nothing ts pmo");
-                                rc.doubleBlip();
+                                if (rc != null) rc.doubleBlip();
                                 return;
                             }
                             if (angle < 0) angle += 180;
@@ -111,5 +110,10 @@ public class SubmersibleGrab extends SequentialCommandGroup {
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
                 new WaitCommand(150)
         );
+    }
+
+
+    public SubmersibleGrab(Follower f, Alliance alliance) {
+        this(f, alliance, null);
     }
 }

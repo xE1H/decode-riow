@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.helpers.utils;
 
+import static com.arcrobotics.ftclib.util.MathUtils.clamp;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -367,7 +369,7 @@ public class MotionProfile {
         telemetry.addData(telemetryName + "_motionProfileTargetVelocity: ", velocitySetPoint);
         telemetry.addData(telemetryName + "_motionProfileTargetAcceleration: ", accelerationSetPoint);
         telemetry.addData(telemetryName + "_motionProfileTime: ", (System.nanoTime() - initialTime) / Math.pow(10, 9));
-        telemetry.addData(telemetryName + "_motor power: ", positionPower + velocityPower + accelerationPower);
+        telemetry.addData(telemetryName + "_motor power: ", clamp(positionPower + velocityPower + accelerationPower, -1, 1));
         telemetry.update();
     }
 }

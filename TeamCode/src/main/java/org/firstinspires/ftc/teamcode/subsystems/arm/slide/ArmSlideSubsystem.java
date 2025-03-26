@@ -4,11 +4,11 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem.mapToRange;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.*;
 
-import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.LowPassFilter;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
@@ -17,9 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
 @Config
 public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
-    private DcMotorEx extensionMotor0;
-    private DcMotorEx extensionMotor1;
-    private DcMotorEx extensionMotor2;
+    private DcMotorSimple extensionMotor0, extensionMotor1, extensionMotor2;
     private DcMotorEx extensionEncoder;
 
     private TouchSensor limitSwitch;
@@ -33,25 +31,20 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     private boolean overridePower = false;
     private double feedForwardGain = FEED_FORWARD_GAIN;
 
-    private LowPassFilter whateverMan = new LowPassFilter(0.95);
-
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
         ArmState.resetAll();
-        extensionMotor0 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_0);
-        extensionMotor1 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_1);
-        extensionMotor2 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_2);
+
+        extensionMotor0 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_0);
+        extensionMotor1 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_1);
+        extensionMotor2 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_2);
 
         limitSwitch = hardwareMap.get(TouchSensor.class, LIMIT_SW_NAME);
 
-        extensionMotor0.setDirection(DcMotorEx.Direction.FORWARD);
-        extensionMotor1.setDirection(DcMotorEx.Direction.FORWARD);
-        extensionMotor2.setDirection(DcMotorEx.Direction.FORWARD);
-
-        extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor0.setDirection(DcMotorSimple.Direction.FORWARD);
+        extensionMotor1.setDirection(DcMotorSimple.Direction.FORWARD);
+        extensionMotor2.setDirection(DcMotorSimple.Direction.FORWARD);
 
         extensionEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
         extensionEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -219,9 +212,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
     public void periodic(double armAngleDegrees) {
         checkLimitSwitch();
-        //System.out.println("slide periodic funning");
 
-        encoderPosition = -extensionEncoder.getCurrentPosition();
+        encoderPosition = -extensionEncoder.getCurrentPosition() / 8192d;
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;
@@ -244,13 +236,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
                         extensionMotor2.setPower(power);
                     }
 
-                } else {
-                    setMotorPower(power);
-                }
-            } else {
-                setMotorPower(power);
-            }
+                } else setMotorPower(power);
+            } else setMotorPower(power);
         }
-
     }
 }
