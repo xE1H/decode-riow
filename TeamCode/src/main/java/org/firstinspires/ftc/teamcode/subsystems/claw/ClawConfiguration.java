@@ -11,7 +11,7 @@ public interface ClawConfiguration {
     String ANALOG_ENCODER_RIGHT = "analog1";
   
     double HORIZONTAL_ROTATION_MIN = 0.04;
-    double HORIZONTAL_ROTATION_MAX = 0.96;
+    double HORIZONTAL_ROTATION_MAX = 1;
 
     double state_closed_normal_pos = 0;
     double state_open_pos = 0.925;
@@ -20,9 +20,9 @@ public interface ClawConfiguration {
     double analog_voltage_right = 0;
 
     enum VerticalRotation {
-        DOWN(0.98),
-        UP(0.05),
-        DEPOSIT(0.24);
+        DOWN(0.95),
+        UP(0.02),
+        DEPOSIT(0.35);
 
         public final double pos;
         VerticalRotation(double pos) {
@@ -41,8 +41,8 @@ public interface ClawConfiguration {
     }
 
     enum GripperState {
-        CLOSED(0),
-        OPEN(0.8);
+        CLOSED(0.95),
+        OPEN(0.24);
 
         public final double pos;
         GripperState(double pos) {

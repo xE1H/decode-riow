@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.limelight;
 
+import android.os.health.SystemHealthManager;
+
 import com.acmerobotics.dashboard.config.Config;
 
 import org.json.JSONArray;
@@ -48,7 +50,7 @@ public class LimelightYoloReader {
                 int y1 = detectionObj.getInt("y1");
                 int x2 = detectionObj.getInt("x2");
                 int y2 = detectionObj.getInt("y2");
-
+                System.out.println("Detected sample " + classId + ", (" + x1 + ", " + y1 + "), (" + x2 + ", " + y2 + ")");
                 //samples.add(new Detection(classId, x1, y1, x2, y2));
             }
         } catch (Exception e) {
@@ -70,12 +72,14 @@ public class LimelightYoloReader {
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String response = readResponse(connection);
+                System.out.println("GET " + endpoint);
+                System.out.println(response);
                 return new JSONObject(response);
             } else {
-                //System.out.println("HTTP GET Error: " + responseCode);
+                System.out.println("GET Error: " + responseCode);
             }
         } catch (Exception e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         } finally {
             if (connection != null) {
                 connection.disconnect();

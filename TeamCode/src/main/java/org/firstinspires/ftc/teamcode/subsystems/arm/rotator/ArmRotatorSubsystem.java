@@ -163,7 +163,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
     @Override
     public void periodic() {
-        encoderPosition = -thoughBoreEncoder.getCurrentPosition();
+        encoderPosition = thoughBoreEncoder.getCurrentPosition();
 
         double currentAngle = getAngleDegrees();
 

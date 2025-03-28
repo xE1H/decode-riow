@@ -48,22 +48,26 @@ public class VLRSpecimenAuto extends VLRLinearOpMode {
 
         f = new Follower(hardwareMap);
         f.setStartingPose(START_POSE);
-
+        f.updatePose();
+        waitForStart();
         cs.schedule(new AutonomousPeriodActionsBetter(f));
 
         while (opModeIsActive()) {
             f.update();
+            try {
+                telemetry.addData("FOLLOWER VELOCITY: ", Math.abs(f.getVelocityMagnitude()));
+                telemetry.addData("FOLLOWER HEADING ERROR: ", Math.abs(f.headingError));
+                telemetry.addData("FOLLOWER POSITION ERROR: ", Math.abs(f.driveError));
+                telemetry.addData("FOLLOWER TRANSLATIONAL ERROR", Math.abs(f.getTranslationalError().getMagnitude()));
 
-            telemetry.addData("FOLLOWER VELOCITY: ", Math.abs(f.getVelocityMagnitude()));
-            telemetry.addData("FOLLOWER HEADING ERROR: ", Math.abs(f.headingError));
-            telemetry.addData("FOLLOWER POSITION ERROR: ", Math.abs(f.driveError));
-            telemetry.addData("FOLLOWER TRANSLATIONAL ERROR", Math.abs(f.getTranslationalError().getMagnitude()));
+                boolean settled = Math.abs(f.getVelocityMagnitude()) < velocityThreshold && Math.abs(f.headingError) < headingThreshold &&
+                        Math.abs(f.driveError) < driveThreshold && Math.abs(f.getTranslationalError().getMagnitude()) < translationalThreshold;
+                telemetry.addData("SETTLED: ", settled ? 1 : 0);
 
-            boolean settled = Math.abs(f.getVelocityMagnitude()) < velocityThreshold && Math.abs(f.headingError) < headingThreshold &&
-                    Math.abs(f.driveError) < driveThreshold && Math.abs(f.getTranslationalError().getMagnitude()) < translationalThreshold;
-            telemetry.addData("SETTLED: ", settled ? 1 : 0);
+                telemetry.update();
+            } catch (NullPointerException e) {
 
-            telemetry.update();
+            }
         }
     }
 }

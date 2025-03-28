@@ -59,4 +59,8 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         clawState = state;
         grabServos.setPosition(state.pos);
     }
+
+    public void disable() {
+        angleServo.getController().pwmDisable();
+    }
 }

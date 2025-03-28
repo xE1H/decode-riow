@@ -35,16 +35,23 @@ public class AutonomousPeriodActionsBetter extends SequentialCommandGroup {
                                 .setConstantHeadingInterpolation(SCORE_PRELOAD_AND_SUB_PICKUP.getHeading()).build()),
 
                         new SequentialCommandGroup(
-                                new SetRotatorAngle(65),
-                                new WaitCommand(300),
-                                new SetSlideExtension(0.35)
+                                new SetRotatorAngle(48),
+                                new WaitCommand(400),
+                                new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT),
+                                new SetSlideExtension(0.6),
+                                new ParallelCommandGroup(
+                                        new SetRotatorAngle(50),
+                                        new SetSlideExtension(0.63)
+                                )
                         )
                 ),
 
                 //SCORE PRELOAD SAMPLE------
-                new WaitCommand(80),
+                new WaitCommand(800),
                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                 new WaitCommand(120),
+
+                new WaitCommand(9999999),
 
                 //RETRACT ARM AND PICK SAMPLE FROM SUB
                 new ParallelCommandGroup(
