@@ -2,12 +2,15 @@ package org.firstinspires.ftc.teamcode.commands.sample;
 
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_POSITION;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.TICKS_PER_IN;
+
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.PrintCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.pedropathing.follower.Follower;
+
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
@@ -15,6 +18,7 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
@@ -23,6 +27,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.BestSampleDeterminer;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.Limelight;
+import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.WaitUntilNextLimelightUpdate;
 
 import java.util.List;
@@ -33,11 +38,11 @@ public class SubmersibleGrab extends SequentialCommandGroup {
 
     double angle = 90;
 
-    public SubmersibleGrab(Follower f, Alliance alliance, RumbleControls rc) {
+    public SubmersibleGrab(Follower f, Alliance alliance, LimelightYoloReader reader, RumbleControls rc) {
         addCommands(
                 new PrintCommand("Sub grab command"),
                 new ParallelCommandGroup(
-                        new WaitUntilNextLimelightUpdate(),
+                        //new WaitUntilNextLimelightUpdate(),
                         new SequentialCommandGroup(
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT),
@@ -47,15 +52,14 @@ public class SubmersibleGrab extends SequentialCommandGroup {
                 new InstantCommand() {
                     @Override
                     public void run() {
-                        List<Limelight.Sample> samples = VLRSubsystem.getInstance(Limelight.class).getDetections();
-                        Limelight.Sample sample = BestSampleDeterminer.determineBestSample(samples, alliance, f.getPose().getX());
+                        LimelightYoloReader.Limelight.Sample sample = reader.getBestSampleWithRetry();
                         if (sample == null) {
                             System.out.println("Found nothing ts pmo");
                             if (rc != null) rc.doubleBlip();
 
                             //generateRetry(f, alliance);
                         } else {
-                            angle = VLRSubsystem.getInstance(Limelight.class).getAngleEstimation(sample);
+                            angle = Math.toDegrees(sample.getAngle());
                             if (angle == -360) {
                                 System.out.println("Found nothing ts pmo");
                                 if (rc != null) rc.doubleBlip();
@@ -63,7 +67,7 @@ public class SubmersibleGrab extends SequentialCommandGroup {
                             }
                             if (angle < 0) angle += 180;
 
-                            System.out.println("Going for sample: " + sample.color + " in X: " + sample.x + " Y: " + sample.y);
+                            System.out.println("Going for sample: " + sample.getColor() + " in X: " + sample.getX() + " Y: " + sample.getY());
                             System.out.println("rich millionaire: " + angle);
                             System.out.println((angle / -90) + 1);
 
@@ -92,28 +96,36 @@ public class SubmersibleGrab extends SequentialCommandGroup {
 //        );
 //    }
 
-    private void generateSubmersibleGrabCommand(Follower f, Limelight.Sample sample) {
+    private void generateSubmersibleGrabCommand(Follower f, LimelightYoloReader.Limelight.Sample sample) {
         // determine sample orientation
         // a sample is vertically oriented if its height is greater than its width
         submersibleGrabCommand.addCommands(
-                new MoveRelative(f, -sample.x, 0),
-                new SetSlideExtension((TICKS_PER_IN * (sample.y + 1.5)) / MAX_POSITION),
-                new SetCurrentArmState(ArmState.State.SAMPLE_INTAKE),
+                new ParallelCommandGroup(
+                        new MoveRelative(f, -sample.getX(), 0),
+                        new SetRotatorAngle(5),
+                        new SetSlideExtension((TICKS_PER_IN * (sample.getY() + 1.5)) / MAX_POSITION),
+                        new SetCurrentArmState(ArmState.State.SAMPLE_INTAKE),
+                        new SequentialCommandGroup(
+                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                                new WaitCommand(450),
+                                new SetClawTwist((angle / -90) + 1),
+                                new SetRotatorAngle(0),
+                                new WaitUntilCommand(() -> VLRSubsystem.getRotator().reachedTargetPosition())
+                                //new SetClawTwist(isVerticallyOriented ? ClawConfiguration.HorizontalRotation.NORMAL : ClawConfiguration.HorizontalRotation.FLIPPED),
+                        )
+                ),
                 new ParallelCommandGroup(
                         new WaitUntilCommand(VLRSubsystem.getInstance(ArmSlideSubsystem.class)::reachedTargetPosition)
                 ).withTimeout(600),
-                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
-                new WaitCommand(150),
-                //new SetClawTwist(isVerticallyOriented ? ClawConfiguration.HorizontalRotation.NORMAL : ClawConfiguration.HorizontalRotation.FLIPPED),
-                new SetClawTwist((angle / -90) + 1),
                 new WaitCommand(250),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                new WaitCommand(150)
+                new WaitCommand(150),
+                new SetRotatorAngle(5)
         );
     }
 
 
-    public SubmersibleGrab(Follower f, Alliance alliance) {
-        this(f, alliance, null);
+    public SubmersibleGrab(Follower f, Alliance alliance, LimelightYoloReader reader) {
+        this(f, alliance, reader, null);
     }
 }

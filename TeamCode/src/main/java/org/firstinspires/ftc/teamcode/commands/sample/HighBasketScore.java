@@ -29,7 +29,7 @@ public class HighBasketScore extends SequentialCommandGroup {
         addCommands(
                 new ParallelCommandGroup(
                         new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                        new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                        new SetClawAngle(ClawConfiguration.VerticalRotation.SAFE),
                         new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                         new FollowPath(f, bezierPath(f.getPose(), SUB_PRE_BEZIER_POSE, BUCKET_HIGH_SCORE_POSE)//new Pose(SUB_GRAB_POSE.getX() + ScheduleNext.XGrabOffset, SUB_GRAB_POSE.getY(), SUB_GRAB_POSE.getHeading()), SUB_PRE_BEZIER_POSE, BUCKET_HIGH_SCORE_POSE)
                                 .setLinearHeadingInterpolation(SUB_GRAB_POSE.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading())

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.limelight;
 
-import android.os.health.SystemHealthManager;
-
 import com.acmerobotics.dashboard.config.Config;
 
 import org.json.JSONArray;
@@ -25,16 +23,24 @@ public class LimelightYoloReader {
             2, Limelight.Sample.Color.YELLOW
     );
 
-    public LimelightYoloReader() {
+    public static int DEFAULT_RETRY_FRAMES = 5;
+    public static int RETRY_DELAY_MS = 100;
 
+    public boolean ready = true;
+
+    public LimelightYoloReader() {
     }
 
-    // todo getDetections
-    public void getDetections() {
+    /**
+     * Get all detections from the vision coprocessor
+     *
+     * @return List of sample objects detected
+     */
+    public List<Limelight.Sample> getDetections() {
         JSONObject json = sendGetRequest("/detection_boxes.json");
         if (json == null) {
             System.out.println("Failed to get detection boxes: JSON null");
-            return;
+            return new ArrayList<>();
         }
 
         List<Limelight.Sample> samples = new ArrayList<>();
@@ -46,17 +52,187 @@ public class LimelightYoloReader {
                 JSONObject detectionObj = detectionsArray.getJSONObject(i);
 
                 int classId = detectionObj.getInt("class");
-                int x1 = detectionObj.getInt("x1");
-                int y1 = detectionObj.getInt("y1");
-                int x2 = detectionObj.getInt("x2");
-                int y2 = detectionObj.getInt("y2");
-                System.out.println("Detected sample " + classId + ", (" + x1 + ", " + y1 + "), (" + x2 + ", " + y2 + ")");
-                //samples.add(new Detection(classId, x1, y1, x2, y2));
+                double worldX = detectionObj.has("world_x") ? detectionObj.getDouble("world_x") : 0.0;
+                double worldY = detectionObj.has("world_y") ? detectionObj.getDouble("world_y") : 0.0;
+
+                Limelight.Sample.Color color = clsMap.getOrDefault(classId, Limelight.Sample.Color.UNKNOWN);
+
+                System.out.println("Detected sample " + classId + ", world: (" + worldX + ", " + worldY + ")");
+                samples.add(new Limelight.Sample(color, worldX, worldY, 0.0));
             }
         } catch (Exception e) {
+            System.out.println("Error parsing detections: " + e.getMessage());
             e.printStackTrace();
         }
 
+        return samples;
+    }
+
+    /**
+     * Get the best sample from the current frame
+     *
+     * @return The best sample or null if none found
+     */
+    public Limelight.Sample getBestSample() {
+        JSONObject json = sendGetRequest("/detection_boxes.json");
+        if (json == null) {
+            System.out.println("Failed to get detection boxes: JSON null");
+            return null;
+        }
+
+        try {
+            if (json.has("best_sample")) {
+                JSONObject bestSampleObj = json.getJSONObject("best_sample");
+                String colorStr = bestSampleObj.getString("color");
+                double x = bestSampleObj.getDouble("x");
+                double y = bestSampleObj.getDouble("y");
+                double angle = bestSampleObj.has("angle") ? bestSampleObj.getDouble("angle") : 0.0;
+
+                Limelight.Sample.Color color;
+                try {
+                    color = Limelight.Sample.Color.valueOf(colorStr);
+                } catch (IllegalArgumentException e) {
+                    color = Limelight.Sample.Color.UNKNOWN;
+                }
+
+                System.out.println("Found best sample: " + color + " at (" + x + ", " + y + "), angle: " + angle);
+                return new Limelight.Sample(color, x, y, angle);
+            } else {
+                System.out.println("No best sample found in current frame");
+            }
+        } catch (Exception e) {
+            System.out.println("Error parsing best sample: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Try to get the best sample across multiple frames
+     * Will return as soon as a valid sample is found
+     *
+     * @return The best sample or null if none found after all retries
+     */
+    public Limelight.Sample getBestSampleWithRetry() {
+        return getBestSampleWithRetry(DEFAULT_RETRY_FRAMES);
+    }
+
+    /**
+     * Try to get the best sample across multiple frames
+     *
+     * @param maxFrames Maximum number of frames to check
+     * @return The best sample or null if none found after all retries
+     */
+    public Limelight.Sample getBestSampleWithRetry(int maxFrames) {
+        for (int i = 0; i < maxFrames; i++) {
+            System.out.println("Attempting to get best sample, frame " + (i + 1) + "/" + maxFrames);
+            Limelight.Sample bestSample = getBestSample();
+            if (bestSample != null) {
+                return bestSample;
+            }
+
+            // Wait a bit before the next attempt
+            if (i < maxFrames - 1) {
+                try {
+                    Thread.sleep(RETRY_DELAY_MS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+        System.out.println("No best sample found after " + maxFrames + " attempts");
+        return null;
+    }
+
+    /**
+     * Set the allowed sample colors for detection
+     *
+     * @param colors List of colors to allow
+     * @return true if successful, false otherwise
+     */
+    public boolean setAllowedColors(List<Limelight.Sample.Color> colors) {
+        if (colors == null || colors.isEmpty()) {
+            System.out.println("No colors specified");
+            return false;
+        }
+
+        // Build comma-separated list of colors
+        StringBuilder colorParam = new StringBuilder();
+        for (int i = 0; i < colors.size(); i++) {
+            colorParam.append(colors.get(i).name());
+            if (i < colors.size() - 1) {
+                colorParam.append(",");
+            }
+        }
+
+        // Send request to set allowed colors
+        String endpoint = "/set_colors?colors=" + colorParam.toString();
+        JSONObject response = sendGetRequest(endpoint);
+
+        if (response != null && response.optBoolean("success", false)) {
+            System.out.println("Successfully set allowed colors: " + colorParam);
+            return true;
+        } else {
+            System.out.println("Failed to set allowed colors");
+            return false;
+        }
+    }
+
+    /**
+     * Set to allow only blue samples
+     */
+    public boolean setBlueOnly() {
+        return setAllowedColors(List.of(Limelight.Sample.Color.BLUE));
+    }
+
+    /**
+     * Set to allow only red samples
+     */
+    public boolean setRedOnly() {
+        return setAllowedColors(List.of(Limelight.Sample.Color.RED));
+    }
+
+    /**
+     * Set to allow only yellow samples
+     */
+    public boolean setYellowOnly() {
+        return setAllowedColors(List.of(Limelight.Sample.Color.YELLOW));
+    }
+
+    /**
+     * Allow all colors (default behavior)
+     */
+    public boolean setAllColors() {
+        return setAllowedColors(List.of(
+                Limelight.Sample.Color.BLUE,
+                Limelight.Sample.Color.RED,
+                Limelight.Sample.Color.YELLOW
+        ));
+    }
+
+    /**
+     * Check if the connection to the vision coprocessor is active
+     *
+     * @return true if ready, false otherwise
+     */
+    public boolean isReady() {
+        return ready;
+    }
+
+    /**
+     * Send a GET request to the vision coprocessor
+     *
+     * @param endpoint API endpoint to query
+     * @return JSON response or null if failed
+     */
+    public String getRawJSONRequest(String endpoint) {
+        JSONObject jsonObject = sendGetRequest(endpoint);
+        if (jsonObject == null) {
+            return "NULL";
+        }
+        return jsonObject.toString();
     }
 
     private JSONObject sendGetRequest(String endpoint) {
@@ -74,12 +250,15 @@ public class LimelightYoloReader {
                 String response = readResponse(connection);
                 System.out.println("GET " + endpoint);
                 System.out.println(response);
+                ready = true;
                 return new JSONObject(response);
             } else {
                 System.out.println("GET Error: " + responseCode);
+                ready = false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Connection error: " + e.getMessage());
+            ready = false;
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -101,4 +280,52 @@ public class LimelightYoloReader {
         return response.toString();
     }
 
+    /**
+     * For testing purposes - this class should be defined elsewhere in your project
+     */
+    public static class Limelight {
+        public static class Sample {
+            public enum Color {
+                RED, BLUE, YELLOW, UNKNOWN
+            }
+
+            private final Color color;
+            private final double x;
+            private final double y;
+            private final double angle;
+
+            public Sample(Color color, double x, double y, double angle) {
+                this.color = color;
+                this.x = x;
+                this.y = y;
+                this.angle = angle;
+            }
+
+            public Color getColor() {
+                return color;
+            }
+
+            public double getX() {
+                return x;
+            }
+
+            public double getY() {
+                return y;
+            }
+
+            public double getAngle() {
+                return angle;
+            }
+
+            @Override
+            public String toString() {
+                return "Sample{" +
+                        "color=" + color +
+                        ", x=" + x +
+                        ", y=" + y +
+                        ", angle=" + angle +
+                        '}';
+            }
+        }
+    }
 }

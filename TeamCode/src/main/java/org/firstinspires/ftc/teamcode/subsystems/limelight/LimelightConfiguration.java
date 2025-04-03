@@ -20,7 +20,7 @@ public class LimelightConfiguration {
     public static double POS_X = -117 / 25.4; // inches right from robot center, -117mm
     public static double POS_Y = -183.6 / 25.4; // inches from the front of the robot 228.27mm
     public static double POS_Z = 234 / 25.4; // inches from the ground, 166.5mm
-    public static double TILT_ANGLE = 105; // degrees to the ground (positive is to the ground)
+    public static double TILT_ANGLE = 90 + 52; // degrees to the ground (positive is to the ground)
 
     // This was calibrated with 3df
     public static double FX = 599.718;

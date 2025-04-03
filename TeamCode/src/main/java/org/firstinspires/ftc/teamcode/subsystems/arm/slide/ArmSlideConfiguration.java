@@ -61,14 +61,14 @@ public class ArmSlideConfiguration {
     public static double MIN_MANUAL_ADJUST_POSITION = 3;
     public static double HORIZONTAL_EXTENSION_LIMIT = 15;
     public static double MAX_POSITION = 23; //ROTATIONS, NOT TICKS
-    public static double TICKS_PER_IN = 44.88;//17.67 * 2.54 * 1.1; // 53.36 //TODO: RECALC
+    public static double TICKS_PER_IN = (6523 / 8192d) * 0.93;//17.67 * 2.54 * 1.1; // 53.36 //TODO: RECALC
     public static double MAX_EXTENSION_IN = HORIZONTAL_EXTENSION_LIMIT / TICKS_PER_IN;
 
     public static double INTAKE_SPECIMEN = 0.05;
 
 
     public enum TargetPosition {
-        RETRACTED(0.1),
+        RETRACTED(0),
         INTAKE_SAMPLE(0.45), // 30.8cm
         SCORE_BUCKET_HIGH(1),
         PREPARE_SPECIMEN_HIGH(0.45),

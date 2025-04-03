@@ -45,6 +45,10 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.hang.commands.SecondStageHangCommand;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.Limelight;
+import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -69,8 +73,9 @@ public class VLRFullAuto extends VLRLinearOpMode {
         cs = CommandScheduler.getInstance();
         GameStateController gameStateController = new GameStateController(this::getTimeSinceInit, false); // FORCING TELEOP FOR TESTING
         StrategyController strategyController = new StrategyController(gameStateController);
+        LimelightYoloReader reader = new LimelightYoloReader();
 
-        VLRSubsystem.requireSubsystems(ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, Limelight.class, Chassis.class);
+        VLRSubsystem.requireSubsystems(ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, Chassis.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         f = new Follower(hardwareMap);
@@ -88,13 +93,19 @@ public class VLRFullAuto extends VLRLinearOpMode {
 
         alliance = choice.text.equals("Red") ? Alliance.RED : Alliance.BLUE;
 
+        List<LimelightYoloReader.Limelight.Sample.Color> allowedColors = new ArrayList<>();
+        allowedColors.add(LimelightYoloReader.Limelight.Sample.Color.YELLOW);
+        allowedColors.add(alliance == Alliance.RED ? LimelightYoloReader.Limelight.Sample.Color.RED : LimelightYoloReader.Limelight.Sample.Color.BLUE);
+
+        reader.setAllowedColors(allowedColors);
+
         boolean runAuto = autoChoice.text.equals("Run");
 
         configurator.review("Alliance: " + alliance, "Auto: " + runAuto);
 
         waitForStart();
-        VLRSubsystem.getInstance(Limelight.class).setAlliance(Alliance.BLUE);
-        VLRSubsystem.getInstance(Limelight.class).enable();
+        //VLRSubsystem.getInstance(Limelight.class).setAlliance(Alliance.BLUE);
+        //VLRSubsystem.getInstance(Limelight.class).enable();
         gameStateController.postInit();
 
         GamepadEx gp = new GamepadEx(gamepad1);
@@ -123,8 +134,8 @@ public class VLRFullAuto extends VLRLinearOpMode {
                                                     .build()).withTimeout(2500)
                                     )
                             ),
-                            new WaitCommand(600),
-                            new SubmersibleGrab(f, alliance, rc)
+                            new WaitCommand(600)
+                            //new SubmersibleGrab(f, alliance, rc) // TODO FIX GRAB
                     ),
                     new ParallelCommandGroup(
                             new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
@@ -159,7 +170,7 @@ public class VLRFullAuto extends VLRLinearOpMode {
                     rc.singleBlip();
                 }
             }
-            if (gp.wasJustPressed(GamepadKeys.Button.B)) {
+            if (gp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.3) {
                 cs.schedule(new RetractArm());
             }
 
@@ -185,7 +196,7 @@ public class VLRFullAuto extends VLRLinearOpMode {
                 cs.schedule(
                         new SequentialCommandGroup(
                                 new WaitCommand((long) (headingError * 30)),
-                                new SubmersibleGrab(f, alliance, rc)
+                                new SubmersibleGrab(f, alliance, reader, rc)
                         ));
             }
             if (gp.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {

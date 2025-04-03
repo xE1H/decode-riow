@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem
 
 public class SetRotatorAngle extends ConditionalCommand {
     //TODO CONFIG FOR NEW HARDWARE VERSION
-    private static final double cameraDangerMinAngle = 0;
-    private static final double cameraDangerMaxAngle = 0;
+    private static final double cameraDangerMinAngle = 5;
+    private static final double cameraDangerMaxAngle = 30;
     private static final double slideMaxSafeExtension = 0;
 
 
@@ -42,6 +42,7 @@ public class SetRotatorAngle extends ConditionalCommand {
     }
 
     private static boolean isCameraInDanger(double a, double b) {
-        return cameraDangerMinAngle <= Math.max(a, b) && cameraDangerMaxAngle >= Math.min(a, b) && VLRSubsystem.getSlides().getExtension() > slideMaxSafeExtension;
+        return false;
+        //return cameraDangerMinAngle <= Math.max(a, b) && cameraDangerMaxAngle >= Math.min(a, b) && VLRSubsystem.getSlides().getExtension() > slideMaxSafeExtension;
     }
 }

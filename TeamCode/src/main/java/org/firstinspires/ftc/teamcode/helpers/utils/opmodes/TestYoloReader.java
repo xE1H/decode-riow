@@ -12,8 +12,8 @@ public class TestYoloReader extends VLRLinearOpMode {
         LimelightYoloReader reader = new LimelightYoloReader();
         waitForStart();
         while (opModeIsActive()) {
-            reader.getDetections();
-            sleep(200);
+            System.out.println(reader.getBestSampleWithRetry());
+            sleep(2000);
         }
     }
 }

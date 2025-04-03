@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
+import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 public class AutonomousPeriodActionsBetter extends SequentialCommandGroup {
     public AutonomousPeriodActionsBetter(Follower f) {
@@ -35,35 +36,36 @@ public class AutonomousPeriodActionsBetter extends SequentialCommandGroup {
                                 .setConstantHeadingInterpolation(SCORE_PRELOAD_AND_SUB_PICKUP.getHeading()).build()),
 
                         new SequentialCommandGroup(
-                                new SetRotatorAngle(48),
+                                new SetRotatorAngle(55),
                                 new WaitCommand(400),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT),
-                                new SetSlideExtension(0.6),
-                                new ParallelCommandGroup(
-                                        new SetRotatorAngle(50),
-                                        new SetSlideExtension(0.63)
-                                )
+                                new SetSlideExtension(0.4),
+                                new WaitCommand(500),
+                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                                new WaitCommand(500),
+                                new SetSlideExtension(0.36).withTimeout(500)
                         )
                 ),
 
                 //SCORE PRELOAD SAMPLE------
-                new WaitCommand(800),
                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                 new WaitCommand(120),
-
-                new WaitCommand(9999999),
+//                new SetSlideExtension(0.05),
+//
+//                new WaitCommand(9999999),
 
                 //RETRACT ARM AND PICK SAMPLE FROM SUB
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
                                 new WaitUntilCommand(()-> VLRSubsystem.getSlides().reachedTargetPosition()),
+                                new WaitCommand(200),
                                 new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.RETRACT),
                                 new WaitUntilCommand(()-> VLRSubsystem.getRotator().reachedTargetPosition())
                         ),
                         new SequentialCommandGroup(
-                                new WaitCommand(800),
-                                new SubmersibleGrab(f, Alliance.BLUE)
+                                //new WaitCommand(800)
+                                new SubmersibleGrab(f, Alliance.BLUE, new LimelightYoloReader())
                         )
                 ),
 
@@ -166,8 +168,8 @@ public class AutonomousPeriodActionsBetter extends SequentialCommandGroup {
                                 new WaitUntilCommand(()-> VLRSubsystem.getRotator().reachedTargetPosition())
                         ),
                         new SequentialCommandGroup(
-                                new WaitCommand(900),
-                                new SubmersibleGrab(f, Alliance.BLUE)
+                                new WaitCommand(900)
+                                // new SubmersibleGrab(f, Alliance.BLUE) todo fix graB
                         )
                 ),
 

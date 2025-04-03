@@ -9,9 +9,9 @@ public interface ClawConfiguration {
     String GRAB_SERVO = "claw";
     String ANALOG_ENCODER_LEFT = "analog0";
     String ANALOG_ENCODER_RIGHT = "analog1";
-  
-    double HORIZONTAL_ROTATION_MIN = 0.04;
-    double HORIZONTAL_ROTATION_MAX = 1;
+
+    double HORIZONTAL_ROTATION_MIN = 0.07;
+    double HORIZONTAL_ROTATION_MAX = 0.94;
 
     double state_closed_normal_pos = 0;
     double state_open_pos = 0.925;
@@ -20,21 +20,24 @@ public interface ClawConfiguration {
     double analog_voltage_right = 0;
 
     enum VerticalRotation {
-        DOWN(0.95),
-        UP(0.02),
+        DOWN(1),
+        UP(0.2),
+        SAFE(0),
         DEPOSIT(0.35);
 
         public final double pos;
+
         VerticalRotation(double pos) {
             this.pos = pos;
         }
     }
 
     enum HorizontalRotation {
-        NORMAL(0.5),
+        NORMAL(0.54),
         FLIPPED(0.95);
 
         public final double pos;
+
         HorizontalRotation(double pos) {
             this.pos = pos;
         }
@@ -45,6 +48,7 @@ public interface ClawConfiguration {
         OPEN(0.24);
 
         public final double pos;
+
         GripperState(double pos) {
             this.pos = pos;
         }
