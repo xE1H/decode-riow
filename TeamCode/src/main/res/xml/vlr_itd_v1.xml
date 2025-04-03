@@ -12,7 +12,7 @@
             <goBILDA5202SeriesMotor name="MotorRightFront" port="1" />
             <goBILDA5202SeriesMotor name="MotorLeftFront" port="2" />
             <goBILDA5202SeriesMotor name="MotorLeftBack" port="3" />
-            <Servo name="wiper" port="0" />
+            <Servo name="ServoWiper" port="0" />
             <RevBlinkinLedDriver name="blinkin" port="1" />
             <RevSPARKMini name="MotorRotator" port="2" />
             <RevSPARKMini name="MotorArm1" port="3" />

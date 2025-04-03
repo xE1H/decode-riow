@@ -27,6 +27,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     private double encoderPosition = 0;
     private double lastPositionChangeTime = 0;
 
+    private double encoderOffset = 0;
+
     private OperationMode operationMode = OperationMode.NORMAL;
     private boolean overridePower = false;
     private double feedForwardGain = FEED_FORWARD_GAIN;
@@ -189,8 +191,10 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     public void checkLimitSwitch() {
         if (limitSwitch.isPressed()) {
             //System.out.println("LIMIT ON");
-            extensionEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            extensionEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //extensionEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            encoderOffset = extensionEncoder.getCurrentPosition();
+//            extensionEncoder.setMode(DcMotor.RunMode.RESET_ENCODERS);
+//            extensionEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
@@ -213,7 +217,7 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     public void periodic(double armAngleDegrees) {
         checkLimitSwitch();
 
-        encoderPosition = -extensionEncoder.getCurrentPosition() / 8192d;
+        encoderPosition = -(extensionEncoder.getCurrentPosition() - encoderOffset) / 8192d;
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;

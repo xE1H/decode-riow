@@ -24,6 +24,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     private ArmSlideSubsystem slideSubsystem;
 
     private double encoderPosition = 0;
+    private double encoderOffset = 0;
 
     private boolean motorResetEnabled = false;
     private boolean disableMotorForHang = false;
@@ -147,9 +148,9 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
     public void reenableMotor() {
         motorResetEnabled = false;
-
-        thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        encoderOffset = thoughBoreEncoder.getCurrentPosition();
+        //thoughBoreEncoder.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        //thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void deactivateRotatorForHang(){
@@ -163,7 +164,7 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
 
     @Override
     public void periodic() {
-        encoderPosition = thoughBoreEncoder.getCurrentPosition();
+        encoderPosition = thoughBoreEncoder.getCurrentPosition() - encoderOffset;
 
         double currentAngle = getAngleDegrees();
 
@@ -196,6 +197,11 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
                 power = 0;
             }
         }
+
+        if (currentAngle < -1.5) {
+            reenableMotor();
+        }
+
 
         motor.setPower(power);
         slideSubsystem.periodic(currentAngle);

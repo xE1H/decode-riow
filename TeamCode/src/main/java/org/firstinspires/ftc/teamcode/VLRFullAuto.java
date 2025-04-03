@@ -46,6 +46,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.hang.commands.SecondStageHangCommand;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
+import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,7 @@ public class VLRFullAuto extends VLRLinearOpMode {
         StrategyController strategyController = new StrategyController(gameStateController);
         LimelightYoloReader reader = new LimelightYoloReader();
 
-        VLRSubsystem.requireSubsystems(ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, Chassis.class);
+        VLRSubsystem.requireSubsystems(ArmSlideSubsystem.class, ArmRotatorSubsystem.class, ClawSubsystem.class, Chassis.class, Wiper.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         f = new Follower(hardwareMap);
@@ -173,6 +174,7 @@ public class VLRFullAuto extends VLRLinearOpMode {
             if (gp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.3) {
                 cs.schedule(new RetractArm());
             }
+            VLRSubsystem.getInstance(Wiper.class).wipe(gp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
             if (gp.wasJustPressed(GamepadKeys.Button.X)) {
                 VLRSubsystem.getInstance(ArmSlideSubsystem.class).setPowerOverride(true);

@@ -97,8 +97,9 @@ public class SubmersibleGrab extends SequentialCommandGroup {
 //    }
 
     private void generateSubmersibleGrabCommand(Follower f, LimelightYoloReader.Limelight.Sample sample) {
-        // determine sample orientation
-        // a sample is vertically oriented if its height is greater than its width
+        double x_abs = f.getPose().getX() + sample.getY() * Math.cos(f.getPose().getHeading()) - sample.getX() * Math.sin(f.getPose().getHeading());
+        double y_abs = f.getPose().getY() + sample.getY() * Math.sin(f.getPose().getHeading()) + sample.getX() * Math.cos(f.getPose().getHeading());
+
         submersibleGrabCommand.addCommands(
                 new ParallelCommandGroup(
                         new MoveRelative(f, -sample.getX(), 0),
