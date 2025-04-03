@@ -20,6 +20,8 @@ public class HangSubsystem extends VLRSubsystem<HangSubsystem> implements HangCo
     private LowPassFilter leftFilter = new LowPassFilter(0.93);
     private LowPassFilter rightFilter = new LowPassFilter(0.93);
 
+    public static double p = 0.01;
+
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
@@ -50,15 +52,25 @@ public class HangSubsystem extends VLRSubsystem<HangSubsystem> implements HangCo
     }
 
 
-    private double getAngle(double voltage){
+    public void setTargetAngle(double angleLeft, double angleRight){
+        double powerLeft = p * (angleLeft - getAngle(analogLeft.getVoltage()));
+        double powerRight = p * (angleRight - getAngle(analogRight.getVoltage()));
+
+        left.setPower(powerLeft);
+        right.setPower(powerRight);
+    }
+
+
+    public double getAngle(double voltage){
         return voltage / 3.3 * 360;
     }
+    public double getLeftAngle(){return getAngle(analogLeft.getVoltage());}
 
 
     public boolean analogFeedbackThresholdReached(){
         return (
-                leftFilter.estimate(getAngle(analogLeft.getVoltage())) > leftAnalogThreshold &&
-                rightFilter.estimate(getAngle(analogRight.getVoltage())) < rightAnalogThreshold
+                getAngle(analogLeft.getVoltage()) > leftAnalogThreshold &&
+                getAngle(analogRight.getVoltage()) < rightAnalogThreshold
         );
     }
 }

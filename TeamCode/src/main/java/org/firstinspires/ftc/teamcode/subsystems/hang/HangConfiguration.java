@@ -14,7 +14,13 @@ public interface HangConfiguration {
     double rightAnalogThreshold = 120;
 
     enum TargetPosition {
-        DOWN,
-        UP
+        DOWN(0, 0),
+        UP(0, 0);
+
+        public final double angleLeft, angleRight;
+        TargetPosition(double angleLeft, double angleRight) {
+            this.angleLeft = angleLeft;
+            this.angleRight = angleRight;
+        }
     }
 }
