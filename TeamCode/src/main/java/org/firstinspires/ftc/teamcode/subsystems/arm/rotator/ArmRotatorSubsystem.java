@@ -177,7 +177,9 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
             return;
         }
 
-        double feedForwardPower = Math.cos(Math.toRadians(currentAngle)) * feedForwardGain;
+        double feedForwardGain_1 = mapToRange(slideSubsystem.getExtension(), 0, 1, FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
+        double feedForwardPower = Math.cos(Math.toRadians(currentAngle)) * feedForwardGain_1;
+
         double power = motionProfile.getPower(currentAngle) + feedForwardPower;
         power = clamp(power, -1, 1);
 

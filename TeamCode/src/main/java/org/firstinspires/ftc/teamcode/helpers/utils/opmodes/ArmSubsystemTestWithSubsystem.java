@@ -61,7 +61,7 @@ public class ArmSubsystemTestWithSubsystem extends VLRLinearOpMode {
             }
 
             else if (gamepad1.square){
-                slides.setTargetPosition(0.01);
+                slides.setTargetPosition(0);
             }
 //            if (prevAngle != targetArmAngle){
 //                armSubsystem.setTargetPosition(targetArmAngle);
