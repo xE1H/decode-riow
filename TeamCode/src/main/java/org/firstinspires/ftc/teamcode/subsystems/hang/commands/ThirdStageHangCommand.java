@@ -31,7 +31,7 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
 
                 new InstantCommand(()-> VLRSubsystem.getHang().setTargetAngleUP()),
-                new SetRotatorAngle(102.5),
+                new SetRotatorAngle(101),
                 new WaitUntilCommand(()-> VLRSubsystem.getRotator().getAngleDegrees() >= 80),
                 new SetSlideExtension(0.314),
                 new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
@@ -49,17 +49,13 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
                 new SetSlideExtension(0.3),
                 new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
 
-                new WaitCommand(10000000),
+                new WaitUntilCommand(()-> (VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
+                new WaitCommand(500),
 
 
                 new SetArmOperationMode(ArmSlideConfiguration.OperationMode.NORMAL),
 
-                new SetSlideExtension(0.3),
-                new InstantCommand(()-> VLRSubsystem.getInstance(HangSubsystem.class).setPower(0)),
-
-
                 new SetSlideExtension(0.888),
-                new WaitCommand(100),
                 new SetRotatorAngle(80),
 
                 new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
@@ -77,12 +73,7 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
 
 
 
-                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_FAST),
-//                new InstantCommand(()-> VLRSubsystem.getSlides().setPowerOverride(true)),
-//                new InstantCommand(()-> VLRSubsystem.getSlides().setMotorPower(0)),
-                //new WaitCommand(500),
-
-                //new InstantCommand(()-> VLRSubsystem.getSlides().setMotorPower(-1)),
+                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_SLOW),
 
 
                 new SetSlideExtension(0.04),
@@ -96,7 +87,6 @@ public class ThirdStageHangCommand extends SequentialCommandGroup {
 
                 new SetRotatorAngle(35),
                 new WaitCommand(200),
-                //new InstantCommand(()-> VLRSubsystem.getRotator().reenableMotorForHang()),
                 new WaitUntilCommand(() -> VLRSubsystem.getSlides().reachedTargetPosition()).withTimeout(3000),
 
 
