@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 
 
-public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
+public class ArmRotatorSubsystem {
     private DcMotorSimple motor;
     private DcMotorEx thoughBoreEncoder;
 
@@ -43,9 +43,8 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     }
 
 
-    protected void initialize(HardwareMap hardwareMap) {
+    public ArmRotatorSubsystem (HardwareMap hardwareMap) {
         ArmState.resetAll();
-        slideSubsystem = VLRSubsystem.getInstance(ArmSlideSubsystem.class);
 
         motor = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -162,7 +161,6 @@ public class ArmRotatorSubsystem extends VLRSubsystem<ArmRotatorSubsystem> {
     }
 
 
-    @Override
     public void periodic() {
         encoderPosition = thoughBoreEncoder.getCurrentPosition() - encoderOffset;
 

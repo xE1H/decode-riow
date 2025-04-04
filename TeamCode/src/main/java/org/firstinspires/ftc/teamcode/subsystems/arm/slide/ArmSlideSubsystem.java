@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
 @Config
-public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
+public class ArmSlideSubsystem {
     private DcMotorSimple extensionMotor0, extensionMotor1, extensionMotor2;
     private DcMotorEx extensionEncoder;
 
@@ -33,8 +33,8 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     private double feedForwardGain = FEED_FORWARD_GAIN;
 
 
-    @Override
-    protected void initialize(HardwareMap hardwareMap) {
+
+    public ArmSlideSubsystem(HardwareMap hardwareMap) {
         ArmState.resetAll();
 
         extensionMotor0 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_0);
