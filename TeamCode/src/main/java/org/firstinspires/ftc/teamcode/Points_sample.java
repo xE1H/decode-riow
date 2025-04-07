@@ -20,8 +20,8 @@ public class Points_sample {
     public static Pose THIRD_MARK_GRAB_POSE = new Pose(40, 125.7, rad(60));
 
     public static Pose SUB_PRE_BEZIER_POSE = new Pose(47,120, rad(-70));
-    public static Pose SUB_PRE_PREGRAB_POSE = new Pose(51,107, rad(-90));
-    public static Pose SUB_GRAB_POSE = new Pose(51,97, rad(-90));
+    public static Pose SUB_PRE_PREGRAB_POSE = new Pose(60,117, rad(-90));
+    public static Pose SUB_GRAB_POSE = new Pose(60,97, rad(-90));
 
     public static double rad(double deg) {
         return Math.toRadians(deg);

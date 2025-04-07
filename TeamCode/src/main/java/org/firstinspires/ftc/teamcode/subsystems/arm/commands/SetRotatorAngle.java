@@ -2,20 +2,21 @@ package org.firstinspires.ftc.teamcode.subsystems.arm.commands;
 
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.PrintCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
+import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
+
+import java.util.logging.Level;
 
 public class SetRotatorAngle extends ConditionalCommand {
     //TODO CONFIG FOR NEW HARDWARE VERSION
     private static final double cameraDangerMinAngle = 5;
     private static final double cameraDangerMaxAngle = 30;
     private static final double slideMaxSafeExtension = 0;
-
 
 
     public SetRotatorAngle(ArmRotatorConfiguration.TargetAngle angle) {
@@ -26,18 +27,11 @@ public class SetRotatorAngle extends ConditionalCommand {
     public SetRotatorAngle(double degrees) {
         super(
                 new SequentialCommandGroup(
-                        new PrintCommand("YOU DUMB IDIOT, WHAT ARE YOU DOING!!!!"),
-                        new org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand() { //TODO COMMENT THIS EXCEPTION OUT BEFORE COMP
-                            @Override
-                            public void run() {
-                                try {throw new Exception("YOU DUMB IDIOT, WHAT ARE YOU DOING!!!!");}
-                                catch (Exception e) {throw new RuntimeException(e);}
-                            }
-                        },
+                        new LogCommand(ArmRotatorSubsystem.class, Level.WARNING, "YOU DUMB IDIOT, WHAT ARE YOU DOING!!!!"),
                         new WaitCommand(999999999)
                 ),
                 new InstantCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).setTargetPosition(degrees)),
-                ()-> (isCameraInDanger(VLRSubsystem.getRotator().getAngleDegrees(), degrees))
+                () -> (isCameraInDanger(VLRSubsystem.getRotator().getAngleDegrees(), degrees))
         );
     }
 

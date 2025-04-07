@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.blinkin;
 
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
@@ -29,13 +28,13 @@ public class BlinkinSubsystem extends VLRSubsystem <BlinkinSubsystem> {
         currentPattern = currentPattern.next();
         blinkinLedDriver.setPattern(currentPattern);
 
-        System.out.println("CURRENT PATTERN: " + currentPattern.toString());
+        logger.info("CURRENT PATTERN: " + currentPattern.toString());
     }
 
     public void previous(){
         currentPattern = currentPattern.previous();
         blinkinLedDriver.setPattern(currentPattern);
 
-        System.out.println("CURRENT PATTERN: " + currentPattern.toString());
+        logger.info("CURRENT PATTERN: " + currentPattern.toString());
     }
 }

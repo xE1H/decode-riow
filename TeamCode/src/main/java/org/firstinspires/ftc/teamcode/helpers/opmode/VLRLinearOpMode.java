@@ -9,12 +9,15 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public abstract class VLRLinearOpMode extends LinearOpMode {
     // Execution
     ExecutorService executorService;
     // Commands
     CommandRunner commandRunner;
+
+    Logger logger = Logger.getLogger("VLRLinearOpMode");
 
     double startTime = 0;
 
@@ -33,7 +36,7 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
         try {
             executorService.awaitTermination(100, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            System.out.println("Force shutdown of all threads timed out");
+            logger.warning("Force shutdown of all threads timed out");
         }
         VLRSubsystem.clearSubsystems(); // Clear all subsystems
     }

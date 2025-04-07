@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 
 @Config
 public class GrabBucketSample extends SequentialCommandGroup {
-    public static double SLIDE = 0.2;
+    public static double SLIDE = 0.19;
 
     public GrabBucketSample(boolean clawTwisted) {
         addCommands(

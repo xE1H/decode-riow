@@ -15,10 +15,8 @@ import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.limelight.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 import pedroPathing.constants.FConstants;
@@ -54,7 +52,7 @@ public class LimelightAimerTest extends VLRLinearOpMode {
         cs.schedule(new SequentialCommandGroup(
                 new SubmersibleGrab(f, Alliance.BLUE, reader),
                 new SetSlideExtension(0)
-                ));
+        ));
 
         while (opModeIsActive()) {
             f.update();

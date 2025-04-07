@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Abstract base class for subsystems.
@@ -20,6 +21,8 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
     /**
      * Map to store singleton instances of subsystems
      */
+
+    protected Logger logger;
     private static final Map<Class<?>, VLRSubsystem<?>> instances = new HashMap<>();
 
     /**
@@ -96,12 +99,26 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
             if (!instances.containsKey(subsystem)) {
                 try {
                     VLRSubsystem<?> instance = subsystem.getDeclaredConstructor().newInstance();
+                    instance.logger = Logger.getLogger(subsystem.getSimpleName());
                     instances.put(subsystem, instance);
                 } catch (Exception e) {
                     throw new RuntimeException("Error creating instance of " + subsystem.getName(), e);
                 }
             }
         }
+    }
+
+    public static Logger getLogger(Class<? extends VLRSubsystem<?>> subsystem) {
+        for (Class<?> sub : instances.keySet()) {
+            if (sub == subsystem) {
+                try {
+                    return instances.get(sub).logger;
+                } catch (Exception e) {
+                    throw new RuntimeException("Error getting logger for " + subsystem.getName(), e);
+                }
+            }
+        }
+        throw new RuntimeException("Error getting logger for " + subsystem.getName() + ": Subsystem not found");
     }
 
     public static void clearSubsystems() {

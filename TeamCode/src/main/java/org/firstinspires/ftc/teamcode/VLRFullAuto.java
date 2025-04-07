@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmLowState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.ResetRotatorMotor;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
@@ -44,7 +45,6 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.hang.commands.SecondStageHangCommand;
-import org.firstinspires.ftc.teamcode.subsystems.limelight.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 
@@ -121,13 +121,7 @@ public class VLRFullAuto extends VLRLinearOpMode {
                             new ParallelCommandGroup(
                                     new RetractArm(),
                                     new SequentialCommandGroup(
-                                            new WaitCommand(600),
-                                            new org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand() {
-                                                @Override
-                                                public void run() {
-                                                    VLRSubsystem.getInstance(Limelight.class).enable();
-                                                }
-                                            },
+                                            new WaitCommand(300),
                                             new FollowPath(f, bezierPath(BUCKET_HIGH_SCORE_POSE, SUB_PRE_BEZIER_POSE,
                                                     new Pose(SUB_PRE_PREGRAB_POSE.getX(), SUB_PRE_PREGRAB_POSE.getY(), SUB_PRE_PREGRAB_POSE.getHeading()),
                                                     new Pose(SUB_GRAB_POSE.getX(), SUB_GRAB_POSE.getY(), SUB_GRAB_POSE.getHeading()))
@@ -135,8 +129,8 @@ public class VLRFullAuto extends VLRLinearOpMode {
                                                     .build()).withTimeout(2500)
                                     )
                             ),
-                            new WaitCommand(600)
-                            //new SubmersibleGrab(f, alliance, rc) // TODO FIX GRAB
+                            new WaitCommand(1200),
+                            new SubmersibleGrab(f, alliance, reader)
                     ),
                     new ParallelCommandGroup(
                             new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
@@ -184,7 +178,10 @@ public class VLRFullAuto extends VLRLinearOpMode {
             }
 
             if (gp.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                cs.schedule(new SecondStageHangCommand(() -> gamepad1.dpad_up));
+                cs.schedule(new SecondStageHangCommand(() -> gamepad1.dpad_down));
+            }
+            if (gp.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                ArmLowState.set(!ArmLowState.get());
             }
 
             if (gp.wasJustPressed(GamepadKeys.Button.Y)) {

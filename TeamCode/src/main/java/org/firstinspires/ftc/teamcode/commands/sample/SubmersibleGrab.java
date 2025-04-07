@@ -4,14 +4,13 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfig
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.TICKS_PER_IN;
 
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
-import com.arcrobotics.ftclib.command.ParallelRaceGroup;
-import com.arcrobotics.ftclib.command.PrintCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.pedropathing.follower.Follower;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
@@ -25,12 +24,10 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
-import org.firstinspires.ftc.teamcode.subsystems.limelight.BestSampleDeterminer;
-import org.firstinspires.ftc.teamcode.subsystems.limelight.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
-import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.WaitUntilNextLimelightUpdate;
 
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SubmersibleGrab extends SequentialCommandGroup {
 
@@ -39,8 +36,9 @@ public class SubmersibleGrab extends SequentialCommandGroup {
     double angle = 90;
 
     public SubmersibleGrab(Follower f, Alliance alliance, LimelightYoloReader reader, RumbleControls rc) {
+        Logger logger = Logger.getLogger("SubmersibleGrab");
         addCommands(
-                new PrintCommand("Sub grab command"),
+                new LogCommand("SubmersibleGrab", Level.INFO, "Sub grab command"),
                 new ParallelCommandGroup(
                         //new WaitUntilNextLimelightUpdate(),
                         new SequentialCommandGroup(
@@ -54,22 +52,21 @@ public class SubmersibleGrab extends SequentialCommandGroup {
                     public void run() {
                         LimelightYoloReader.Limelight.Sample sample = reader.getBestSampleWithRetry();
                         if (sample == null) {
-                            System.out.println("Found nothing ts pmo");
+                            logger.info("Found nothing ts pmo");
                             if (rc != null) rc.doubleBlip();
 
                             //generateRetry(f, alliance);
                         } else {
                             angle = Math.toDegrees(sample.getAngle());
                             if (angle == -360) {
-                                System.out.println("Found nothing ts pmo");
+                                logger.info("Found nothing ts pmo");
                                 if (rc != null) rc.doubleBlip();
                                 return;
                             }
                             if (angle < 0) angle += 180;
 
-                            System.out.println("Going for sample: " + sample.getColor() + " in X: " + sample.getX() + " Y: " + sample.getY());
-                            System.out.println("rich millionaire: " + angle);
-                            System.out.println((angle / -90) + 1);
+                            logger.info("Going for sample: " + sample.getColor() + " in X: " + sample.getX() + " Y: " + sample.getY());
+                            logger.info("Sample angle: " + angle);
 
                             generateSubmersibleGrabCommand(f, sample);
                         }
@@ -120,8 +117,7 @@ public class SubmersibleGrab extends SequentialCommandGroup {
                 ).withTimeout(600),
                 new WaitCommand(250),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                new WaitCommand(150),
-                new SetRotatorAngle(5)
+                new WaitCommand(150)
         );
     }
 

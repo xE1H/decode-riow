@@ -44,7 +44,7 @@ public interface ClawConfiguration {
     }
 
     enum GripperState {
-        CLOSED(0.95),
+        CLOSED(1),
         OPEN(0.24);
 
         public final double pos;

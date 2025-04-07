@@ -6,10 +6,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 public class AutoConfigurator {
     private final Telemetry telemetry;
     private final Gamepad gamepad;
+    private static final Logger logger = Logger.getLogger("AutoConfigurator");
 
     public static class Choice {
         public String text;
@@ -22,7 +24,7 @@ public class AutoConfigurator {
 
         public Choice(String text) {
             this.text = text;
-            this.action = () -> System.out.println("picked" + text);
+            this.action = () -> logger.info("picked" + text);
         }
     }
 

@@ -18,9 +18,6 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmLowState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.VerticalRotation;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetEffect;
 
 @Config
 public class ScoreSample extends CustomConditionalCommand {
@@ -48,9 +45,9 @@ public class ScoreSample extends CustomConditionalCommand {
                         //new SetColour(NeoPixelConfiguration.Colour.CYAN),
                         //new SetColour(NeoPixelConfiguration.Colour.YELLOW),
 
-
+                        new SetClawAngle(VerticalRotation.SAFE),
                         new SetRotatorAngle(rotator),
-                        new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 30),
+                        new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= 50),
                         new SetClawAngle(VerticalRotation.DOWN),
 
                         new WaitUntilCommand(() -> VLRSubsystem.getInstance(ArmRotatorSubsystem.class).getAngleDegrees() >= rotator - 45),

@@ -13,10 +13,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @Config
 public class LimelightYoloReader {
     public static String baseUrl = "http://172.29.0.1:8000";
+    public static Logger logger = Logger.getLogger("LimelightYoloReader");
     public static Map<Integer, Limelight.Sample.Color> clsMap = Map.of(
             0, Limelight.Sample.Color.BLUE,
             1, Limelight.Sample.Color.RED,
@@ -39,7 +41,7 @@ public class LimelightYoloReader {
     public List<Limelight.Sample> getDetections() {
         JSONObject json = sendGetRequest("/detection_boxes.json");
         if (json == null) {
-            System.out.println("Failed to get detection boxes: JSON null");
+            logger.warning("Failed to get detection boxes: JSON null");
             return new ArrayList<>();
         }
 
@@ -57,12 +59,11 @@ public class LimelightYoloReader {
 
                 Limelight.Sample.Color color = clsMap.getOrDefault(classId, Limelight.Sample.Color.UNKNOWN);
 
-                System.out.println("Detected sample " + classId + ", world: (" + worldX + ", " + worldY + ")");
+                logger.info("Detected sample " + classId + ", world: (" + worldX + ", " + worldY + ")");
                 samples.add(new Limelight.Sample(color, worldX, worldY, 0.0));
             }
         } catch (Exception e) {
-            System.out.println("Error parsing detections: " + e.getMessage());
-            e.printStackTrace();
+            logger.warning("Error parsing detections: " + e.getMessage());
         }
 
         return samples;
@@ -76,7 +77,7 @@ public class LimelightYoloReader {
     public Limelight.Sample getBestSample() {
         JSONObject json = sendGetRequest("/detection_boxes.json");
         if (json == null) {
-            System.out.println("Failed to get detection boxes: JSON null");
+            logger.info("Failed to get detection boxes: JSON null");
             return null;
         }
 
@@ -95,14 +96,13 @@ public class LimelightYoloReader {
                     color = Limelight.Sample.Color.UNKNOWN;
                 }
 
-                System.out.println("Found best sample: " + color + " at (" + x + ", " + y + "), angle: " + angle);
+                logger.info("Found best sample: " + color + " at (" + x + ", " + y + "), angle: " + angle);
                 return new Limelight.Sample(color, x, y, angle);
             } else {
-                System.out.println("No best sample found in current frame");
+                logger.info("No best sample found in current frame");
             }
         } catch (Exception e) {
-            System.out.println("Error parsing best sample: " + e.getMessage());
-            e.printStackTrace();
+            logger.warning("Error parsing best sample: " + e.getMessage());
         }
 
         return null;
@@ -126,7 +126,7 @@ public class LimelightYoloReader {
      */
     public Limelight.Sample getBestSampleWithRetry(int maxFrames) {
         for (int i = 0; i < maxFrames; i++) {
-            System.out.println("Attempting to get best sample, frame " + (i + 1) + "/" + maxFrames);
+            logger.info("Attempting to get best sample, frame " + (i + 1) + "/" + maxFrames);
             Limelight.Sample bestSample = getBestSample();
             if (bestSample != null) {
                 return bestSample;
@@ -142,7 +142,7 @@ public class LimelightYoloReader {
                 }
             }
         }
-        System.out.println("No best sample found after " + maxFrames + " attempts");
+        logger.info("No best sample found after " + maxFrames + " attempts");
         return null;
     }
 
@@ -154,7 +154,7 @@ public class LimelightYoloReader {
      */
     public boolean setAllowedColors(List<Limelight.Sample.Color> colors) {
         if (colors == null || colors.isEmpty()) {
-            System.out.println("No colors specified");
+            logger.info("No colors specified");
             return false;
         }
 
@@ -172,10 +172,10 @@ public class LimelightYoloReader {
         JSONObject response = sendGetRequest(endpoint);
 
         if (response != null && response.optBoolean("success", false)) {
-            System.out.println("Successfully set allowed colors: " + colorParam);
+            logger.info("Successfully set allowed colors: " + colorParam);
             return true;
         } else {
-            System.out.println("Failed to set allowed colors");
+            logger.warning("Failed to set allowed colors");
             return false;
         }
     }
@@ -248,16 +248,16 @@ public class LimelightYoloReader {
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String response = readResponse(connection);
-                System.out.println("GET " + endpoint);
-                System.out.println(response);
+                logger.info("GET " + endpoint);
+                logger.info(response);
                 ready = true;
                 return new JSONObject(response);
             } else {
-                System.out.println("GET Error: " + responseCode);
+                logger.warning("GET Error: " + responseCode);
                 ready = false;
             }
         } catch (Exception e) {
-            System.out.println("Connection error: " + e.getMessage());
+            logger.warning("Connection error: " + e.getMessage());
             ready = false;
         } finally {
             if (connection != null) {

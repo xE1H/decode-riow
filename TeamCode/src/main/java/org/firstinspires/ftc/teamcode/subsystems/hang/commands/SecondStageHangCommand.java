@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems.hang.commands;
 
 import static org.firstinspires.ftc.teamcode.subsystems.arm.ArmState.State.HANG_SECOND_STAGE;
+
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
+
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
@@ -15,11 +17,6 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
-import org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetEffect;
 
 import java.util.function.BooleanSupplier;
 
@@ -38,23 +35,21 @@ public class SecondStageHangCommand extends SequentialCommandGroup {
                 //new ForceCalibrateSlides(),
 
                 new SetRotatorAngle(102.5),
-                new WaitUntilCommand(()-> VLRSubsystem.getRotator().getAngleDegrees() >= 60),
+                new WaitUntilCommand(() -> VLRSubsystem.getRotator().getAngleDegrees() >= 60),
                 new SetSlideExtension(0.314),
-                new WaitUntilCommand(()-> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
+                new WaitUntilCommand(() -> (VLRSubsystem.getRotator().reachedTargetPosition() && VLRSubsystem.getSlides().reachedTargetPosition())).withTimeout(2000),
 
                 //LEDS:
                 //new SetColour(NeoPixelConfiguration.Colour.RED),
                 //new SetEffect(NeoPixelConfiguration.Effect.SOLID_COLOR),
 
-
                 new WaitUntilCommand(gamepadCondition),
-                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_SLOW),
-
                 new SetSlideExtension(0.1),
-                new WaitCommand(2000),
-
-
-                new SetRotatorAngle(50)
+                new InstantCommand(() -> VLRSubsystem.getRotator().setHangCoefficients()),
+                new SetRotatorAngle(42),
+                new WaitCommand(1000),
+                new SetArmOperationMode(ArmSlideConfiguration.OperationMode.HANG_SLOW),
+                new SetSlideExtension(0.03)
         );
     }
 }

@@ -17,9 +17,6 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetEffect;
 
 import java.util.function.BooleanSupplier;
 

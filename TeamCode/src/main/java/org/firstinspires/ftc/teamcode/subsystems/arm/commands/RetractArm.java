@@ -18,9 +18,6 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.GripperS
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.NeoPixelConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetColour;
-import org.firstinspires.ftc.teamcode.subsystems.neopixel.commands.SetEffect;
 
 public class RetractArm extends SequentialCommandGroup {
     public RetractArm() {
@@ -61,7 +58,7 @@ public class RetractArm extends SequentialCommandGroup {
                                 new SetClawTwist(HorizontalRotation.NORMAL),
                                 new WaitCommand(60),
                                 new SetRotatorAngle(ArmRotatorConfiguration.TargetAngle.RETRACT), // Just in case the state gets bugged
-                                new SetSlideExtension(ArmSlideConfiguration.TargetPosition.RETRACTED),
+                                new SetSlideExtension(0.04),
                                 new WaitUntilCommand(slides::reachedTargetPosition),
                                 new SetCurrentArmState(ArmState.State.IN_ROBOT)
                         ),

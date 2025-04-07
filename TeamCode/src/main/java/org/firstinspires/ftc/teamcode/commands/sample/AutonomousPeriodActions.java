@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
@@ -14,11 +15,9 @@ import com.pedropathing.pathgen.Point;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArmAuto;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.IntakeSample;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetRotatorAngle;
+import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetSlideExtension;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.sample.ScoreSample;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
@@ -27,8 +26,8 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
 public class AutonomousPeriodActions extends SequentialCommandGroup {
-    public static int toScoreX = 21;
-    public static int toScoreY = 116;
+    public static int toScoreX = 26;
+    public static int toScoreY = 115;
 
     public static double toSample1X = 32.3;
     public static double toSample1Y = 118.7;
@@ -86,18 +85,20 @@ public class AutonomousPeriodActions extends SequentialCommandGroup {
                 new ParallelCommandGroup(
                         //new FollowPath(f, bezierPath(new Pose(toScoreX, toSample1Y, 0), new Pose(toSample1X, toSample1Y, 0)).build()).withTimeout(0),
                         new SequentialCommandGroup(
-                                new WaitCommand(300),
+                                new WaitCommand(1),
                                 //new SetColour(NeoPixelConfiguration.Colour.YELLOW),
                                 new GrabBucketSample()
                         )
                 ),
-
+                //
+                //
 //                new FollowPath(0, toScoreHeading, new Point(30, 120)),
                 new ParallelCommandGroup(
                         new FollowPath(f, bezierPath(new Pose(toSample1X, toSample1Y, 0), new Pose(toScoreX, toScoreY, rad(toScoreHeading)))
                                 .setLinearHeadingInterpolation(0, rad(toScoreHeading)).build()),
                         new SequentialCommandGroup(
                                 new WaitCommand(650),
+                                new SetSlideExtension(0),
                                 //new SetLiftUpLed(NeoPixelConfiguration.Colour.YELLOW),
                                 new ScoreSample(117),
                                 new WaitCommand(100)
@@ -131,6 +132,7 @@ public class AutonomousPeriodActions extends SequentialCommandGroup {
                                 .setLinearHeadingInterpolation(0, rad(toScoreHeading)).build()),
                         new SequentialCommandGroup(
                                 new WaitCommand(500),
+                                new SetSlideExtension(0),
                                 //new SetLiftUpLed(NeoPixelConfiguration.Colour.YELLOW),
                                 new ScoreSample(117),
                                 new WaitCommand(100)
@@ -163,26 +165,33 @@ public class AutonomousPeriodActions extends SequentialCommandGroup {
 //                                new Pose(toSample3X, toSample3Y, rad(toSample3Heading))).build()),
                         new SequentialCommandGroup(
                                 new WaitCommand(300),
-                                new IntakeSample(0.40),
+                                new SetSlideExtension(0.1),
+                                new SetRotatorAngle(5),
+//                                new IntakeSample(0.40),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new WaitCommand(100),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                                 new WaitCommand(120),
-                                new SetClawTwist(0.8),
+//                                new SetClawTwist(0.8),
+                                new SetRotatorAngle(0),
+                                new SetSlideExtension(0.26),
+
                                 new WaitCommand(300),
+                                new WaitUntilCommand(() -> VLRSubsystem.getRotator().reachedTargetPosition()),
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
 
                                 //new SetColour(NeoPixelConfiguration.Colour.CYAN),
 
                                 new WaitCommand(200),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                new SetCurrentArmState(ArmState.State.IN_ROBOT)
+                                new SetSlideExtension(0),
+                                new WaitCommand(100)
                         )
                 ),
 //                  new FollowPath(90, toScoreHeading, new Point(30, 120)),
                 new ParallelCommandGroup(
                         new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                        new FollowPath(f, bezierPath(new Pose(toSample3X, toSample3Y, rad(40)), new Pose(toScoreX+2, toScoreY-2, rad(toScoreHeading)))
+                        new FollowPath(f, bezierPath(new Pose(toSample3X, toSample3Y, rad(40)), new Pose(toScoreX + 2, toScoreY - 2, rad(toScoreHeading)))
                                 .setLinearHeadingInterpolation(rad(40), rad(toScoreHeading)).build()).withTimeout(300),
                         new SequentialCommandGroup(
                                 new WaitCommand(650),
@@ -190,8 +199,7 @@ public class AutonomousPeriodActions extends SequentialCommandGroup {
                                 new ScoreSample(117),
                                 new WaitCommand(100)
                         )
-                ),
-                new RetractArm()
+                )
         );
     }
 }
