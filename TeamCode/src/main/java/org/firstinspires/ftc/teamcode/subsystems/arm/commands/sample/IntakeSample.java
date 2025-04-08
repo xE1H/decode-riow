@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmOverrideState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
+import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.RetractArm;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetCurrentArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.commands.SetIsArmMoving;
@@ -36,8 +37,8 @@ public class IntakeSample extends CustomConditionalCommand {
                                 () -> !ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE, ArmState.State.IN_ROBOT)
                         ),
 
-                        //new SetColour(NeoPixelConfiguration.Colour.CYAN),
 
+                        new SetArmPosition(true).XY(5, 5),
 
                         new SetClawAngle(VerticalRotation.UP),
                         new SetSlideExtension(extension),

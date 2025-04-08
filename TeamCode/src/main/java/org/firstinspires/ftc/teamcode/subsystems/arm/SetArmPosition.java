@@ -1,32 +1,77 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm;
 
-import com.acmerobotics.dashboard.config.Config;
+import static org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem.getArm;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.COORDINATE_IDENTIFIER;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OFFSET_REFERENCE_PLANE;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 
-@Config
-public class SetArmPosition extends ConditionalCommand {
-    public static double exclusionZoneMinAngle = 0;
-    public static double exclusionZoneMaxAngle = 0;
-    public static double exclusionZoneMinExtension = 0;
+import java.util.logging.Level;
 
-    public SetArmPosition(){
-        super(
-                new SequentialCommandGroup(
+public class SetArmPosition extends SequentialCommandGroup{
 
+    public SetArmPosition(boolean interpolation){
+        MainArmSubsystem arm = getArm();
+
+        addRequirements(arm);
+        arm.setInterpolation(interpolation);
+    }
+
+    public SetArmPosition() {this(false);}
+
+    private ConditionalCommand safeSetTargetPoint(double magnitudeOrX, double thetaOrY, COORDINATE_IDENTIFIER identifier, InstantCommand setCommand){
+        return new ConditionalCommand(
+                new ConditionalCommand(
+                        setCommand,
+                        moveToTargetWhileAvoidingCamera(magnitudeOrX, thetaOrY, identifier),
+                        ()-> getArm().isNewTargetSafeToMoveDirectly(getArm().coordinatesToTheta(magnitudeOrX, thetaOrY, identifier))
                 ),
-                new SequentialCommandGroup(
 
-                ),
-                ()-> isCameraInDanger()
+                new LogCommand("SET ARM POSITION COMMAND", Level.INFO, "TARGET POINT IS INVALID, SKIPPING COMMAND"),
+                ()-> getArm().isTargetPointValid(getArm().coordinatesToTheta(magnitudeOrX, thetaOrY, identifier))
         );
     }
 
-    private static boolean isBetween(double num, double num1, double num2){
-        return num > Math.min(num1, num2) && num < Math.max(num1, num2);
+    private ConditionalCommand magnitudeAndExtension(double magnitude, double angleDegrees){
+        return safeSetTargetPoint(magnitude, angleDegrees, COORDINATE_IDENTIFIER.POLAR, new InstantCommand(()-> getArm().setTargetPoint(magnitude, angleDegrees)));
     }
 
-    private static boolean isCameraInDanger(double target, double prevTarget, double extension){
-        return (isBetween(exclusionZoneMinAngle, prevTarget, target) || isBetween(exclusionZoneMaxAngle, prevTarget, target)) || extension > exclusionZoneMinExtension;
+    private ConditionalCommand XY(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
+        return safeSetTargetPoint(x_cm, y_cm, COORDINATE_IDENTIFIER.CARTESIAN, new InstantCommand(()-> getArm().setTargetPointWithRealWordCoordinates(x_cm, y_cm, reference)));
+    }
+
+    private SequentialCommandGroup moveToTargetWhileAvoidingCamera(double magnitudeOrX, double thetaOrY, COORDINATE_IDENTIFIER coordinateType){
+        return new SequentialCommandGroup(
+                new LogCommand("SET ARM POSITION COMMAND", Level.INFO, "ARM IS ON A COLLISION TRAJECTORY WITH CAMERA, MAKING AN AVOIDANCE MANEUVER"),
+                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                new WaitCommand(100),
+                new SetArmPosition().extension(0),
+                new WaitUntilCommand(()-> getArm().reachedTargetPosition()),
+                new SetArmPosition().angleDegrees(getArm().coordinatesToTheta(magnitudeOrX, thetaOrY, coordinateType)),
+                new WaitUntilCommand(()-> getArm().reachedTargetPosition()),
+                new SetArmPosition().extension(getArm().coordinatesToExtension(magnitudeOrX, thetaOrY, coordinateType))
+        );
+    }
+
+    public ConditionalCommand extension(double extension){
+        return magnitudeAndExtension(extension, getArm().getTargetAngleDegrees());
+    }
+
+    public ConditionalCommand angleDegrees(double angleDegrees){
+        return magnitudeAndExtension(getArm().getTargetExtension(), angleDegrees);
+    }
+
+    public ConditionalCommand X(double x, OFFSET_REFERENCE_PLANE reference){
+        return XY(x, getArm().getTargetY(), reference);
+    }
+
+    public ConditionalCommand Y(double y, OFFSET_REFERENCE_PLANE reference){
+        return XY(getArm().getTargetX(), y, reference);
     }
 }
