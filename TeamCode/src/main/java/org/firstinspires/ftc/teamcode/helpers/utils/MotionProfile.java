@@ -31,6 +31,8 @@ public class MotionProfile {
 
     private final PIDController pid;
 
+    private double t = 0;
+
     private Type profileType;
 
 
@@ -66,22 +68,25 @@ public class MotionProfile {
 
 
     public void updateCoefficients(double acceleration, double deceleration, double maxVelocity, double p, double i, double d, double v, double a) {
-        this.maxVelocity = maxVelocity;
-        this.pid.setPID(p, i, d);
-        this.velocityGain = v;
-        this.accelerationGain = a;
+        if (t == 1) {
+            this.maxVelocity = maxVelocity;
+            this.pid.setPID(p, i, d);
+            this.velocityGain = v;
+            this.accelerationGain = a;
 
-        switch (profileType){
-            case ACCELERATION_LIMITED:
-                this.acceleration = acceleration;
-                this.deceleration = deceleration;
-                break;
+            switch (profileType) {
+                case ACCELERATION_LIMITED:
+                    this.acceleration = acceleration;
+                    this.deceleration = deceleration;
+                    break;
 
-            case JERK_LIMITED:
-                this.jerkAcceleration = acceleration;
-                this.jerkDeceleration = deceleration;
-                break;
+                case JERK_LIMITED:
+                    this.jerkAcceleration = acceleration;
+                    this.jerkDeceleration = deceleration;
+                    break;
+            }
         }
+        else {System.out.println("TRIED OVERWRITING MOTION PROFILE COEFFICIENTS MID TRAVEL, REJECTING");}
     }
 
 
@@ -126,6 +131,7 @@ public class MotionProfile {
         else motionState = new MotionState(Math.abs(positionError), 0, 0);
 
         double positionSetPoint = initialPosition + Math.signum(positionError) * motionState.position;
+        t = clamp(Math.abs(motionState.position / positionError), 0, 1);
 
         double positionPower = pid.calculate(currentPosition, positionSetPoint);
         double velocityPower = motionState.velocity * velocityGain * Math.signum(positionError);
@@ -143,6 +149,9 @@ public class MotionProfile {
         }
         return positionPower + velocityPower + accelerationPower;
     }
+
+
+    public double getT() {return t;}
 
 
     private double calculateDistance(double jerk, double time) {

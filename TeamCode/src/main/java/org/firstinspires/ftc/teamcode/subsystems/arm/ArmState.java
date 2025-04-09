@@ -16,9 +16,9 @@ public class ArmState {
         moving = false;
     }
 
-    public static boolean isMoving() {
-        return System.currentTimeMillis() - lastMoved < ArmSlideConfiguration.ERROR_TIMEOUT_MILLIS && moving;
-    }
+//    public static boolean isMoving() {
+//        return System.currentTimeMillis() - lastMoved < ArmSlideConfiguration.ERROR_TIMEOUT_MILLIS && moving;
+//    }
 
     public static void setMoving(boolean movingValue) {
         moving = movingValue;

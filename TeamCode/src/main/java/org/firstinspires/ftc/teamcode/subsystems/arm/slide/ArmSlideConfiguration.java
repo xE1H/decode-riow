@@ -11,17 +11,6 @@ public class ArmSlideConfiguration {
 
     public static String LIMIT_SW_NAME = "SlideLimit";
 
-//    public static double ACCELERATION_JERK = 700000;
-//    public static double DECELERATION_JERK = 480000;
-//    public static double MAX_VELOCITY = 3100;
-//    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.0255;
-//    public static double FEEDBACK_INTEGRAL_GAIN = 0.000001;
-//    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0004;
-//    public static double FEED_FORWARD_GAIN = 0.1;
-//    public static double VELOCITY_GAIN = 0.0002;
-//    public static double ACCELERATION_GAIN = 0.000016;
-
-
     public static double ACCELERATION = 700;
     public static double DECELERATION = 500;
     public static double MAX_VELOCITY = 200;
@@ -31,7 +20,6 @@ public class ArmSlideConfiguration {
     public static double FEED_FORWARD_GAIN = 0.08;
     public static double VELOCITY_GAIN = 0.12;
     public static double ACCELERATION_GAIN = 0.08;
-
 
     public static double ACCELERATION_HANG = 70;
     public static double DECELERATION_HANG = 50;
@@ -43,47 +31,17 @@ public class ArmSlideConfiguration {
     public static double VELOCITY_GAIN_HANG = 0;
     public static double ACCELERATION_GAIN_HANG = 0;
 
-
-    public static double ACCELERATION_HANG_FAST = 0;
-    public static double DECELERATION_HANG_FAST = 0;
-    public static double MAX_VELOCITY_HANG_FAST = 0;
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG_FAST = 0;
-    public static double FEEDBACK_INTEGRAL_GAIN_HANG_FAST = 0;
-    public static double VELOCITY_GAIN_HANG_FAST = 0;
-
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT = 0;
+    public static double FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT = 0;
+    public static double FEEDBACK_INTEGRAL_GAIN_HOLD_POINT = 0;
 
     public static double CREEP = 2;
-
     public static double ERROR_MARGIN = 0.3;
-    public static double ERROR_TIMEOUT_MILLIS = 1000; // ms before position is automatically classified as reached
 
     public static double MIN_POSITION = 0;
     public static double HORIZONTAL_EXTENSION_LIMIT = 15;
     public static double MAX_POSITION = 23; //ROTATIONS, NOT TICKS
     public static double MAX_EXTENSION_CM = 0;
 
-    public static double INTAKE_SPECIMEN = 0.05;
 
-
-    public enum TargetPosition {
-        RETRACTED(0),
-        INTAKE_SAMPLE(0.45), // 30.8cm
-        SCORE_BUCKET_HIGH(1),
-        PREPARE_SPECIMEN_HIGH(0.45),
-        SCORE_SPECIMEN_HIGH(0.165),
-        INTAKE_SPECIMEN(0.45);
-
-        public final double extension;
-
-        TargetPosition(double extension) {
-            this.extension = extension;
-        }
-    }
-
-
-    public enum OperationMode {
-        NORMAL,
-        HANG_SLOW,
-        HANG_FAST
-    }
 }

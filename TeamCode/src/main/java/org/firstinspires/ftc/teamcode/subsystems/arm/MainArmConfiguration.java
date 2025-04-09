@@ -45,4 +45,17 @@ public class MainArmConfiguration {
     }
 
 
+    public enum TARGET_POSITION{
+        INTAKE,
+        RETRACT,
+        SCORE_SAMPLE,
+        SCORE_SPECIMEN
+    }
+
+
+    public enum OPERATION_MODE {
+        NORMAL,
+        HANG,
+        HOLD_POINT
+    }
 }

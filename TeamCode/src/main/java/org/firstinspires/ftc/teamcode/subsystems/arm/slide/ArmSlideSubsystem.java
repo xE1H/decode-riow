@@ -3,14 +3,12 @@ package org.firstinspires.ftc.teamcode.subsystems.arm.slide;
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem.mapToRange;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.*;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
@@ -22,14 +20,11 @@ public class ArmSlideSubsystem {
     private TouchSensor limitSwitch;
 
     private MotionProfile motionProfile;
-
     private double encoderPosition = 0;
-    private double lastPositionChangeTime = 0;
 
     private double encoderOffset = 0;
-
-    private OperationMode operationMode = OperationMode.NORMAL;
     private boolean overridePower = false;
+    private boolean holdingPosition = false;
     private double feedForwardGain = FEED_FORWARD_GAIN;
 
 
@@ -69,30 +64,17 @@ public class ArmSlideSubsystem {
     }
 
 
-    public void setTargetPosition(TargetPosition position) {
-        setTargetPosition(position.extension);
-    }
 
     public void setTargetPosition(double position) {
-        //System.out.print("Setting target to");
-        //System.out.println(position);
-        lastPositionChangeTime = System.currentTimeMillis();
+        holdingPosition = false;
+        setDefaultCoefficients();
+
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
         motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
     }
 
 
-    // This method should only be used for commands.
-    // Returns true if position has been reached, or position timeout has occurred.
-    // This is so the whole command system doesn't freeze if the slides are unable to reach the specified position
     public boolean reachedTargetPosition() {
-        if (lastPositionChangeTime != 0 && System.currentTimeMillis() - lastPositionChangeTime > ERROR_TIMEOUT_MILLIS) {
-            return true;
-        }
-        return reachedPosition(getTargetPosition());
-    }
-
-    public boolean reachedTargetPositionNoOverride() {
         return reachedPosition(getTargetPosition());
     }
 
@@ -118,26 +100,6 @@ public class ArmSlideSubsystem {
 
     public double getTargetExtension() {
         return mapToRange(getPosition(), MIN_POSITION, MAX_POSITION, 0, 1);
-    }
-
-
-    public void incrementTargetPosition(double increment) {
-        //System.out.printf("sniegas " + clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT) + "\n");
-        motionProfile.setTargetPosition(clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT));
-    }
-
-
-    public void setHangCoefficientsFast() {
-        feedForwardGain = FEED_FORWARD_GAIN_HANG;
-        motionProfile.updateCoefficients(
-                ACCELERATION_HANG_FAST,
-                DECELERATION_HANG_FAST,
-                MAX_VELOCITY_HANG_FAST,
-                FEEDBACK_PROPORTIONAL_GAIN_HANG_FAST,
-                FEEDBACK_INTEGRAL_GAIN_HANG_FAST,
-                FEEDBACK_DERIVATIVE_GAIN_HANG,
-                VELOCITY_GAIN_HANG_FAST,
-                ACCELERATION_GAIN_HANG);
     }
 
 
@@ -188,61 +150,57 @@ public class ArmSlideSubsystem {
 
 
     public void checkLimitSwitch() {
-        if (limitSwitch.isPressed()) {
-            //System.out.println("LIMIT ON");
-            //extensionEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            encoderOffset = extensionEncoder.getCurrentPosition();
-//            extensionEncoder.setMode(DcMotor.RunMode.RESET_ENCODERS);
-//            extensionEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
+        if (limitSwitch.isPressed()) {encoderOffset = extensionEncoder.getCurrentPosition();}
     }
-
 
     public boolean getLimitSwitchState(){
         return limitSwitch.isPressed();
     }
 
-
-    public void setOperationMode(OperationMode operationMode){
-        this.operationMode = operationMode;
+    public double getT(){
+        return motionProfile.getT();
     }
 
-
-    public OperationMode getOperationMode(){
-        return operationMode;
+    private void updateCoefficients(){
+        if (motionProfile.getT() == 1 && !holdingPosition){
+            motionProfile.updateCoefficients(0, 0, 0, FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT, 0, 0);
+            holdingPosition = true;
+        }
     }
 
 
     public void periodic(double armAngleDegrees) {
         checkLimitSwitch();
-
         encoderPosition = -(extensionEncoder.getCurrentPosition() - encoderOffset) / 8192d;
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;
         power = clamp(power, -1, 1);
 
+        //setMotorPower(power);
 
-        if (!overridePower) {
-            if (operationMode == OperationMode.NORMAL) {
-                setDefaultCoefficients();
+//        if (!overridePower) {
+//            if (operationMode == OperationMode.NORMAL) {
+//                setDefaultCoefficients();
+//
+//                if (reachedTargetPositionNoOverride()) {
+//                    extensionMotor0.setPower(0);
+//
+//                    if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
+//                        extensionMotor1.setPower(0);
+//                        extensionMotor2.setPower(0);
+//
+//                    } else{
+//                        extensionMotor1.setPower(power);
+//                        extensionMotor2.setPower(power);
+//                    }
+//
+//                } else setMotorPower(power);
+//            } else{
+//                setMotorPower(power);
+//            }
+//        }
 
-                if (reachedTargetPositionNoOverride()) {
-                    extensionMotor0.setPower(0);
-
-                    if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
-                        extensionMotor1.setPower(0);
-                        extensionMotor2.setPower(0);
-
-                    } else{
-                        extensionMotor1.setPower(power);
-                        extensionMotor2.setPower(power);
-                    }
-
-                } else setMotorPower(power);
-            } else{
-                setMotorPower(power);
-            }
-        }
+        updateCoefficients();
     }
 }

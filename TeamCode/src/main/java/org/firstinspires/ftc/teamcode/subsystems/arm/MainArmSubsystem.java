@@ -11,6 +11,8 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 
+import java.util.logging.Level;
+
 public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     private ArmRotatorSubsystem rotator;
     private ArmSlideSubsystem slides;
@@ -83,11 +85,11 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
                 Point interpolatedTarget = new Point(currentX, currentY);
 
-                rotator.setTargetPosition(Math.toDegrees(interpolatedTarget.getTheta()));
+                rotator.setTargetPosition(Math.toDegrees(interpolatedTarget.getTheta()), interpolatedTarget.getR());
                 slides.setTargetPosition(interpolatedTarget.getR());
             }
             else if (currentScalar == 1 && prevTargetPosition != targetPosition){
-                rotator.setTargetPosition(Math.toDegrees(targetPosition.getTheta()));
+                rotator.setTargetPosition(Math.toDegrees(targetPosition.getTheta()), targetPosition.getR());
                 slides.setTargetPosition(targetPosition.getR());
                 prevTargetPosition = targetPosition;
             }
@@ -95,10 +97,17 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
 
         else if (prevTargetPosition != targetPosition){
-            rotator.setTargetPosition(Math.toDegrees(targetPosition.getTheta()));
+            rotator.setTargetPosition(Math.toDegrees(targetPosition.getTheta()), targetPosition.getR());
             slides.setTargetPosition(targetPosition.getR());
             prevTargetPosition = targetPosition;
         }
+
+
+        logger.log(Level.INFO, "TARGET ANGLE FROM ARM SUBSYSTEM: " + Math.toDegrees(targetPosition.getTheta()));
+        logger.log(Level.INFO, "TARGET EXTENSION FROM ARM SUBSYSTEM: " + targetPosition.getR());
+
+        rotator.periodic(Math.toDegrees(targetPosition.getTheta()));
+        slides.periodic(targetPosition.getR());
     }
 
 
@@ -127,5 +136,9 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public boolean reachedTargetPosition(){
         return rotator.reachedTargetPosition() && slides.reachedTargetPosition();
+    }
+
+    public boolean motionProfilePathsAtParametricEnd(){
+        return rotator.getT() == 1 && slides.getT() == 1;
     }
 }

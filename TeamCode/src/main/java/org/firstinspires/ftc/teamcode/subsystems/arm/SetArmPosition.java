@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
+import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 
@@ -28,7 +29,16 @@ public class SetArmPosition extends SequentialCommandGroup{
     private ConditionalCommand safeSetTargetPoint(double magnitudeOrX, double thetaOrY, COORDINATE_IDENTIFIER identifier, InstantCommand setCommand){
         return new ConditionalCommand(
                 new ConditionalCommand(
-                        setCommand,
+                        new SequentialCommandGroup(
+                                setCommand,
+                                new WaitUntilCommand(()-> getArm().reachedTargetPosition()).raceWith(
+                                        new SequentialCommandGroup(
+                                                new WaitUntilCommand(()-> VLRSubsystem.getArm().motionProfilePathsAtParametricEnd()),
+                                                new WaitCommand(500),
+                                                new LogCommand("SET ARM POSITION COMMAND", Level.INFO, "WAIT UNTIL REACHED POSITION TIMEOUT TRIGGERED, OVERRIDING")
+                                        )
+                                )
+                        ),
                         moveToTargetWhileAvoidingCamera(magnitudeOrX, thetaOrY, identifier),
                         ()-> getArm().isNewTargetSafeToMoveDirectly(getArm().coordinatesToTheta(magnitudeOrX, thetaOrY, identifier))
                 ),
