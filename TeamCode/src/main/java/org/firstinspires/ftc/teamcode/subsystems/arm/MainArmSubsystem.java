@@ -37,7 +37,7 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         setTargetPoint(new Point(magnitude, angleDegrees));
     }
 
-    public Point calculateTargetPointWithRealWordCoordinates(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
+    public Point calculateTargetPointFromRealWordCoordinates(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
         double minY = ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getY() + RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.getY();
         if (y_cm < minY) {
             y_cm = minY;
@@ -45,24 +45,33 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         }
 
         Vector2d endEffectorFromPivotReferencePoint = new Vector2d(
-                reference.xScalar * (x_cm + ROBOT_LENGTH_CM / 2 + ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getX()),
-                y_cm - ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getY()
+                reference.xScalar * (x_cm + ROBOT_LENGTH_CM / 2 + Math.abs(ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getX())),
+                y_cm - Math.abs(ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getY())
         );
 
-        double alpha = Math.toDegrees(Math.acos(RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.getY() / endEffectorFromPivotReferencePoint.magnitude()));
-        Vector2d retractedArmEndFactor = RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.rotateBy(90 + Math.toDegrees(endEffectorFromPivotReferencePoint.angle()) - alpha);
+        logger.log(Level.WARNING, "END EFFECTOR FROM PIVOT POINT ANGLE: " + Math.toDegrees(endEffectorFromPivotReferencePoint.angle()) + " ;MAGNITUDE: " + endEffectorFromPivotReferencePoint.magnitude());
+
+        double alpha = Math.acos(Math.abs(RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.getY() / endEffectorFromPivotReferencePoint.magnitude()));
+        double beta = Math.atan(RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.getX() / Math.abs(RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.getY()));
+        double sigma = endEffectorFromPivotReferencePoint.angle();
+        double gamma = beta - alpha + sigma;
+
+        logger.log(Level.WARNING, "ALPHA: " + Math.toDegrees(alpha));
+        logger.log(Level.WARNING, "BETA: " + Math.toDegrees(beta));
+        logger.log(Level.WARNING, "SIGMA: " + Math.toDegrees(sigma));
+        logger.log(Level.WARNING, "GAMMA: " + Math.toDegrees(gamma));
+
+        double magnitude = RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.magnitude();
+        Vector2d retractedArmEndFactor = new Vector2d(magnitude * Math.cos(gamma), magnitude * Math.sin(gamma));
+
+        logger.log(Level.WARNING, "RETRACTED END EFFECTOR VECTOR: " + Math.toDegrees(retractedArmEndFactor.angle()) + "; " + retractedArmEndFactor.magnitude());
 
         Vector2d extensionVector = endEffectorFromPivotReferencePoint.minus(retractedArmEndFactor);
         extensionVector = extensionVector.scale(1 / MAX_EXTENSION_CM);
 
-        logger.log(Level.WARNING, "SETTING ARM TO " + extensionVector.magnitude() + " " + Math.toDegrees(extensionVector.angle()) + "TO ACHIEVE TARGET X AND Y REAL WORLD POSITION");
+        logger.log(Level.WARNING, "SETTING ARM TO " + extensionVector.magnitude() + " " + Math.toDegrees(extensionVector.angle()) + " TO ACHIEVE TARGET X AND Y REAL WORLD POSITION");
         return new Point(extensionVector.magnitude(), Math.toDegrees(extensionVector.angle()));
     }
-
-
-    public void setTargetExtension(double extension) {setTargetPoint(extension, getTargetAngleRads());}
-
-    public void setTargetAngle(double angleDegrees) {setTargetPoint(getTargetExtension(), angleDegrees);}
 
     public Point getTargetPoint() {return targetPoint;}
 
@@ -139,7 +148,6 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
             logger.log(Level.SEVERE, "CURRENT TARGET: " + target.angleDegrees() + "; " + target.magnitude());
         }
         return state;
-
         //return (isBetween(EXCLUSION_ZONE_MIN_ANGLE, prevTarget, target.angleDegrees()) || isBetween(EXCLUSION_ZONE_MAX_ANGLE, prevTarget, target.angleDegrees())) && (prevTargetPoint.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION) || target.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
     }
 

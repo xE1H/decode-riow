@@ -65,7 +65,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
     public ConditionalCommand XY(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
-        Point targetPoint = arm.calculateTargetPointWithRealWordCoordinates(x_cm, y_cm, reference);
+        Point targetPoint = arm.calculateTargetPointFromRealWordCoordinates(x_cm, y_cm, reference);
         return safeSetTargetPoint(targetPoint);
     }
 

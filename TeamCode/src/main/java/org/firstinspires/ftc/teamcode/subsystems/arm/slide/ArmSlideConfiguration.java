@@ -41,7 +41,7 @@ public class ArmSlideConfiguration {
     public static double MIN_POSITION = 0;
     public static double HORIZONTAL_EXTENSION_LIMIT = 15;
     public static double MAX_POSITION = 23; //ROTATIONS, NOT TICKS
-    public static double MAX_EXTENSION_CM = 0;
+    public static double MAX_EXTENSION_CM = 73.65;
 
 
 }
