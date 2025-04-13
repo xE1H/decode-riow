@@ -22,6 +22,12 @@ public class LogCommand extends InstantCommand {
         this.message = message;
     }
 
+    public LogCommand(String loggerName, String message) {
+        this.logger = Logger.getLogger(loggerName);
+        this.level = Level.INFO;
+        this.message = message;
+    }
+
     @Override
     public void run() {
         logger.log(level, message);

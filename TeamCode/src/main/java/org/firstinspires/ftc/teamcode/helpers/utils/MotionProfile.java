@@ -58,6 +58,8 @@ public class MotionProfile {
         this.accelerationGain = a;
         this.telemetryName = telemetryName;
         this.pid = new PIDController(p, i, d);
+
+        initialTime = System.nanoTime();
     }
 
 
@@ -131,7 +133,9 @@ public class MotionProfile {
         else motionState = new MotionState(Math.abs(positionError), 0, 0);
 
         double positionSetPoint = initialPosition + Math.signum(positionError) * motionState.position;
-        t = clamp(Math.abs(motionState.position / positionError), 0, 1);
+
+        if (positionError != 0) {t = clamp(Math.abs(motionState.position / positionError), 0, 1);}
+        else {t = 1;}
 
         double positionPower = pid.calculate(currentPosition, positionSetPoint);
         double velocityPower = motionState.velocity * velocityGain * Math.signum(positionError);
@@ -378,6 +382,7 @@ public class MotionProfile {
         telemetry.addData(telemetryName + "_motionProfileTargetAcceleration: ", accelerationSetPoint);
         telemetry.addData(telemetryName + "_motionProfileTime: ", (System.nanoTime() - initialTime) / Math.pow(10, 9));
         telemetry.addData(telemetryName + "_motor power: ", clamp(positionPower + velocityPower + accelerationPower, -1, 1));
+        telemetry.addData(telemetryName + "_T value: ", t);
         telemetry.update();
     }
 }

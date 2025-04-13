@@ -4,7 +4,6 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.*;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_EXTENSION_CM;
 import com.arcrobotics.ftclib.geometry.Vector2d;
-import com.pedropathing.pathgen.Point;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
@@ -17,8 +16,8 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     private ArmRotatorSubsystem rotator;
     private ArmSlideSubsystem slides;
 
-    private Point targetPosition = new Point(0, 0);
-    private Point prevTargetPosition = new Point(0, 0);
+    private Point targetPoint = new Point(0, 0);
+    private Point prevTargetPoint = new Point(0, 0);
 
     private boolean interpolation = false;
     private ElapsedTime interpolationTimer = new ElapsedTime();
@@ -29,11 +28,19 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         slides = new ArmSlideSubsystem(hardwareMap);
     }
 
-    public void setTargetPoint(double magnitude, double angleDegrees) {
-        targetPosition = new Point(magnitude, angleDegrees, Point.POLAR);
+    public void setTargetPoint(Point point) {
+        targetPoint = point;
+        //logger.log(Level.INFO, "ROBOT COORDINATE TARGET JUST UPDATED FROM MAIN ARM SUBSYSTEM " + point.magnitude() + point.angleDegrees());
     }
 
-    public void setTargetPointWithRealWordCoordinates(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
+    public void setTargetPoint(double magnitude, double angleDegrees) {
+        setTargetPoint(new Point(magnitude, angleDegrees));
+    }
+
+    public Point calculateTargetPointWithRealWordCoordinates(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
+        double minY = ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getY() + RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.getY();
+        if (y_cm < minY) {y_cm = minY;}
+
         Vector2d endEffectorFromPivotReferencePoint = new Vector2d(
                 reference.xScalar * (x_cm + ROBOT_LENGTH_CM / 2 + ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getX()),
                 y_cm - ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getY()
@@ -45,27 +52,26 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         Vector2d extensionVector = endEffectorFromPivotReferencePoint.minus(retractedArmEndFactor);
         extensionVector = extensionVector.scale(1 / MAX_EXTENSION_CM);
 
-        targetPosition = new Point(extensionVector.getX(), extensionVector.getY(), Point.CARTESIAN);
+        logger.log(Level.WARNING, "returning " + extensionVector.magnitude() + " " + Math.toDegrees(extensionVector.angle()) + "to achieve x and y position");
+        return new Point(extensionVector.magnitude(), Math.toDegrees(extensionVector.angle()));
     }
 
 
     public void setTargetExtension(double extension) {setTargetPoint(extension, getTargetAngleRads());}
 
-    public void setTargetAngle(double angleRads) {setTargetPoint(getTargetExtension(), angleRads);}
+    public void setTargetAngle(double angleDegrees) {setTargetPoint(getTargetExtension(), angleDegrees);}
 
-    public void moveTargetRelative(double deltaX_cm, double deltaY_cm, OFFSET_REFERENCE_PLANE reference) {setTargetPointWithRealWordCoordinates(targetPosition.getX() + deltaX_cm, targetPosition.getY() + deltaY_cm, reference);}
+    public Point getTargetPoint() {return targetPoint;}
 
-    public Point getTargetPoint() {return targetPosition;}
+    public double getTargetAngleDegrees() {return clamp(targetPoint.angleDegrees(), 0, 180);}
 
-    public double getTargetAngleDegrees() {return clamp(Math.toDegrees(targetPosition.getTheta()), 0, 180);}
+    public double getTargetAngleRads() {return clamp(targetPoint.angleRads(), 0, Math.PI);}
 
-    public double getTargetAngleRads() {return clamp(targetPosition.getTheta(), 0, Math.PI);}
+    public double getTargetExtension() {return clamp(targetPoint.magnitude(), 0, 1);}
 
-    public double getTargetExtension() {return clamp(targetPosition.getR(), 0, 1);}
+    public double getTargetX() {return clamp(targetPoint.getX(), -1, 1);}
 
-    public double getTargetX() {return clamp(targetPosition.getX(), -1, 1);}
-
-    public  double getTargetY() {return clamp(targetPosition.getY(), 0, 1);}
+    public  double getTargetY() {return clamp(targetPoint.getY(), 0, 1);}
 
     public void setInterpolation(boolean interpolation) {
         this.interpolation = interpolation;
@@ -75,39 +81,44 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     @Override
     public void periodic(){
-        if (interpolation) {
-            double delta = Math.hypot(targetPosition.getX() - prevTargetPosition.getX(), targetPosition.getY() - prevTargetPosition.getY());
-            double currentScalar = clamp(interpolationTimer.seconds() * delta / interpolationTimeConstant, 0 ,1);
+//        if (interpolation) {
+//            double delta = Math.hypot(targetPosition.getX() - prevTargetPosition.getX(), targetPosition.getY() - prevTargetPosition.getY());
+//            double currentScalar = clamp(interpolationTimer.seconds() * delta / interpolationTimeConstant, 0 ,1);
+//
+//            if (currentScalar < 1){
+//                double currentX = prevTargetPosition.getX() + (targetPosition.getX() - prevTargetPosition.getX()) * currentScalar;
+//                double currentY = prevTargetPosition.getY() + (targetPosition.getY() - prevTargetPosition.getY()) * currentScalar;
+//
+//                Point interpolatedTarget = new Point(currentX, currentY);
+//
+//                rotator.setTargetPosition(Math.toDegrees(interpolatedTarget.getTheta()), interpolatedTarget.getR());
+//                slides.setTargetPosition(interpolatedTarget.getR());
+//            }
+//            else if (currentScalar == 1 && prevTargetPosition != targetPosition){
+//                rotator.setTargetPosition(Math.toDegrees(targetPosition.getTheta()), targetPosition.getR());
+//                slides.setTargetPosition(targetPosition.getR());
+//                prevTargetPosition = targetPosition;
+//            }
+//        }
 
-            if (currentScalar < 1){
-                double currentX = prevTargetPosition.getX() + (targetPosition.getX() - prevTargetPosition.getX()) * currentScalar;
-                double currentY = prevTargetPosition.getY() + (targetPosition.getY() - prevTargetPosition.getY()) * currentScalar;
 
-                Point interpolatedTarget = new Point(currentX, currentY);
+        if (!prevTargetPoint.equals(targetPoint)){
+            //logger.log(Level.INFO, "UPDATING TARGET POS WITH " + targetPoint.magnitude() + (targetPoint.angleDegrees()));
 
-                rotator.setTargetPosition(Math.toDegrees(interpolatedTarget.getTheta()), interpolatedTarget.getR());
-                slides.setTargetPosition(interpolatedTarget.getR());
-            }
-            else if (currentScalar == 1 && prevTargetPosition != targetPosition){
-                rotator.setTargetPosition(Math.toDegrees(targetPosition.getTheta()), targetPosition.getR());
-                slides.setTargetPosition(targetPosition.getR());
-                prevTargetPosition = targetPosition;
-            }
+            //rotator.setTargetPosition(targetPoint.angleDegrees(), targetPoint.magnitude());
+            //slides.setTargetPosition(targetPoint.magnitude());
+            prevTargetPoint = targetPoint;
         }
 
-
-        else if (prevTargetPosition != targetPosition){
-            rotator.setTargetPosition(Math.toDegrees(targetPosition.getTheta()), targetPosition.getR());
-            slides.setTargetPosition(targetPosition.getR());
-            prevTargetPosition = targetPosition;
-        }
+        //logger.log(Level.INFO, "periodic running " + System.nanoTime());
 
 
-        logger.log(Level.INFO, "TARGET ANGLE FROM ARM SUBSYSTEM: " + Math.toDegrees(targetPosition.getTheta()));
-        logger.log(Level.INFO, "TARGET EXTENSION FROM ARM SUBSYSTEM: " + targetPosition.getR());
+        //logger.log(Level.INFO, "TARGET ANGLE FROM ARM SUBSYSTEM: " + Math.toDegrees(targetPosition.angle()));
+        //logger.log(Level.INFO, "TARGET EXTENSION FROM ARM SUBSYSTEM: " + targetPosition.magnitude());
 
-        rotator.periodic(Math.toDegrees(targetPosition.getTheta()));
-        slides.periodic(targetPosition.getR());
+
+        rotator.periodic(targetPoint.magnitude());
+        slides.periodic(targetPoint.angleDegrees());
     }
 
 
@@ -129,9 +140,9 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         return !isBetween(targetAngle, EXCLUSION_ZONE_MIN_ANGLE, EXCLUSION_ZONE_MAX_ANGLE);
     }
 
-    public boolean isNewTargetSafeToMoveDirectly(double targetAngle){
-        double prevTarget = Math.toDegrees(prevTargetPosition.getTheta());
-        return (isBetween(EXCLUSION_ZONE_MIN_ANGLE, prevTarget, targetAngle) || isBetween(EXCLUSION_ZONE_MAX_ANGLE, prevTarget, targetAngle)) && prevTargetPosition.getR() > EXCLUSION_ZONE_MIN_EXTENSION;
+    public boolean isCameraInTheWayToNewTarget(Point target){
+        double prevTarget = prevTargetPoint.angleDegrees();
+        return (isBetween(EXCLUSION_ZONE_MIN_ANGLE, prevTarget, target.angleDegrees()) || isBetween(EXCLUSION_ZONE_MAX_ANGLE, prevTarget, target.angleDegrees())) && (prevTargetPoint.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION) || target.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
     }
 
     public boolean reachedTargetPosition(){
@@ -140,5 +151,13 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public boolean motionProfilePathsAtParametricEnd(){
         return rotator.getT() == 1 && slides.getT() == 1;
+    }
+
+    public double extension(){
+        return slides.getExtension();
+    }
+
+    public double angleDegrees(){
+        return rotator.getAngleDegrees();
     }
 }

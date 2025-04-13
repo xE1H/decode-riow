@@ -201,6 +201,6 @@ public class ArmSlideSubsystem {
 //            }
 //        }
 
-        updateCoefficients();
+        //updateCoefficients();
     }
 }

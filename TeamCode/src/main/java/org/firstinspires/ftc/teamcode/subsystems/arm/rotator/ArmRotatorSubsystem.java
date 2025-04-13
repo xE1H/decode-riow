@@ -8,8 +8,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
+
+import java.util.logging.Level;
 
 
 public class ArmRotatorSubsystem {
@@ -59,24 +64,30 @@ public class ArmRotatorSubsystem {
                 ACCELERATION_GAIN);
 
         motionProfile.enableTelemetry(true);
+        motionProfile.setTargetPosition(0);
         timer.reset();
     }
 
 
     public void setTargetPosition(double angleDegrees, double slideExtension) {
-        holdingPosition = false;
+        VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.INFO, "NEW ROTATOR ANGLE JUST SET");
 
-        double p = mapToRange(slideExtension, 0, 1, FEEDBACK_PROPORTIONAL_GAIN, EXTENDED_FEEDBACK_PROPORTIONAL_GAIN);
-        double i = mapToRange(slideExtension, 0, 1, FEEDBACK_INTEGRAL_GAIN, EXTENDED_FEEDBACK_INTEGRAL_GAIN);
-        double d = mapToRange(slideExtension, 0, 1, FEEDBACK_DERIVATIVE_GAIN, EXTENDED_FEEDBACK_DERIVATIVE_GAIN);
-        double v = mapToRange(slideExtension, 0, 1, VELOCITY_GAIN, EXTENDED_VELOCITY_GAIN);
-        double a = mapToRange(slideExtension, 0, 1, ACCELERATION_GAIN, EXTENDED_ACCELERATION_GAIN);
-        double acceleration = mapToRange(slideExtension, 0, 1, ACCELERATION_JERK, EXTENDED_ACCELERATION_JERK);
-        double deceleration = mapToRange(slideExtension, 0, 1, DECELERATION_JERK, EXTENDED_DECELERATION_JERK);
-        double maxVelocity = mapToRange(slideExtension, 0, 1, MAX_VELOCITY, EXTENDED_MAX_VELOCITY);
-
-        motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
+//        holdingPosition = false;
+//
+//        double p = mapToRange(slideExtension, 0, 1, FEEDBACK_PROPORTIONAL_GAIN, EXTENDED_FEEDBACK_PROPORTIONAL_GAIN);
+//        double i = mapToRange(slideExtension, 0, 1, FEEDBACK_INTEGRAL_GAIN, EXTENDED_FEEDBACK_INTEGRAL_GAIN);
+//        double d = mapToRange(slideExtension, 0, 1, FEEDBACK_DERIVATIVE_GAIN, EXTENDED_FEEDBACK_DERIVATIVE_GAIN);
+//        double v = mapToRange(slideExtension, 0, 1, VELOCITY_GAIN, EXTENDED_VELOCITY_GAIN);
+//        double a = mapToRange(slideExtension, 0, 1, ACCELERATION_GAIN, EXTENDED_ACCELERATION_GAIN);
+//        double acceleration = mapToRange(slideExtension, 0, 1, ACCELERATION_JERK, EXTENDED_ACCELERATION_JERK);
+//        double deceleration = mapToRange(slideExtension, 0, 1, DECELERATION_JERK, EXTENDED_DECELERATION_JERK);
+//        double maxVelocity = mapToRange(slideExtension, 0, 1, MAX_VELOCITY, EXTENDED_MAX_VELOCITY);
+//
+//        motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
         motionProfile.setTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
+
+        VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.INFO, "SKIBIDI MOTION PROFILE SET PASSED");
+
     }
 
 
@@ -143,7 +154,7 @@ public class ArmRotatorSubsystem {
         double power = motionProfile.getPower(currentAngle) + feedForwardPower;
         power = clamp(power, -1, 1);
 
-        updateCoefficients();
+        //updateCoefficients();
 //        if (slideSubsystem.getOperationMode() == ArmSlideConfiguration.OperationMode.NORMAL) {
 //            setDefaultCoefficients();
 //
