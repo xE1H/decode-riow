@@ -24,7 +24,7 @@ public class LogCommand extends InstantCommand {
 
     public LogCommand(String loggerName, String message) {
         this.logger = Logger.getLogger(loggerName);
-        this.level = Level.INFO;
+        this.level = Level.WARNING;
         this.message = message;
     }
 

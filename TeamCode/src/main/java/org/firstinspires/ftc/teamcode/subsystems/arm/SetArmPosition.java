@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.arm;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem.getArm;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.COORDINATE_IDENTIFIER;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OFFSET_REFERENCE_PLANE;
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -30,68 +30,64 @@ public class SetArmPosition extends SequentialCommandGroup{
 
     public SetArmPosition() {this(false);}
 
-    private ConditionalCommand safeSetTargetPoint(double magnitudeOrX, double thetaOrY, COORDINATE_IDENTIFIER identifier, InstantCommand setCommand){
+    private ConditionalCommand safeSetTargetPoint(Point targetPoint, Command ifCameraIsInTheWay){
         return new ConditionalCommand(
+                new ConditionalCommand(
                         new SequentialCommandGroup(
-                                setCommand
-                        )
-                        .raceWith(
-                                new SequentialCommandGroup(
-                                        new WaitCommand(500),
-                                        new InstantCommand(()-> System.out.println("LOGGER TEST"))
+                                new LogCommand("SET ARM POS COMMAND", "SETTING TARGET ARM ANGLE TO " + targetPoint.angleDegrees() + " WITH MAGNITUDE " + targetPoint.magnitude()),
+                                new InstantCommand(()-> arm.setTargetPoint(targetPoint)),
+                                new WaitCommand(5),
+                                new WaitUntilCommand(()-> arm.motionProfilePathsAtParametricEnd()),
+                                new WaitCommand(500),
+
+                                new ConditionalCommand(
+                                        new LogCommand("SET ARM POS COMMAND", Level.WARNING, "TARGET REACHED SUCCESSFULLY"),
+                                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "ARM TIMEOUT TRIGGERED"),
+                                        ()-> arm.reachedTargetPosition()
                                 )
                         ),
-                        new InstantCommand(),
-                        ()-> true
+
+                        ifCameraIsInTheWay,
+                        ()-> !arm.isCameraInTheWayToNewTarget(targetPoint)
+                ),
+
+                new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "TARGET POINT IS INVALID, SKIPPING"),
+                ()-> arm.isTargetPointValid(targetPoint.angleDegrees())
         );
     }
 
-//    private ConditionalCommand safeSetTargetPoint(double magnitudeOrX, double thetaOrY, COORDINATE_IDENTIFIER identifier, InstantCommand setCommand){
-//        return new ConditionalCommand(
-//                new ConditionalCommand(
-//                                new SequentialCommandGroup(
-//                                                //new LogCommand("SET ARM COMMAND", "RUNNING SET COMMAND"),
-//                                                setCommand
-//                                                //new WaitUntilCommand(()-> arm.reachedTargetPosition())
-//                                ).raceWith(
-//                                        new SequentialCommandGroup(
-//                                                        //new WaitUntilCommand(()-> arm.motionProfilePathsAtParametricEnd()),
-//                                                        new WaitCommand(500),
-//                                                        new InstantCommand(()-> System.out.println("LOGGER TEST"))
-//
-//
-//                                                        //TODO THIS OMEGA STUPID LOG FREEZES THE ENTIRE COMMAND THREAD, FIGURE OUT WHY
-//                                                        //new LogCommand("SET ARM COMMAND", "ARM DID NOT REACH TARGET POSITION IN TIME, INTERRUPTING THE WAIT COMMAND")
-//                                        )
-//                                ),
-//
-//                        new InstantCommand(),
-//                        ()-> true
-//                        //moveToTargetWhileAvoidingCamera(magnitudeOrX, thetaOrY, identifier),
-//                        //()-> !arm.isCameraInTheWayToNewTarget(arm.coordinatesToTheta(magnitudeOrX, thetaOrY, identifier))
-//                ),
-//
-//                new LogCommand("SET ARM POSITION COMMAND", Level.INFO, "TARGET POINT IS INVALID, SKIPPING COMMAND"),
-//                ()-> arm.isTargetPointValid(arm.coordinatesToTheta(magnitudeOrX, thetaOrY, identifier))
-//        );
-//    }
+    private ConditionalCommand safeSetTargetPoint(Point point){
+        return safeSetTargetPoint(point, moveToTargetWhileAvoidingCamera(point));
+    }
 
     public ConditionalCommand magnitudeAndExtension(double magnitude, double angleDegrees){
-        return safeSetTargetPoint(magnitude, angleDegrees, COORDINATE_IDENTIFIER.POLAR, new InstantCommand(()-> arm.setTargetPoint(magnitude, angleDegrees)));
+        return safeSetTargetPoint(new Point(magnitude, angleDegrees));
     }
 
     public ConditionalCommand XY(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
-        return safeSetTargetPoint(x_cm, y_cm, COORDINATE_IDENTIFIER.CARTESIAN, new InstantCommand(()-> arm.setTargetPoint(arm.calculateTargetPointWithRealWordCoordinates(x_cm, y_cm, reference))));
+        Point targetPoint = arm.calculateTargetPointWithRealWordCoordinates(x_cm, y_cm, reference);
+        return safeSetTargetPoint(targetPoint);
     }
 
-    private SequentialCommandGroup moveToTargetWhileAvoidingCamera(double magnitudeOrX, double thetaOrY, COORDINATE_IDENTIFIER coordinateType){
+    private SequentialCommandGroup moveToTargetWhileAvoidingCamera(Point target){
         return new SequentialCommandGroup(
-                new LogCommand("SET ARM POSITION COMMAND", "CAN'T GO TO TARGET DIRECTLY, MAKING AN AVOIDANCE MANEUVER"),
+                new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "MAKING A CAMERA AVOIDANCE MANEUVER"),
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new WaitCommand(100),
-                new SetArmPosition().extension(0),
-                new SetArmPosition().angleDegrees(arm.coordinatesToTheta(magnitudeOrX, thetaOrY, coordinateType)),
-                new SetArmPosition().extension(arm.coordinatesToExtension(magnitudeOrX, thetaOrY, coordinateType))
+
+                safeSetTargetPoint(new Point(0, arm.angleDegrees()),
+                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "SOMETHING WENT WRONG ON RETRACTION")
+                ),
+
+                safeSetTargetPoint(new Point(0, target.angleDegrees()),
+                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "SOMETHING WENT WRONG WHILE ROTATING TO TARGET")
+                ),
+
+                safeSetTargetPoint(new Point(target.magnitude(), target.angleDegrees()),
+                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "SOMETHING WENT WRONG WHILE EXTENDING ARM TO TARGET")
+                ),
+
+                new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "END OF CAMERA AVOIDANCE MANEUVER")
         );
     }
 

@@ -9,8 +9,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+
+import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
+
+import java.util.logging.Level;
 
 @Config
 public class ArmSlideSubsystem {
@@ -66,8 +71,10 @@ public class ArmSlideSubsystem {
 
 
     public void setTargetPosition(double position) {
-        holdingPosition = false;
-        setDefaultCoefficients();
+        VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "NEW SLIDE EXTENSION OF " + position + " JUST SET");
+
+        //holdingPosition = false;
+        //setDefaultCoefficients();
 
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
         motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));

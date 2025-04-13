@@ -70,7 +70,7 @@ public class ArmRotatorSubsystem {
 
 
     public void setTargetPosition(double angleDegrees, double slideExtension) {
-        VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.INFO, "NEW ROTATOR ANGLE JUST SET");
+        VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "NEW ROTATOR ANGLE OF " + angleDegrees + " JUST SET");
 
 //        holdingPosition = false;
 //
@@ -85,9 +85,6 @@ public class ArmRotatorSubsystem {
 //
 //        motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
         motionProfile.setTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
-
-        VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.INFO, "SKIBIDI MOTION PROFILE SET PASSED");
-
     }
 
 

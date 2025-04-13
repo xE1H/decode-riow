@@ -30,7 +30,7 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public void setTargetPoint(Point point) {
         targetPoint = point;
-        //logger.log(Level.INFO, "ROBOT COORDINATE TARGET JUST UPDATED FROM MAIN ARM SUBSYSTEM " + point.magnitude() + point.angleDegrees());
+        logger.log(Level.WARNING, "NEW TARGET UPDATED IN ARM SUBSYSTEM WITH ANGLE " + point.angleDegrees() + " AND MAGNITUDE " + point.magnitude());
     }
 
     public void setTargetPoint(double magnitude, double angleDegrees) {
@@ -39,7 +39,10 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public Point calculateTargetPointWithRealWordCoordinates(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
         double minY = ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getY() + RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.getY();
-        if (y_cm < minY) {y_cm = minY;}
+        if (y_cm < minY) {
+            y_cm = minY;
+            logger.log(Level.SEVERE, "TARGET Y COORDINATE IS OUT OF BOUNDS, CLAMPING TO MIN VALUE");
+        }
 
         Vector2d endEffectorFromPivotReferencePoint = new Vector2d(
                 reference.xScalar * (x_cm + ROBOT_LENGTH_CM / 2 + ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getX()),
@@ -52,7 +55,7 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         Vector2d extensionVector = endEffectorFromPivotReferencePoint.minus(retractedArmEndFactor);
         extensionVector = extensionVector.scale(1 / MAX_EXTENSION_CM);
 
-        logger.log(Level.WARNING, "returning " + extensionVector.magnitude() + " " + Math.toDegrees(extensionVector.angle()) + "to achieve x and y position");
+        logger.log(Level.WARNING, "SETTING ARM TO " + extensionVector.magnitude() + " " + Math.toDegrees(extensionVector.angle()) + "TO ACHIEVE TARGET X AND Y REAL WORLD POSITION");
         return new Point(extensionVector.magnitude(), Math.toDegrees(extensionVector.angle()));
     }
 
@@ -103,33 +106,14 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
 
         if (!prevTargetPoint.equals(targetPoint)){
-            //logger.log(Level.INFO, "UPDATING TARGET POS WITH " + targetPoint.magnitude() + (targetPoint.angleDegrees()));
 
-            //rotator.setTargetPosition(targetPoint.angleDegrees(), targetPoint.magnitude());
-            //slides.setTargetPosition(targetPoint.magnitude());
+            rotator.setTargetPosition(targetPoint.angleDegrees(), targetPoint.magnitude());
+            slides.setTargetPosition(targetPoint.magnitude());
             prevTargetPoint = targetPoint;
         }
 
-        //logger.log(Level.INFO, "periodic running " + System.nanoTime());
-
-
-        //logger.log(Level.INFO, "TARGET ANGLE FROM ARM SUBSYSTEM: " + Math.toDegrees(targetPosition.angle()));
-        //logger.log(Level.INFO, "TARGET EXTENSION FROM ARM SUBSYSTEM: " + targetPosition.magnitude());
-
-
         rotator.periodic(targetPoint.magnitude());
         slides.periodic(targetPoint.angleDegrees());
-    }
-
-
-    public double coordinatesToTheta(double magnitudeOrX, double thetaOrY, COORDINATE_IDENTIFIER coordinateIdentifier){
-        if (coordinateIdentifier == COORDINATE_IDENTIFIER.POLAR) {return thetaOrY;}
-        else {return Math.atan2(thetaOrY, magnitudeOrX);}
-    }
-
-    public double coordinatesToExtension(double magnitudeOrX, double thetaOrY, COORDINATE_IDENTIFIER coordinateIdentifier){
-        if (coordinateIdentifier == COORDINATE_IDENTIFIER.POLAR) {return magnitudeOrX;}
-        else {return Math.hypot(magnitudeOrX, thetaOrY);}
     }
 
     public boolean isBetween(double num, double num1, double num2){
@@ -142,7 +126,21 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public boolean isCameraInTheWayToNewTarget(Point target){
         double prevTarget = prevTargetPoint.angleDegrees();
-        return (isBetween(EXCLUSION_ZONE_MIN_ANGLE, prevTarget, target.angleDegrees()) || isBetween(EXCLUSION_ZONE_MAX_ANGLE, prevTarget, target.angleDegrees())) && (prevTargetPoint.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION) || target.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
+        boolean minBool = isBetween(EXCLUSION_ZONE_MIN_ANGLE, prevTarget, target.angleDegrees());
+        boolean maxBool = isBetween(EXCLUSION_ZONE_MAX_ANGLE, prevTarget, target.angleDegrees());
+        boolean prevExt = prevTargetPoint.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
+        boolean currentExt = target.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
+
+        boolean state = (minBool || maxBool) && (prevExt || currentExt);
+
+        if (state){
+            logger.log(Level.SEVERE, "CAMERA IS IN THE WAY, INDIVIDUAL BOOLEANS ARE " + minBool + maxBool + prevExt + currentExt);
+            logger.log(Level.SEVERE, "PREV TARGET: " + prevTargetPoint.angleDegrees() + "; "  + prevTargetPoint.magnitude());
+            logger.log(Level.SEVERE, "CURRENT TARGET: " + target.angleDegrees() + "; " + target.magnitude());
+        }
+        return state;
+
+        //return (isBetween(EXCLUSION_ZONE_MIN_ANGLE, prevTarget, target.angleDegrees()) || isBetween(EXCLUSION_ZONE_MAX_ANGLE, prevTarget, target.angleDegrees())) && (prevTargetPoint.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION) || target.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
     }
 
     public boolean reachedTargetPosition(){
