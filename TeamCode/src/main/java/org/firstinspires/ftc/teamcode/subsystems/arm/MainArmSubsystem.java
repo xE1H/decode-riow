@@ -40,6 +40,11 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         setTargetPoint(new Point(magnitude, angleDegrees));
     }
 
+    public void updateCoefficients(OPERATION_MODE operationMode){
+        rotator.updateCoefficientsForOperationMode(operationMode);
+        slides.updateCoefficientsForOperationMode(operationMode);
+    }
+
     public Point calculateTargetPointFromRealWordCoordinates(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
         double minY = ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getY() + RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.getY();
         if (y_cm < minY) {
@@ -163,7 +168,6 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
             logger.log(Level.SEVERE, "CURRENT TARGET: " + target.angleDegrees() + "; " + target.magnitude());
         }
         return state;
-        //return (isBetween(EXCLUSION_ZONE_MIN_ANGLE, prevTarget, target.angleDegrees()) || isBetween(EXCLUSION_ZONE_MAX_ANGLE, prevTarget, target.angleDegrees())) && (prevTargetPoint.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION) || target.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
     }
 
     public boolean reachedTargetPosition(){

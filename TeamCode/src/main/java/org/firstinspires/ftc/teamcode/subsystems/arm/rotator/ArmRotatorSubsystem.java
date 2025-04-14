@@ -94,7 +94,6 @@ public class ArmRotatorSubsystem {
     }
 
     public void setHangCoefficients() {
-        //feedForwardGain = FEEDFORWARD_GAIN_HANG;
         motionProfile.updateCoefficients(
                 ACCELERATION_HANG,
                 DECELERATION_HANG,
@@ -108,7 +107,6 @@ public class ArmRotatorSubsystem {
 
 
     public void setDefaultCoefficients() {
-        //feedForwardGain = FEEDFORWARD_GAIN;
         motionProfile.updateCoefficients(
                 ACCELERATION_JERK,
                 DECELERATION_JERK,
@@ -123,6 +121,11 @@ public class ArmRotatorSubsystem {
 
     public double getT(){
         return motionProfile.getT();
+    }
+
+    public void updateCoefficientsForOperationMode(OPERATION_MODE operationMode){
+        if (operationMode == OPERATION_MODE.HANG) {setHangCoefficients();}
+        else if (operationMode == OPERATION_MODE.NORMAL) {setDefaultCoefficients();}
     }
 
     public void periodic(double slideExtension, OPERATION_MODE operationMode) {
