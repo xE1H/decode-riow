@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -16,10 +17,12 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 
+import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 
 public class SetArmPosition extends SequentialCommandGroup{
     private MainArmSubsystem arm;
+    private static BooleanSupplier interruptCondition = ()-> false;
 
     public SetArmPosition(boolean interpolation){
         arm = getArm();
@@ -46,7 +49,8 @@ public class SetArmPosition extends SequentialCommandGroup{
                                             .andThen(new InstantCommand(()-> arm.setOperationMode(MainArmConfiguration.OPERATION_MODE.HOLD_POINT))),
                                             //^more aggressive pids when arm arrives at target position, but only if it correctly reaches target position
 
-                                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "ARM TIMEOUT TRIGGERED"),
+                                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "ARM TIMEOUT TRIGGERED, WAITING INDEFINITELY OR FOR MANUAL OVERRIDE")
+                                                .andThen(new WaitUntilCommand(()-> arm.reachedTargetPosition()).interruptOn(interruptCondition)),
                                         ()-> arm.reachedTargetPosition()
                                 )
                         ),
@@ -111,10 +115,26 @@ public class SetArmPosition extends SequentialCommandGroup{
         return XY(arm.getTargetX(), y, reference);
     }
 
-    public SequentialCommandGroup intakeSample(double extension, double twist){
+    public SequentialCommandGroup MANUALLY_INTERRUPT_CURRENT_COMMAND(){
+        return new SequentialCommandGroup(
+                new InstantCommand(()-> interruptCondition = ()-> true),
+                new WaitCommand(50),
+                new InstantCommand(()-> interruptCondition = ()-> false)
+        );
+    }
+
+
+    private InstantCommand setArmState(ArmState.State state){
+        return new InstantCommand(()-> ArmState.set(state));
+    }
+
+
+    public SequentialCommandGroup intake(double extension, double angle, double twist){
         return new SequentialCommandGroup(
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
+                                new LogCommand("INTAKE SAMPLE COMMAND", "INTAKING SAMPLE FROM IN ROBOT STATE"),
+
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new SetArmPosition().extension(extension).alongWith(
@@ -124,22 +144,119 @@ public class SetArmPosition extends SequentialCommandGroup{
                                                 new SetClawTwist(twist)
                                         )
                                 ),
+                                setArmState(ArmState.State.SAMPLE_INTAKE),
+
                                 new WaitCommand(150),
+                                retract()
+                        ),
+                        ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
+                ),
+
+                new CustomConditionalCommand(
+                        new SequentialCommandGroup(
+                                retract(),
+                                new LogCommand("INTAKE SAMPLE COMMAND", "INTAKING SAMPLE FROM SAMPLE SCORE OR SPECIMEN SCORE STATES"),
+                                intake(extension, angle, twist)
+                        ),
+                        ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE)
+                )
+        );
+    }
+
+
+    public SequentialCommandGroup intakeSample(double extension, double twist) {
+        return intake(extension, ClawConfiguration.VerticalRotation.DOWN.pos, twist);
+    }
+
+    public SequentialCommandGroup intakeSpecimen(double extension) {
+        return intake(extension, 0.8, ClawConfiguration.HorizontalRotation.NORMAL.pos);
+    }
+
+
+    public SequentialCommandGroup retract(){
+        return new SequentialCommandGroup(
+                new CustomConditionalCommand(
+                       new SequentialCommandGroup(
+                               new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SAMPLE SCORE STATE"),
+
+                               new SetClawState(ClawConfiguration.GripperState.OPEN),
+                               new WaitCommand(150),
+                               new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                               new WaitCommand(50),
+                               new SetArmPosition().extension(0),
+                               new SetClawState(ClawConfiguration.GripperState.CLOSED),
+                               new SetArmPosition().angleDegrees(0),
+                               setArmState(ArmState.State.IN_ROBOT)
+                       ),
+                       ()-> ArmState.isCurrentState(ArmState.State.SPECIMEN_SCORE)
+                ),
+
+
+                new CustomConditionalCommand(
+                        new SequentialCommandGroup(
+                                new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SPECIMEN SCORE STATE"),
+
+                                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                new WaitCommand(80),
+                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                                new WaitCommand(50),
+
+                                new ParallelCommandGroup(
+                                        new SetArmPosition().angleDegrees(65),
+                                        new WaitCommand(100).andThen(new SetArmPosition().extension(0)),
+                                        new WaitCommand(250).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
+                                ),
+
+                                new SetClawState(ClawConfiguration.GripperState.CLOSED),
+                                new SetArmPosition().angleDegrees(0),
+                                setArmState(ArmState.State.IN_ROBOT)
+                        ),
+                        ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.HANG_SECOND_STAGE, ArmState.State.HANG_THIRD_STAGE)
+                ),
+
+
+                new CustomConditionalCommand(
+                        new SequentialCommandGroup(
+                                new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SPECIMEN OR SAMPLE INTAKE STATE"),
+
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
                                 new WaitCommand(100),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                                new SetArmPosition().extension(0)
-                        ),
-                        ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
-                )
+                                new SetArmPosition().extension(0),
 
-//                new CustomConditionalCommand(
-//                        new SequentialCommandGroup(
-//
-//                        ),
-//                        ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)
-//                ),
+                                setArmState(ArmState.State.IN_ROBOT)
+                        ),
+                        ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE, ArmState.State.SPECIMEN_INTAKE)
+                )
+        );
+    }
+
+
+    public SequentialCommandGroup scoreSample(){
+        return new SequentialCommandGroup(
+
+        );
+    }
+
+
+    public SequentialCommandGroup scoreSpecimen(){
+        return new SequentialCommandGroup(
+
+        );
+    }
+
+
+    public SequentialCommandGroup hangSecondStage(){
+        return new SequentialCommandGroup(
+
+        );
+    }
+
+
+    public SequentialCommandGroup hangThirdStage(){
+        return new SequentialCommandGroup(
+
         );
     }
 }
