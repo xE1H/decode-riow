@@ -24,7 +24,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     public SetArmPosition(boolean interpolation){
         arm = getArm();
 
-        //addRequirements(arm);
+        addRequirements(arm);
         arm.setInterpolation(interpolation);
     }
 
@@ -35,13 +35,17 @@ public class SetArmPosition extends SequentialCommandGroup{
                 new ConditionalCommand(
                         new SequentialCommandGroup(
                                 new LogCommand("SET ARM POS COMMAND", "SETTING TARGET ARM ANGLE TO " + targetPoint.angleDegrees() + " WITH MAGNITUDE " + targetPoint.magnitude()),
+                                new InstantCommand(()-> arm.setOperationMode(MainArmConfiguration.OPERATION_MODE.NORMAL)),
                                 new InstantCommand(()-> arm.setTargetPoint(targetPoint)),
                                 new WaitCommand(5),
                                 new WaitUntilCommand(()-> arm.motionProfilePathsAtParametricEnd()),
                                 new WaitCommand(500),
 
                                 new ConditionalCommand(
-                                        new LogCommand("SET ARM POS COMMAND", Level.WARNING, "TARGET REACHED SUCCESSFULLY"),
+                                        new LogCommand("SET ARM POS COMMAND", Level.WARNING, "TARGET REACHED SUCCESSFULLY")
+                                            .andThen(new InstantCommand(()-> arm.setOperationMode(MainArmConfiguration.OPERATION_MODE.HOLD_POINT))),
+                                            //^more aggressive pids when arm arrives at target position, but only if it correctly reaches target position
+
                                         new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "ARM TIMEOUT TRIGGERED"),
                                         ()-> arm.reachedTargetPosition()
                                 )

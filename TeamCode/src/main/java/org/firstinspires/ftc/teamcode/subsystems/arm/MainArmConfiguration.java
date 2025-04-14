@@ -10,28 +10,12 @@ public class MainArmConfiguration {
     public static double EXCLUSION_ZONE_MAX_ANGLE = 55;
     public static double EXCLUSION_ZONE_MIN_EXTENSION = 0.1;
 
+    //dimensions taken from cad
     public static Vector2d ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER = new Vector2d(15.25, 13.76);
     public static Vector2d RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT = new Vector2d(34.844, -9);
     public static double ROBOT_LENGTH_CM = 44.9;
 
     public static double interpolationTimeConstant = 10; //time to move a distance of 1 in a unit circle
-
-
-    public enum COORDINATE_IDENTIFIER {
-        POLAR (0),
-        CARTESIAN (1);
-
-        public final int identifier;
-        COORDINATE_IDENTIFIER(int extension) {
-            this.identifier = extension;
-        }
-    }
-
-
-    public enum COORDINATE_TYPE {
-        ROBOT,
-        REAL_WORLD
-    }
 
 
     public enum OFFSET_REFERENCE_PLANE {

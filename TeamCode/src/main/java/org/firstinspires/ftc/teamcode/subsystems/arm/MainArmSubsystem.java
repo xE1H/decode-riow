@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.arm;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.*;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.MAX_ANGLE;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.MIN_ANGLE;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_EXTENSION_CM;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -21,6 +23,7 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     private boolean interpolation = false;
     private ElapsedTime interpolationTimer = new ElapsedTime();
+    private OPERATION_MODE operationMode = OPERATION_MODE.NORMAL;
 
 
     protected void initialize(HardwareMap hardwareMap){
@@ -69,8 +72,19 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         Vector2d extensionVector = endEffectorFromPivotReferencePoint.minus(retractedArmEndFactor);
         extensionVector = extensionVector.scale(1 / MAX_EXTENSION_CM);
 
-        logger.log(Level.WARNING, "SETTING ARM TO " + extensionVector.magnitude() + " " + Math.toDegrees(extensionVector.angle()) + " TO ACHIEVE TARGET X AND Y REAL WORLD POSITION");
-        return new Point(extensionVector.magnitude(), Math.toDegrees(extensionVector.angle()));
+        double extension = extensionVector.magnitude();
+        double angleDegrees = Math.toDegrees(extensionVector.angle());
+
+        if (extension < 0 || extension > 1 || angleDegrees < MIN_ANGLE || angleDegrees > MAX_ANGLE){
+            logger.log(Level.SEVERE, "TARGET POINT:  " + x_cm + "; " + y_cm + " IS UNREACHABLE, EITHER USER IS AN IDIOT, OR THERE IS A BUG IN ARM KINEMATICS");
+            logger.log(Level.SEVERE, "DEFAULTING TO THE CLOSEST ACHIEVABLE POINT");
+
+            angleDegrees = clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE);
+            extension = clamp(extension, 0, 1);
+        }
+
+        logger.log(Level.WARNING, "SETTING ARM TO " + extension + " " + angleDegrees + " TO ACHIEVE TARGET X AND Y REAL WORLD POSITION");
+        return new Point(extension, angleDegrees);
     }
 
     public Point getTargetPoint() {return targetPoint;}
@@ -90,29 +104,30 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         interpolationTimer.reset();
     }
 
+    public void setOperationMode(OPERATION_MODE operationMode) {this.operationMode = operationMode;}
+
 
     @Override
     public void periodic(){
-//        if (interpolation) {
-//            double delta = Math.hypot(targetPosition.getX() - prevTargetPosition.getX(), targetPosition.getY() - prevTargetPosition.getY());
-//            double currentScalar = clamp(interpolationTimer.seconds() * delta / interpolationTimeConstant, 0 ,1);
-//
-//            if (currentScalar < 1){
-//                double currentX = prevTargetPosition.getX() + (targetPosition.getX() - prevTargetPosition.getX()) * currentScalar;
-//                double currentY = prevTargetPosition.getY() + (targetPosition.getY() - prevTargetPosition.getY()) * currentScalar;
-//
-//                Point interpolatedTarget = new Point(currentX, currentY);
-//
-//                rotator.setTargetPosition(Math.toDegrees(interpolatedTarget.getTheta()), interpolatedTarget.getR());
-//                slides.setTargetPosition(interpolatedTarget.getR());
-//            }
-//            else if (currentScalar == 1 && prevTargetPosition != targetPosition){
-//                rotator.setTargetPosition(Math.toDegrees(targetPosition.getTheta()), targetPosition.getR());
-//                slides.setTargetPosition(targetPosition.getR());
-//                prevTargetPosition = targetPosition;
-//            }
-//        }
+        if (interpolation) {
+            double delta = Math.hypot(targetPoint.getX() - prevTargetPoint.getX(), targetPoint.getY() - prevTargetPoint.getY());
+            double currentScalar = clamp(interpolationTimer.seconds() * delta / interpolationTimeConstant, 0 ,1);
 
+            if (currentScalar < 1){
+                double currentX = prevTargetPoint.getX() + (targetPoint.getX() - prevTargetPoint.getX()) * currentScalar;
+                double currentY = prevTargetPoint.getY() + (targetPoint.getY() - prevTargetPoint.getY()) * currentScalar;
+
+                Point interpolatedTarget = new Point(currentX, currentY);
+
+                rotator.setTargetPosition(interpolatedTarget.angleDegrees(), interpolatedTarget.magnitude());
+                slides.setTargetPosition(interpolatedTarget.magnitude());
+            }
+            else if (currentScalar == 1 && !targetPoint.equals(prevTargetPoint)){
+                rotator.setTargetPosition(targetPoint.angleDegrees(), targetPoint.magnitude());
+                slides.setTargetPosition(targetPoint.magnitude());
+                prevTargetPoint = targetPoint;
+            }
+        }
 
         if (!prevTargetPoint.equals(targetPoint)){
 
@@ -121,8 +136,8 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
             prevTargetPoint = targetPoint;
         }
 
-        rotator.periodic(targetPoint.magnitude());
-        slides.periodic(targetPoint.angleDegrees());
+        rotator.periodic(targetPoint.magnitude(), operationMode);
+        slides.periodic(targetPoint.angleDegrees(), operationMode);
     }
 
     public boolean isBetween(double num, double num1, double num2){
@@ -165,5 +180,12 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public double angleDegrees(){
         return rotator.getAngleDegrees();
+    }
+
+    public static double mapToRange(double value, double minInput, double maxInput, double minOutput, double maxOutput) {
+        if (minInput == maxInput) {
+            throw new IllegalArgumentException("inMIN and inMax cant be the same");
+        }
+        return minOutput + ((value - minInput) * (maxOutput - minOutput)) / (maxInput - minInput);
     }
 }

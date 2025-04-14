@@ -1,14 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.claw;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem.mapToRange;
-
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.configuration.ServoHubConfiguration;
-
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 
 

@@ -1,18 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.slide;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem.mapToRange;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem.mapToRange;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERATION_MODE;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 
 import java.util.logging.Level;
@@ -29,9 +30,9 @@ public class ArmSlideSubsystem {
 
     private double encoderOffset = 0;
     private boolean overridePower = false;
-    private boolean holdingPosition = false;
     private double feedForwardGain = FEED_FORWARD_GAIN;
 
+    private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
 
 
     public ArmSlideSubsystem(HardwareMap hardwareMap) {
@@ -66,15 +67,12 @@ public class ArmSlideSubsystem {
                 ACCELERATION_GAIN);
 
         motionProfile.enableTelemetry(true);
+        setDefaultCoefficients();
     }
-
 
 
     public void setTargetPosition(double position) {
         VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "NEW SLIDE EXTENSION OF " + position + " JUST SET");
-
-        //holdingPosition = false;
-        //setDefaultCoefficients();
 
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
         motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
@@ -89,7 +87,6 @@ public class ArmSlideSubsystem {
         return Math.abs(getPosition() - position) <= ERROR_MARGIN;
     }
 
-
     public double getPosition() {
         return encoderPosition;
     }
@@ -98,7 +95,6 @@ public class ArmSlideSubsystem {
     public double getExtension(){
         return mapToRange(getPosition(), MIN_POSITION, MAX_POSITION, 0, 1);
     }
-
 
     public double getTargetPosition() {
         return motionProfile.getTargetPosition();
@@ -138,23 +134,19 @@ public class ArmSlideSubsystem {
     }
 
 
-
     public void setPowerOverride(boolean condition){
         overridePower = condition;
     }
 
-
     public boolean getPowerOverride(){
         return overridePower;
     }
-
 
     public void setMotorPower(double power) {
         extensionMotor0.setPower(power);
         extensionMotor1.setPower(power);
         extensionMotor2.setPower(power);
     }
-
 
     public void checkLimitSwitch() {
         if (limitSwitch.isPressed()) {encoderOffset = extensionEncoder.getCurrentPosition();}
@@ -168,20 +160,24 @@ public class ArmSlideSubsystem {
         return motionProfile.getT();
     }
 
-    private void updateCoefficients(){
-        if (motionProfile.getT() == 1 && !holdingPosition){
-            motionProfile.updateCoefficients(0, 0, 0, FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT, 0, 0);
-            holdingPosition = true;
-        }
+    public void updateCoefficientsForOperationMode(OPERATION_MODE operationMode){
+        if (operationMode == OPERATION_MODE.HANG) {setHangCoefficients();}
+        else if (operationMode == OPERATION_MODE.NORMAL) {setDefaultCoefficients();}
     }
 
 
-    public void periodic(double armAngleDegrees) {
+    public void periodic(double armAngleDegrees, OPERATION_MODE operationMode) {
         checkLimitSwitch();
         encoderPosition = -(extensionEncoder.getCurrentPosition() - encoderOffset) / 8192d;
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;
+
+        if (operationMode == OPERATION_MODE.HOLD_POINT){
+            VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "SLIDES HOLDING POINT");
+            power = holdPointPID.calculate(getPosition(), motionProfile.getTargetPosition()) + feedForwardPower;
+        }
+
         power = clamp(power, -1, 1);
 
         //setMotorPower(power);
@@ -207,7 +203,5 @@ public class ArmSlideSubsystem {
 //                setMotorPower(power);
 //            }
 //        }
-
-        //updateCoefficients();
     }
 }
