@@ -28,18 +28,19 @@ public class MainArmConfiguration {
         }
     }
 
-
-    public enum TARGET_POSITION{
-        INTAKE,
-        RETRACT,
-        SCORE_SAMPLE,
-        SCORE_SPECIMEN
-    }
-
-
     public enum OPERATION_MODE {
         NORMAL,
         HANG,
         HOLD_POINT
+    }
+
+    public enum SAMPLE_SCORE_HEIGHT {
+        LOW_BASKET (0.4),
+        HIGH_BASKET (1);
+
+        public final double extension;
+        SAMPLE_SCORE_HEIGHT (double extension){
+            this.extension = extension;
+        }
     }
 }

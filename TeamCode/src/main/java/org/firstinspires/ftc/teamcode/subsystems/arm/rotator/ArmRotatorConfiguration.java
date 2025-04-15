@@ -7,6 +7,7 @@ public class ArmRotatorConfiguration {
 
     public static String MOTOR_NAME = "MotorRotator";
     public static String ENCODER_NAME = "MotorRightBack";
+    public static String BEAM_BREAK_NAME = "BeamBreak";
 
     //JERK PROFILE CONSTANTS:
     public static double ACCELERATION_JERK = 10000;

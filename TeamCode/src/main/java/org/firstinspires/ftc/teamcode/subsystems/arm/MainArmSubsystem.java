@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.helpers.utils.Point;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 
@@ -24,6 +25,8 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     private boolean interpolation = false;
     private ElapsedTime interpolationTimer = new ElapsedTime();
     private OPERATION_MODE operationMode = OPERATION_MODE.NORMAL;
+
+    private SAMPLE_SCORE_HEIGHT sampleScoreHeight = SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
 
 
     protected void initialize(HardwareMap hardwareMap){
@@ -111,6 +114,12 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public void setOperationMode(OPERATION_MODE operationMode) {this.operationMode = operationMode;}
 
+    public void setSampleScoreHeight(SAMPLE_SCORE_HEIGHT sampleScoreHeight){
+        this.sampleScoreHeight = sampleScoreHeight;
+    }
+
+    public SAMPLE_SCORE_HEIGHT getSampleScoreHeight() {return sampleScoreHeight;}
+
 
     @Override
     public void periodic(){
@@ -177,6 +186,14 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     public boolean motionProfilePathsAtParametricEnd(){
         return rotator.getT() == 1 && slides.getT() == 1;
     }
+
+    public boolean isRotatorMoving() {return rotator.getT() != 1;}
+
+    public boolean areSlidesMoving() {return slides.getT() != 1;}
+
+    public void enableSlidePowerOverride(double power) {slides.enablePowerOverride(power);}
+
+    public void disableSlidePowerOverride() {slides.disablePowerOverride();}
 
     public double extension(){
         return slides.getExtension();

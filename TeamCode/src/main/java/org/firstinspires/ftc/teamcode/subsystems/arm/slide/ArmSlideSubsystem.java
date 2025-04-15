@@ -5,11 +5,15 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem.map
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
@@ -29,8 +33,15 @@ public class ArmSlideSubsystem {
     private double encoderPosition = 0;
 
     private double encoderOffset = 0;
-    private boolean overridePower = false;
+    private boolean overridePowerState = false;
+    private double overridePowerValue = 0;
+
     private double feedForwardGain = FEED_FORWARD_GAIN;
+    private boolean limitSwitchPressed = true;
+    private boolean prevLimitSwitchPressed = false;
+    private boolean encoderReset = true;
+
+    private ElapsedTime timer = new ElapsedTime();
 
     private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
 
@@ -68,6 +79,7 @@ public class ArmSlideSubsystem {
 
         motionProfile.enableTelemetry(true);
         setDefaultCoefficients();
+        timer.reset();
     }
 
 
@@ -134,26 +146,28 @@ public class ArmSlideSubsystem {
     }
 
 
-    public void setPowerOverride(boolean condition){
-        overridePower = condition;
+    public void enablePowerOverride(double power){
+        overridePowerState = true;
+        overridePowerValue = power;
+    }
+
+    public void disablePowerOverride(){
+        overridePowerState = false;
+        overridePowerValue = 0;
     }
 
     public boolean getPowerOverride(){
-        return overridePower;
+        return overridePowerState;
     }
 
-    public void setMotorPower(double power) {
+    private void setMotorPower(double power) {
         extensionMotor0.setPower(power);
         extensionMotor1.setPower(power);
         extensionMotor2.setPower(power);
     }
 
-    public void checkLimitSwitch() {
-        if (limitSwitch.isPressed()) {encoderOffset = extensionEncoder.getCurrentPosition();}
-    }
-
     public boolean getLimitSwitchState(){
-        return limitSwitch.isPressed();
+        return limitSwitchPressed;
     }
 
     public double getT(){
@@ -167,41 +181,59 @@ public class ArmSlideSubsystem {
 
 
     public void periodic(double armAngleDegrees, OPERATION_MODE operationMode) {
-        checkLimitSwitch();
+        limitSwitchPressed = limitSwitch.isPressed();
         encoderPosition = -(extensionEncoder.getCurrentPosition() - encoderOffset) / 8192d;
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;
 
-        if (operationMode == OPERATION_MODE.HOLD_POINT){
+        if (operationMode == OPERATION_MODE.HOLD_POINT) {
             VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "SLIDES HOLDING POINT");
             power = holdPointPID.calculate(getPosition(), motionProfile.getTargetPosition()) + feedForwardPower;
         }
-
         power = clamp(power, -1, 1);
 
-        //setMotorPower(power);
 
-//        if (!overridePower) {
-//            if (operationMode == OperationMode.NORMAL) {
-//                setDefaultCoefficients();
-//
-//                if (reachedTargetPositionNoOverride()) {
-//                    extensionMotor0.setPower(0);
-//
-//                    if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
-//                        extensionMotor1.setPower(0);
-//                        extensionMotor2.setPower(0);
-//
-//                    } else{
-//                        extensionMotor1.setPower(power);
-//                        extensionMotor2.setPower(power);
-//                    }
-//
-//                } else setMotorPower(power);
-//            } else{
-//                setMotorPower(power);
-//            }
-//        }
+        if (limitSwitchPressed) {
+            //extensionMotor1.setPower(0);
+            //extensionMotor2.setPower(0);
+
+            if (!prevLimitSwitchPressed) {
+                //extensionMotor0.setPower(-0.15);
+                timer.reset();
+
+                if (overridePowerState){
+                    VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.INFO, "SUCCESSFULLY RESET SLIDES WITH MANUAL OVERRIDE");
+                }
+
+            } else if (timer.seconds() > 0.5 && !encoderReset) {
+                encoderOffset = extensionEncoder.getCurrentPosition();
+                encoderReset = true;
+            }
+        } else {
+            encoderReset = false;
+
+            if (overridePowerState) {
+//            extensionMotor0.setPower(clamp(overridePowerValue, -0.5, 0.5));
+//            extensionMotor1.setPower(0);
+//            extensionMotor2.setPower(0);
+            }
+
+            else if (reachedTargetPosition()) {
+                //extensionMotor0.setPower(0);
+                //extensionMotor1.setPower(power);
+                //extensionMotor2.setPower(power);
+            } else {
+                //setMotorPower(power);
+            }
+        }
+
+        prevLimitSwitchPressed = limitSwitchPressed;
+
+        Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+        telemetry.addData("ARM SLIDE SUBSYSTEM POWER TIMER: ", timer.seconds());
+        telemetry.addData("ARM SLIDE SUBSYSTEM ENCODER RESET: ", encoderReset ? 1 : 0);
+        telemetry.addData("ARM SLIDE SUBSYSTEM LIMIT SWITCH STATE: ", limitSwitchPressed);
+        telemetry.addData("ARM SLIDE SUBSYSTEM PREV LIMIT SWITCH STATE: ", prevLimitSwitchPressed);
     }
 }

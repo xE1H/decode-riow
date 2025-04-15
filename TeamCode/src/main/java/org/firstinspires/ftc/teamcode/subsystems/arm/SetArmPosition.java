@@ -2,8 +2,9 @@ package org.firstinspires.ftc.teamcode.subsystems.arm;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem.getArm;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OFFSET_REFERENCE_PLANE;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERATION_MODE;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OFFSET_REFERENCE_PLANE;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERATION_MODE;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.SAMPLE_SCORE_HEIGHT;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -14,7 +15,7 @@ import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
+import org.firstinspires.ftc.teamcode.helpers.utils.Point;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
@@ -29,10 +30,16 @@ public class SetArmPosition extends SequentialCommandGroup{
     private MainArmSubsystem arm;
     private static BooleanSupplier interruptCondition = ()-> false;
 
+    {
+        // This needs to be here, since addRequirements needs to be called BEFORE the command is
+        // able to run. The running may happen instantly (on super() being called), or at any point
+        // in the future, so it's best to call addRequirements as soon as possible, in this case
+        // before the constructor ever runs.
+        addRequirements(getArm());
+    }
+
     public SetArmPosition(boolean interpolation){
         arm = getArm();
-
-        addRequirements(arm);
         arm.setInterpolation(interpolation);
     }
 
@@ -54,8 +61,15 @@ public class SetArmPosition extends SequentialCommandGroup{
                                             .andThen(new InstantCommand(()-> arm.setOperationMode(MainArmConfiguration.OPERATION_MODE.HOLD_POINT))),
                                             //^more aggressive pids when arm arrives at target position, but only if it correctly reaches target position
 
-                                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "ARM TIMEOUT TRIGGERED, WAITING INDEFINITELY OR FOR MANUAL OVERRIDE")
-                                                .andThen(new WaitUntilCommand(()-> arm.reachedTargetPosition()).interruptOn(interruptCondition)),
+                                        new SequentialCommandGroup(
+                                                new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "ARM TIMEOUT TRIGGERED, WAITING INDEFINITELY FOR MANUAL OVERRIDE"),
+                                                new WaitUntilCommand(()-> arm.reachedTargetPosition()).interruptOn(interruptCondition),
+                                                new ConditionalCommand(
+                                                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "WAIT INTERRUPTED, HOPE THE DRIVER KNOWS WHAT HES DOING"),
+                                                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "ARM MAGICALLY REACHED TARGET POSITION WITH NO OVERRIDE"),
+                                                        interruptCondition
+                                                )
+                                        ),
                                         ()-> arm.reachedTargetPosition()
                                 )
                         ),
@@ -73,13 +87,19 @@ public class SetArmPosition extends SequentialCommandGroup{
         return safeSetTargetPoint(point, moveToTargetWhileAvoidingCamera(point));
     }
 
-    public ConditionalCommand magnitudeAndExtension(double magnitude, double angleDegrees){
+    public ConditionalCommand extensionAndAngleDegrees(double magnitude, double angleDegrees){
         return safeSetTargetPoint(new Point(magnitude, angleDegrees));
     }
 
     public ConditionalCommand XY(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
         Point targetPoint = arm.calculateTargetPointFromRealWordCoordinates(x_cm, y_cm, reference);
-        return safeSetTargetPoint(targetPoint);
+        return new ConditionalCommand(
+                new LogCommand("SET ARM POSITION.XY", Level.SEVERE, "ARM ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
+                        .andThen(new WaitUntilCommand(()-> arm.motionProfilePathsAtParametricEnd()).interruptOn(interruptCondition)
+                ),
+                safeSetTargetPoint(targetPoint),
+                ()-> !arm.motionProfilePathsAtParametricEnd()
+        );
     }
 
     private SequentialCommandGroup moveToTargetWhileAvoidingCamera(Point target){
@@ -105,15 +125,27 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
     public ConditionalCommand extension(double extension){
-        return magnitudeAndExtension(extension, arm.getTargetAngleDegrees());
+        return new ConditionalCommand(
+                new LogCommand("SET ARM POSITION.EXTENSION", Level.SEVERE, "SLIDES ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
+                        .andThen(new WaitUntilCommand(()-> !arm.areSlidesMoving()).interruptOn(interruptCondition)
+                        ),
+                extensionAndAngleDegrees(extension, arm.getTargetAngleDegrees()),
+                ()-> arm.areSlidesMoving()
+        );
     }
 
     public ConditionalCommand extensionRelative(double delta){
-        return magnitudeAndExtension(arm.extension() + delta, arm.getTargetAngleDegrees());
+        return extension(arm.extension() + delta);
     }
 
     public ConditionalCommand angleDegrees(double angleDegrees){
-        return magnitudeAndExtension(arm.getTargetExtension(), angleDegrees);
+        return new ConditionalCommand(
+                new LogCommand("SET ARM POSITION.ANGLE_DEGREES", Level.SEVERE, "ROTATOR ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
+                        .andThen(new WaitUntilCommand(()-> !arm.isRotatorMoving()).interruptOn(interruptCondition)
+                ),
+                extensionAndAngleDegrees(arm.getTargetExtension(), angleDegrees),
+                ()-> arm.isRotatorMoving()
+        );
     }
 
     public ConditionalCommand X(double x, OFFSET_REFERENCE_PLANE reference){
@@ -248,7 +280,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
 
-    public SequentialCommandGroup scoreSample(){
+    public SequentialCommandGroup scoreSample(SAMPLE_SCORE_HEIGHT sampleScoreHeight){
         return new SequentialCommandGroup(
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
@@ -256,11 +288,11 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                                 new ParallelCommandGroup(
                                         new SetArmPosition().angleDegrees(110),
-                                        new WaitUntilCommand(()-> arm.angleDegrees() > 60).andThen(new SetArmPosition().extension(1)),
+                                        new WaitUntilCommand(()-> arm.angleDegrees() > 60).andThen(new SetArmPosition().extension(sampleScoreHeight.extension)),
                                         new SequentialCommandGroup(
                                                 new WaitUntilCommand(()-> arm.angleDegrees() > 75),
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
-                                                new WaitUntilCommand(()-> arm.extension() > 0.7),
+                                                new WaitUntilCommand(()-> arm.extension() > sampleScoreHeight.extension - 0.3),
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT)
                                         )
                                 ),

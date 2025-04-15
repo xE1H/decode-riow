@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.arm;
+package org.firstinspires.ftc.teamcode.helpers.utils;
 
 public class Point {
     private double magnitude, angleDegrees;

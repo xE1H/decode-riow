@@ -3,12 +3,16 @@ package org.firstinspires.ftc.teamcode.subsystems.arm.rotator;
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.*;
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
@@ -32,6 +36,8 @@ public class ArmRotatorSubsystem {
     private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
     private ElapsedTime timer = new ElapsedTime();
 
+    private RevTouchSensor breamBreak;
+
 
     public ArmRotatorSubsystem (HardwareMap hardwareMap) {
         ArmState.resetAll();
@@ -42,6 +48,8 @@ public class ArmRotatorSubsystem {
         thoughBoreEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
         thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        breamBreak = hardwareMap.get(RevTouchSensor.class, BEAM_BREAK_NAME);
 
         motionProfile = new MotionProfile(
                 FtcDashboard.getInstance().getTelemetry(),
@@ -142,21 +150,10 @@ public class ArmRotatorSubsystem {
         }
 
         power = clamp(power, -1, 1);
+        if (breamBreak.isPressed()) {power = 0;}
 
-
-//        if (slideSubsystem.getOperationMode() == ArmSlideConfiguration.OperationMode.NORMAL) {
-//            setDefaultCoefficients();
-//
-//            boolean reachedTarget = reachedTargetPosition();
-//            if (!reachedTarget || !prevReachedPosition){
-//                timer.reset();
-//            }
-//            prevReachedPosition = reachedTarget;
-//
-//            if (reachedTarget && motionProfile.getTargetPosition() == TargetAngle.RETRACT.angleDegrees && timer.seconds() > 0.5){
-//                power = 0;
-//            }
-//        }
+        Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+        telemetry.addData("ARM ROTATOR SUBSYSTEM BEAM BREAK", breamBreak.getValue());
 
         //motor.setPower(power);
     }
