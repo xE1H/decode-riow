@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.rotator;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
+import static org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig.DEBUG_MODE;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -11,7 +12,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERATION_MODE;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem.mapToRange;
+
 
 
 import java.util.logging.Level;
@@ -35,8 +36,13 @@ public class ArmRotatorSubsystem {
 
     private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
     private ElapsedTime timer = new ElapsedTime();
+    private boolean encoderReset = false;
 
     private RevTouchSensor breamBreak;
+    private boolean prevBreamBreakState = false;
+
+    private OPERATION_MODE operationMode = OPERATION_MODE.NORMAL;
+    private OPERATION_MODE prevOperationMode = OPERATION_MODE.NORMAL;
 
 
     public ArmRotatorSubsystem (HardwareMap hardwareMap) {
@@ -74,16 +80,18 @@ public class ArmRotatorSubsystem {
     public void setTargetPosition(double angleDegrees, double slideExtension) {
         VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "NEW ROTATOR ANGLE OF " + angleDegrees + " JUST SET");
 
-        double p = mapToRange(slideExtension, 0, 1, FEEDBACK_PROPORTIONAL_GAIN, EXTENDED_FEEDBACK_PROPORTIONAL_GAIN);
-        double i = mapToRange(slideExtension, 0, 1, FEEDBACK_INTEGRAL_GAIN, EXTENDED_FEEDBACK_INTEGRAL_GAIN);
-        double d = mapToRange(slideExtension, 0, 1, FEEDBACK_DERIVATIVE_GAIN, EXTENDED_FEEDBACK_DERIVATIVE_GAIN);
-        double v = mapToRange(slideExtension, 0, 1, VELOCITY_GAIN, EXTENDED_VELOCITY_GAIN);
-        double a = mapToRange(slideExtension, 0, 1, ACCELERATION_GAIN, EXTENDED_ACCELERATION_GAIN);
-        double acceleration = mapToRange(slideExtension, 0, 1, ACCELERATION_JERK, EXTENDED_ACCELERATION_JERK);
-        double deceleration = mapToRange(slideExtension, 0, 1, DECELERATION_JERK, EXTENDED_DECELERATION_JERK);
-        double maxVelocity = mapToRange(slideExtension, 0, 1, MAX_VELOCITY, EXTENDED_MAX_VELOCITY);
+        if (operationMode == OPERATION_MODE.NORMAL) {
+            double p = mapToRange(slideExtension, 0, 1, FEEDBACK_PROPORTIONAL_GAIN, EXTENDED_FEEDBACK_PROPORTIONAL_GAIN);
+            double i = mapToRange(slideExtension, 0, 1, FEEDBACK_INTEGRAL_GAIN, EXTENDED_FEEDBACK_INTEGRAL_GAIN);
+            double d = mapToRange(slideExtension, 0, 1, FEEDBACK_DERIVATIVE_GAIN, EXTENDED_FEEDBACK_DERIVATIVE_GAIN);
+            double v = mapToRange(slideExtension, 0, 1, VELOCITY_GAIN, EXTENDED_VELOCITY_GAIN);
+            double a = mapToRange(slideExtension, 0, 1, ACCELERATION_GAIN, EXTENDED_ACCELERATION_GAIN);
+            double acceleration = mapToRange(slideExtension, 0, 1, ACCELERATION_JERK, EXTENDED_ACCELERATION_JERK);
+            double deceleration = mapToRange(slideExtension, 0, 1, DECELERATION_JERK, EXTENDED_DECELERATION_JERK);
+            double maxVelocity = mapToRange(slideExtension, 0, 1, MAX_VELOCITY, EXTENDED_MAX_VELOCITY);
 
-        motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
+            motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
+        }
         motionProfile.setTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
     }
 
@@ -132,29 +140,58 @@ public class ArmRotatorSubsystem {
     }
 
     public void updateCoefficientsForOperationMode(OPERATION_MODE operationMode){
+        this.operationMode = operationMode;
         if (operationMode == OPERATION_MODE.HANG) {setHangCoefficients();}
         else if (operationMode == OPERATION_MODE.NORMAL) {setDefaultCoefficients();}
     }
 
+
+    private void resetEncoder(){
+        encoderOffset = thoughBoreEncoder.getCurrentPosition();
+    }
+
+
     public void periodic(double slideExtension, OPERATION_MODE operationMode) {
-        encoderPosition = thoughBoreEncoder.getCurrentPosition() - encoderOffset;
+        encoderPosition = -(thoughBoreEncoder.getCurrentPosition() - encoderOffset);
         double currentAngle = getAngleDegrees();
+        boolean currentBeamBreakState = breamBreak.isPressed();
+
+        if (DEBUG_MODE){
+            setDefaultCoefficients();
+            holdPointPID.setPID(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
+        }
 
         double feedForward = mapToRange(slideExtension, 0, 1, FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
         double feedForwardPower = Math.cos(Math.toRadians(currentAngle)) * feedForward;
         double power = motionProfile.getPower(currentAngle) + feedForwardPower;
 
-        if (operationMode == OPERATION_MODE.HOLD_POINT){
-            VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "ROTATOR HOLDING POINT");
+        if (operationMode == OPERATION_MODE.HOLD_POINT && motionProfile.getTargetPosition() != 0){
             power = holdPointPID.calculate(currentAngle, motionProfile.getTargetPosition()) + feedForwardPower;
+
+            if (prevOperationMode != OPERATION_MODE.HOLD_POINT){
+                prevOperationMode = OPERATION_MODE.HOLD_POINT;
+                VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "ROTATOR HOLDING POINT");
+            }
         }
 
         power = clamp(power, -1, 1);
-        if (breamBreak.isPressed()) {power = 0;}
+
+
+        if (currentBeamBreakState && motionProfile.getTargetPosition() == 0) {
+            power = 0;
+
+            if (!prevBreamBreakState) {timer.reset();}
+            else if (timer.seconds() > 0.25 && !encoderReset){
+                resetEncoder();
+                encoderReset = true;
+            }
+        }
+        else {encoderReset = false;}
+        prevBreamBreakState = currentBeamBreakState;
 
         Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
         telemetry.addData("ARM ROTATOR SUBSYSTEM BEAM BREAK", breamBreak.getValue());
 
-        //motor.setPower(power);
+        motor.setPower(power);
     }
 }

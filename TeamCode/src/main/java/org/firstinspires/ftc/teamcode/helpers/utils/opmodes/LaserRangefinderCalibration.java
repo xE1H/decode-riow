@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -24,11 +24,12 @@ public class LaserRangefinderCalibration extends LinearOpMode {
         /* <configuration code> */
 
         //SET TO ANALOG
-        lrf.setTiming(33, 0);
-        lrf.setROI(0, 8, 8, 0);
+        lrf.setTiming(20, 0);
+        lrf.setDistanceMode(LaserRangefinder.DistanceMode.SHORT);
+        lrf.setROI(3, 12, 12, 3);
 
-        lrf.setPin1Analog(0, 1000);
-        lrf.setPin0Analog(0, 1000);
+        lrf.setPin1Analog(0, 1300);
+        lrf.setPin0Analog(0, 1300);
     }
 }
 

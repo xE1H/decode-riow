@@ -36,7 +36,7 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public void setTargetPoint(Point point) {
         targetPoint = point;
-        logger.log(Level.WARNING, "NEW TARGET UPDATED IN ARM SUBSYSTEM WITH ANGLE " + point.angleDegrees() + " AND MAGNITUDE " + point.magnitude());
+        //logger.log(Level.WARNING, "NEW TARGET UPDATED IN ARM SUBSYSTEM WITH ANGLE " + point.angleDegrees() + " AND MAGNITUDE " + point.magnitude());
     }
 
     public void setTargetPoint(double magnitude, double angleDegrees) {
@@ -195,13 +195,9 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public void disableSlidePowerOverride() {slides.disablePowerOverride();}
 
-    public double extension(){
-        return slides.getExtension();
-    }
+    public double extension() {return slides.getExtension();}
 
-    public double angleDegrees(){
-        return rotator.getAngleDegrees();
-    }
+    public double angleDegrees() {return rotator.getAngleDegrees();}
 
     public static double mapToRange(double value, double minInput, double maxInput, double minOutput, double maxOutput) {
         if (minInput == maxInput) {

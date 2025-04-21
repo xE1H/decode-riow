@@ -7,16 +7,16 @@ public class ArmSlideConfiguration {
     public static String MOTOR_NAME_0 = "MotorArm1";
     public static String MOTOR_NAME_1 = "MotorArm2";
     public static String MOTOR_NAME_2 = "MotorArm3";
-    public static String ENCODER_NAME = "MotorLeftBack";
+    public static String ENCODER_NAME = "MotorLeftFront";   //MotorLeftBack
 
     public static String LIMIT_SW_NAME = "SlideLimit";
 
-    public static double ACCELERATION = 150;
-    public static double DECELERATION = 120;
-    public static double MAX_VELOCITY = 50;
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.1;
+    public static double ACCELERATION = 200;
+    public static double DECELERATION = 160;
+    public static double MAX_VELOCITY = 80;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.35;
     public static double FEEDBACK_INTEGRAL_GAIN = 0;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.005;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.01;
     public static double FEED_FORWARD_GAIN = 0;
     public static double VELOCITY_GAIN = 0;
     public static double ACCELERATION_GAIN = 0;
@@ -31,9 +31,9 @@ public class ArmSlideConfiguration {
     public static double VELOCITY_GAIN_HANG = 0;
     public static double ACCELERATION_GAIN_HANG = 0;
 
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT = 0;
-    public static double FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT = 0;
-    public static double FEEDBACK_INTEGRAL_GAIN_HOLD_POINT = 0;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT = 0.65;
+    public static double FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT = 0.02;
+    public static double FEEDBACK_INTEGRAL_GAIN_HOLD_POINT = 0.01;
 
     public static double CREEP = 2;
     public static double ERROR_MARGIN = 0.3;
