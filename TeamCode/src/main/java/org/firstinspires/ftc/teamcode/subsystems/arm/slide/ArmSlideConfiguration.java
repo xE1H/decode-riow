@@ -11,15 +11,15 @@ public class ArmSlideConfiguration {
 
     public static String LIMIT_SW_NAME = "SlideLimit";
 
-    public static double ACCELERATION = 200;
+    public static double ACCELERATION = 270;
     public static double DECELERATION = 160;
-    public static double MAX_VELOCITY = 80;
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.4;
-    public static double FEEDBACK_INTEGRAL_GAIN = 0;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.01;
-    public static double FEED_FORWARD_GAIN = 0;
-    public static double VELOCITY_GAIN = 0;
-    public static double ACCELERATION_GAIN = 0;
+    public static double MAX_VELOCITY = 110;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.45;
+    public static double FEEDBACK_INTEGRAL_GAIN = 0.00002;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.021;
+    public static double FEED_FORWARD_GAIN = 0.11;
+    public static double VELOCITY_GAIN = 0.025;
+    public static double ACCELERATION_GAIN = 0.0005;
 
     public static double ACCELERATION_HANG = 70;
     public static double DECELERATION_HANG = 50;
@@ -40,7 +40,7 @@ public class ArmSlideConfiguration {
 
     public static double MIN_POSITION = 0;
     public static double HORIZONTAL_EXTENSION_LIMIT = 15;
-    public static double MAX_POSITION = 22.15; //ROTATIONS, NOT TICKS
+    public static double MAX_POSITION = 22; //ROTATIONS, NOT TICKS
     public static double MAX_EXTENSION_CM = 73.65;
 
 

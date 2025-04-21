@@ -22,15 +22,15 @@ public class ArmRotatorConfiguration {
 //    public static double FEEDFORWARD_GAIN = 0.05;
 
     //VERY SLOW, LOGIC TUNING CONSTANTS
-    public static double ACCELERATION_JERK = 1000;
-    public static double DECELERATION_JERK = 600;
-    public static double MAX_VELOCITY = 60;
+    public static double ACCELERATION_JERK = 36000;
+    public static double DECELERATION_JERK = 28000;
+    public static double MAX_VELOCITY = 880;
 
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.08;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.039;
     public static double FEEDBACK_INTEGRAL_GAIN = 0;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0005;
-    public static double VELOCITY_GAIN = 0;
-    public static double ACCELERATION_GAIN = 0;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0006;
+    public static double VELOCITY_GAIN = 0.0019;
+    public static double ACCELERATION_GAIN = 0.000121;
     public static double FEEDFORWARD_GAIN = 0.08;
 
     public static double EXTENDED_ACCELERATION_JERK = 10000;
@@ -50,9 +50,9 @@ public class ArmRotatorConfiguration {
     public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0;//.0001;
     public static double FEEDFORWARD_GAIN_HANG = 0;//.1;
 
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT = 0.25;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT = 0.14;
     public static double FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT = 0.001;
-    public static double FEEDBACK_INTEGRAL_GAIN_HOLD_POINT = 0;
+    public static double FEEDBACK_INTEGRAL_GAIN_HOLD_POINT = 0.0002;
 
     public static double ERROR_MARGIN = 3;
 

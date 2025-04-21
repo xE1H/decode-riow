@@ -152,7 +152,7 @@ public class ArmRotatorSubsystem {
 
 
     public void periodic(double slideExtension, OPERATION_MODE operationMode) {
-        encoderPosition = -(thoughBoreEncoder.getCurrentPosition() - encoderOffset);
+        encoderPosition = (thoughBoreEncoder.getCurrentPosition() - encoderOffset);
         double currentAngle = getAngleDegrees();
         boolean currentBeamBreakState = breamBreak.isPressed();
 
@@ -178,12 +178,16 @@ public class ArmRotatorSubsystem {
 
 
         if (currentBeamBreakState && motionProfile.getTargetPosition() == 0) {
-            power = 0;
-
             if (!prevBreamBreakState) {timer.reset();}
-            else if (timer.seconds() > 0.25 && !encoderReset){
-                resetEncoder();
-                encoderReset = true;
+            else if(timer.seconds() < 0.4){
+                power = -0.02;
+            }
+            else if (timer.seconds() > 0.4) {
+                power = 0;
+                if (timer.seconds() > 0.6 && !encoderReset) {
+                    resetEncoder();
+                    encoderReset = true;
+                }
             }
         }
         else {encoderReset = false;}

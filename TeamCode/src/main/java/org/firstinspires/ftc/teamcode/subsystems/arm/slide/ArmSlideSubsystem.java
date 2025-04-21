@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -25,7 +26,7 @@ import java.util.logging.Level;
 
 @Config
 public class ArmSlideSubsystem {
-    private DcMotorSimple extensionMotor0, extensionMotor1, extensionMotor2;
+    private DcMotorEx extensionMotor0, extensionMotor1, extensionMotor2;
     private DcMotorEx extensionEncoder;
 
     private TouchSensor limitSwitch;
@@ -52,15 +53,19 @@ public class ArmSlideSubsystem {
     public ArmSlideSubsystem(HardwareMap hardwareMap) {
         ArmState.resetAll();
 
-        extensionMotor0 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_0);
-        extensionMotor1 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_1);
-        extensionMotor2 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_2);
+        extensionMotor0 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_0);
+        extensionMotor1 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_1);
+        extensionMotor2 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_2);
 
         limitSwitch = hardwareMap.get(TouchSensor.class, LIMIT_SW_NAME);
 
-        extensionMotor0.setDirection(DcMotorSimple.Direction.FORWARD);
-        extensionMotor1.setDirection(DcMotorSimple.Direction.FORWARD);
-        extensionMotor2.setDirection(DcMotorSimple.Direction.FORWARD);
+        extensionMotor0.setDirection(DcMotorEx.Direction.FORWARD);
+        extensionMotor1.setDirection(DcMotorEx.Direction.FORWARD);
+        extensionMotor2.setDirection(DcMotorEx.Direction.FORWARD);
+
+        extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         extensionEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
         extensionEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -210,21 +215,25 @@ public class ArmSlideSubsystem {
         power = clamp(power, -1, 1);
 
 
-        if (limitSwitchPressed) {
+        if (limitSwitchPressed && motionProfile.getTargetPosition() == 0) {
             extensionMotor1.setPower(0);
             extensionMotor2.setPower(0);
 
             if (!prevLimitSwitchPressed) {
-                extensionMotor0.setPower(-0.15);
                 timer.reset();
+            }
 
-                if (overridePowerState){
-                    VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.INFO, "SUCCESSFULLY RESET SLIDES WITH MANUAL OVERRIDE");
+            else if (timer.seconds() < 0.4){
+                extensionMotor0.setPower(-0.3);
+            }
+
+            else if (timer.seconds() > 0.4) {
+                setMotorPower(0);
+
+                if (timer.seconds() > 0.7 && !encoderReset) {
+                    resetEncoder();
+                    encoderReset = true;
                 }
-
-            } else if (timer.seconds() > 0.5 && !encoderReset) {
-                resetEncoder();
-                encoderReset = true;
             }
         }
 
