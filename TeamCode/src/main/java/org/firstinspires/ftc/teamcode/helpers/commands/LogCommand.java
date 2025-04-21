@@ -11,6 +11,7 @@ public class LogCommand extends InstantCommand {
     private final Level level;
     private final Supplier<String> messageSupplier;
 
+
     // Static message constructor (legacy)
     public LogCommand(String loggerName, Level level, String message) {
         this.logger = Logger.getLogger(loggerName);
@@ -36,6 +37,7 @@ public class LogCommand extends InstantCommand {
     public LogCommand(Class<? extends VLRSubsystem<?>> subsystem, Level level, Supplier<String> messageSupplier) {
         this(VLRSubsystem.getLogger(subsystem).getName(), level, messageSupplier);
     }
+
 
     @Override
     public void run() {
