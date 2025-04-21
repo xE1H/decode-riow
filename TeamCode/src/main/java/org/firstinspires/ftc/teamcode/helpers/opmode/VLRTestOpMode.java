@@ -24,6 +24,8 @@ public abstract class VLRTestOpMode extends VLRLinearOpMode{
         while (opModeInInit()) {InitLoop();}
 
         waitForStart();
+
+        Start();
         while (opModeIsActive()) {Loop();}
 
         Stop();
@@ -31,6 +33,7 @@ public abstract class VLRTestOpMode extends VLRLinearOpMode{
 
     public abstract void Loop();
     public void Init() {}
+    public void Start() {}
     public void Stop(){}
     public void InitLoop(){}
 }

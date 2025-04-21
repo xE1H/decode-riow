@@ -152,6 +152,8 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
         rotator.periodic(targetPoint.magnitude(), operationMode);
         slides.periodic(targetPoint.angleDegrees(), operationMode);
+
+        //System.out.println("TARGET MAGNITUDE: " + targetPoint.magnitude() + " TARGET ANGLE: " + targetPoint.angleDegrees());
     }
 
     public boolean isBetween(double num, double num1, double num2){
@@ -195,9 +197,9 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public void disableSlidePowerOverride() {slides.disablePowerOverride();}
 
-    public double extension() {return slides.getExtension();}
+    public double currentExtension() {return slides.getExtension();}
 
-    public double angleDegrees() {return rotator.getAngleDegrees();}
+    public double currentAngleDegrees() {return rotator.getAngleDegrees();}
 
     public static double mapToRange(double value, double minInput, double maxInput, double minOutput, double maxOutput) {
         if (minInput == maxInput) {

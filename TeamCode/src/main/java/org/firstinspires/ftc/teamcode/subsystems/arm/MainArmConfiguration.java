@@ -15,7 +15,7 @@ public class MainArmConfiguration {
     public static Vector2d RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT = new Vector2d(34.844, -9);
     public static double ROBOT_LENGTH_CM = 44.9;
 
-    public static double interpolationTimeConstant = 10; //time to move a distance of 1 in a unit circle
+    public static double interpolationTimeConstant = 3; //time to move a distance of 1 in a unit circle
 
 
     public enum OFFSET_REFERENCE_PLANE {

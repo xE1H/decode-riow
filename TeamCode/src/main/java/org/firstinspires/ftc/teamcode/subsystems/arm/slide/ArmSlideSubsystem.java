@@ -81,6 +81,7 @@ public class ArmSlideSubsystem {
                 ACCELERATION_GAIN);
 
         motionProfile.enableTelemetry(true);
+        resetEncoder();
         timer.reset();
     }
 
@@ -176,6 +177,10 @@ public class ArmSlideSubsystem {
         return motionProfile.getT();
     }
 
+    private void resetEncoder(){
+        encoderOffset = extensionEncoder.getCurrentPosition();
+    }
+
     public void updateCoefficientsForOperationMode(OPERATION_MODE operationMode){
         if (operationMode == OPERATION_MODE.HANG) {setHangCoefficients();}
         else if (operationMode == OPERATION_MODE.NORMAL) {setDefaultCoefficients();}
@@ -218,7 +223,7 @@ public class ArmSlideSubsystem {
                 }
 
             } else if (timer.seconds() > 0.5 && !encoderReset) {
-                encoderOffset = extensionEncoder.getCurrentPosition();
+                resetEncoder();
                 encoderReset = true;
             }
         }

@@ -88,7 +88,7 @@ public class MotionProfile {
                     break;
             }
         }
-        else {System.out.println("TRIED OVERWRITING MOTION PROFILE COEFFICIENTS MID TRAVEL, REJECTING");}
+        //else {System.out.println("TRIED OVERWRITING MOTION PROFILE COEFFICIENTS MID TRAVEL, REJECTING");}
     }
 
 

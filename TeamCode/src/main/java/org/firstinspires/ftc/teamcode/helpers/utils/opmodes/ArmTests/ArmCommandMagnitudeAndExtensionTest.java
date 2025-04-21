@@ -5,6 +5,8 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRTestOpMode;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 
 @Config
@@ -22,6 +24,11 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 
 
     @Override
+    public void Start(){
+        //CommandScheduler.getInstance().schedule(new SetArmPosition().X(20, MainArmConfiguration.OFFSET_REFERENCE_PLANE.FRONT));
+    }
+
+    @Override
     public void Loop() {
 //        if (extension != prevExtension){
 //            prevExtension = extension;
@@ -34,17 +41,25 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 //        }
 
 
+//        if (gamepad1.triangle && !prevTriangle){
+//            CommandScheduler.getInstance().schedule(new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET));
+//        }
+//
+//        else if (gamepad1.cross && !prevCross){
+//            CommandScheduler.getInstance().schedule(new SetArmPosition().retract());
+//        }
+
         if (gamepad1.triangle && !prevTriangle){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().intake(0.4, 0, 0.5));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().XY(40, 30, MainArmConfiguration.OFFSET_REFERENCE_PLANE.FRONT));
         }
 
         else if (gamepad1.cross && !prevCross){
-            //CommandScheduler.getInstance().schedule(new SetArmPosition().retract());
+            CommandScheduler.getInstance().schedule(new SetArmPosition().XY(10, 0, MainArmConfiguration.OFFSET_REFERENCE_PLANE.FRONT));
         }
+
 
         prevTriangle = gamepad1.triangle;
         prevCross = gamepad1.cross;
-
 
         telemetry.update();
     }
