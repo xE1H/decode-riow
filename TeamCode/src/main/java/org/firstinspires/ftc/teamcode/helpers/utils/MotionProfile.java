@@ -31,6 +31,8 @@ public class MotionProfile {
 
     private final PIDController pid;
 
+    private double t = 0;
+
     private Type profileType;
 
 
@@ -56,6 +58,8 @@ public class MotionProfile {
         this.accelerationGain = a;
         this.telemetryName = telemetryName;
         this.pid = new PIDController(p, i, d);
+
+        initialTime = System.nanoTime();
     }
 
 
@@ -66,23 +70,25 @@ public class MotionProfile {
 
 
     public void updateCoefficients(double acceleration, double deceleration, double maxVelocity, double p, double i, double d, double v, double a) {
-        this.maxVelocity = maxVelocity;
-        this.pid.setPID(p, i, d);
-        this.velocityGain = v;
-        this.accelerationGain = a;
+        if (t == 1) {
+            this.maxVelocity = maxVelocity;
+            this.pid.setPID(p, i, d);
+            this.velocityGain = v;
+            this.accelerationGain = a;
 
-        switch (profileType){
-            case ACCELERATION_LIMITED:
-                this.acceleration = acceleration;
-                this.deceleration = deceleration;
-                break;
+            switch (profileType) {
+                case ACCELERATION_LIMITED:
+                    this.acceleration = acceleration;
+                    this.deceleration = deceleration;
+                    break;
 
-            case JERK_LIMITED:
-                this.jerkAcceleration = acceleration;
-                this.jerkDeceleration = deceleration;
-                break;
-
+                case JERK_LIMITED:
+                    this.jerkAcceleration = acceleration;
+                    this.jerkDeceleration = deceleration;
+                    break;
+            }
         }
+        //else {System.out.println("TRIED OVERWRITING MOTION PROFILE COEFFICIENTS MID TRAVEL, REJECTING");}
     }
 
 
@@ -128,6 +134,9 @@ public class MotionProfile {
 
         double positionSetPoint = initialPosition + Math.signum(positionError) * motionState.position;
 
+        if (positionError != 0) {t = clamp(Math.abs(motionState.position / positionError), 0, 1);}
+        else {t = 1;}
+
         double positionPower = pid.calculate(currentPosition, positionSetPoint);
         double velocityPower = motionState.velocity * velocityGain * Math.signum(positionError);
         double accelerationPower = motionState.acceleration * accelerationGain * Math.signum(positionError);
@@ -144,6 +153,9 @@ public class MotionProfile {
         }
         return positionPower + velocityPower + accelerationPower;
     }
+
+
+    public double getT() {return t;}
 
 
     private double calculateDistance(double jerk, double time) {
@@ -370,6 +382,7 @@ public class MotionProfile {
         telemetry.addData(telemetryName + "_motionProfileTargetAcceleration: ", accelerationSetPoint);
         telemetry.addData(telemetryName + "_motionProfileTime: ", (System.nanoTime() - initialTime) / Math.pow(10, 9));
         telemetry.addData(telemetryName + "_motor power: ", clamp(positionPower + velocityPower + accelerationPower, -1, 1));
+        telemetry.addData(telemetryName + "_T value: ", t);
         telemetry.update();
     }
 }

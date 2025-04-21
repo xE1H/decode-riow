@@ -21,4 +21,8 @@ public class CustomConditionalCommand extends ConditionalCommand {
     public CustomConditionalCommand(Command onTrue, BooleanSupplier condition) {
         super(onTrue, new InstantCommand(), condition);
     }
+
+    public CustomConditionalCommand(BooleanSupplier condition, Command onTrue) {
+        super(onTrue, new InstantCommand(), condition);
+    }
 }

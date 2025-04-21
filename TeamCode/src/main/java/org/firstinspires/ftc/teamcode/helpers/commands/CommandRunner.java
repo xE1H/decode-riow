@@ -60,17 +60,19 @@ public class CommandRunner implements Runnable {
         }
 
         while (runningInterface.isOpModeRunning()) {
-            loopTimeMonitor.loopStart();
+            while (runningInterface.isOpModeRunning()) {
+                //loopTimeMonitor.loopStart();
 
-            for (LynxModule hub : allHubs) {
-                hub.clearBulkCache();
+                for (LynxModule hub : allHubs) {
+                    hub.clearBulkCache();
+                }
+
+                CommandScheduler.getInstance().run();
+                //loopTimeMonitor.loopEnd();
+
+                //double cycleTime = loopTimeMonitor.getAverageTime(5, LoopTimeMonitor.ElementSelectionType.TOP_PERCENTILE_ELEMENTS) / 1000;
+                //System.out.println("COMMAND THREAD CYCLE TIME: " + 1.0 / cycleTime);
             }
-
-            CommandScheduler.getInstance().run();
-            loopTimeMonitor.loopEnd();
-
-            double cycleTime = loopTimeMonitor.getAverageTime(5, LoopTimeMonitor.ElementSelectionType.TOP_PERCENTILE_ELEMENTS) / 1000;
-            //System.out.println("COMMAND THREAD CYCLE TIME: " + 1.0 / cycleTime);
         }
     }
 }

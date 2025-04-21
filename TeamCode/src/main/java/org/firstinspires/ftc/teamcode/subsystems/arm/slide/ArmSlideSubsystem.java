@@ -1,52 +1,71 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm.slide;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem.mapToRange;
+import static org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig.DEBUG_MODE;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem.mapToRange;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.*;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERATION_MODE;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
+
+import java.util.logging.Level;
 
 @Config
-public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
-    private DcMotorSimple extensionMotor0, extensionMotor1, extensionMotor2;
+public class ArmSlideSubsystem {
+    private DcMotorEx extensionMotor0, extensionMotor1, extensionMotor2;
     private DcMotorEx extensionEncoder;
 
     private TouchSensor limitSwitch;
 
     private MotionProfile motionProfile;
-
     private double encoderPosition = 0;
-    private double lastPositionChangeTime = 0;
 
     private double encoderOffset = 0;
+    private boolean overridePowerState = false;
+    private double overridePowerValue = 0;
 
-    private OperationMode operationMode = OperationMode.NORMAL;
-    private boolean overridePower = false;
     private double feedForwardGain = FEED_FORWARD_GAIN;
+    private boolean limitSwitchPressed = true;
+    private boolean prevLimitSwitchPressed = false;
+    private boolean encoderReset = true;
+
+    private OPERATION_MODE prevOperationMode = OPERATION_MODE.NORMAL;
+
+    private ElapsedTime timer = new ElapsedTime();
+
+    private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
 
 
-    @Override
-    protected void initialize(HardwareMap hardwareMap) {
+    public ArmSlideSubsystem(HardwareMap hardwareMap) {
         ArmState.resetAll();
 
-        extensionMotor0 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_0);
-        extensionMotor1 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_1);
-        extensionMotor2 = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME_2);
+        extensionMotor0 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_0);
+        extensionMotor1 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_1);
+        extensionMotor2 = hardwareMap.get(DcMotorEx.class, MOTOR_NAME_2);
 
         limitSwitch = hardwareMap.get(TouchSensor.class, LIMIT_SW_NAME);
 
-        extensionMotor0.setDirection(DcMotorSimple.Direction.FORWARD);
-        extensionMotor1.setDirection(DcMotorSimple.Direction.FORWARD);
-        extensionMotor2.setDirection(DcMotorSimple.Direction.FORWARD);
+        extensionMotor0.setDirection(DcMotorEx.Direction.FORWARD);
+        extensionMotor1.setDirection(DcMotorEx.Direction.FORWARD);
+        extensionMotor2.setDirection(DcMotorEx.Direction.FORWARD);
+
+        extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         extensionEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
         extensionEncoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -67,40 +86,26 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
                 ACCELERATION_GAIN);
 
         motionProfile.enableTelemetry(true);
+        resetEncoder();
+        timer.reset();
     }
 
-
-    public void setTargetPosition(TargetPosition position) {
-        setTargetPosition(position.extension);
-    }
 
     public void setTargetPosition(double position) {
-        //System.out.print("Setting target to");
-        //System.out.println(position);
-        lastPositionChangeTime = System.currentTimeMillis();
+        VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "NEW SLIDE EXTENSION OF " + position + " JUST SET");
+
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
         motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
     }
 
 
-    // This method should only be used for commands.
-    // Returns true if position has been reached, or position timeout has occurred.
-    // This is so the whole command system doesn't freeze if the slides are unable to reach the specified position
     public boolean reachedTargetPosition() {
-        if (lastPositionChangeTime != 0 && System.currentTimeMillis() - lastPositionChangeTime > ERROR_TIMEOUT_MILLIS) {
-            return true;
-        }
-        return reachedPosition(getTargetPosition());
-    }
-
-    public boolean reachedTargetPositionNoOverride() {
         return reachedPosition(getTargetPosition());
     }
 
     public boolean reachedPosition(double position) {
         return Math.abs(getPosition() - position) <= ERROR_MARGIN;
     }
-
 
     public double getPosition() {
         return encoderPosition;
@@ -111,7 +116,6 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
         return mapToRange(getPosition(), MIN_POSITION, MAX_POSITION, 0, 1);
     }
 
-
     public double getTargetPosition() {
         return motionProfile.getTargetPosition();
     }
@@ -119,26 +123,6 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
 
     public double getTargetExtension() {
         return mapToRange(getPosition(), MIN_POSITION, MAX_POSITION, 0, 1);
-    }
-
-
-    public void incrementTargetPosition(double increment) {
-        //System.out.printf("sniegas " + clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT) + "\n");
-        motionProfile.setTargetPosition(clamp(getTargetPosition() + increment, MIN_MANUAL_ADJUST_POSITION, HORIZONTAL_EXTENSION_LIMIT));
-    }
-
-
-    public void setHangCoefficientsFast() {
-        feedForwardGain = FEED_FORWARD_GAIN_HANG;
-        motionProfile.updateCoefficients(
-                ACCELERATION_HANG_FAST,
-                DECELERATION_HANG_FAST,
-                MAX_VELOCITY_HANG_FAST,
-                FEEDBACK_PROPORTIONAL_GAIN_HANG_FAST,
-                FEEDBACK_INTEGRAL_GAIN_HANG_FAST,
-                FEEDBACK_DERIVATIVE_GAIN_HANG,
-                VELOCITY_GAIN_HANG_FAST,
-                ACCELERATION_GAIN_HANG);
     }
 
 
@@ -170,78 +154,112 @@ public class ArmSlideSubsystem extends VLRSubsystem<ArmSlideSubsystem> {
     }
 
 
-
-    public void setPowerOverride(boolean condition){
-        overridePower = condition;
+    public void enablePowerOverride(double power){
+        overridePowerState = true;
+        overridePowerValue = power;
     }
 
+    public void disablePowerOverride(){
+        overridePowerState = false;
+        overridePowerValue = 0;
+    }
 
     public boolean getPowerOverride(){
-        return overridePower;
+        return overridePowerState;
     }
 
-
-    public void setMotorPower(double power) {
+    private void setMotorPower(double power) {
         extensionMotor0.setPower(power);
         extensionMotor1.setPower(power);
         extensionMotor2.setPower(power);
     }
 
-
-    public void checkLimitSwitch() {
-        if (limitSwitch.isPressed()) {
-            //System.out.println("LIMIT ON");
-            //extensionEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            encoderOffset = extensionEncoder.getCurrentPosition();
-//            extensionEncoder.setMode(DcMotor.RunMode.RESET_ENCODERS);
-//            extensionEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
-    }
-
-
     public boolean getLimitSwitchState(){
-        return limitSwitch.isPressed();
+        return limitSwitchPressed;
+    }
+
+    public double getT(){
+        return motionProfile.getT();
+    }
+
+    private void resetEncoder(){
+        encoderOffset = extensionEncoder.getCurrentPosition();
+    }
+
+    public void updateCoefficientsForOperationMode(OPERATION_MODE operationMode){
+        if (operationMode == OPERATION_MODE.HANG) {setHangCoefficients();}
+        else if (operationMode == OPERATION_MODE.NORMAL) {setDefaultCoefficients();}
     }
 
 
-    public void setOperationMode(OperationMode operationMode){
-        this.operationMode = operationMode;
-    }
-
-
-    public OperationMode getOperationMode(){
-        return operationMode;
-    }
-
-
-    public void periodic(double armAngleDegrees) {
-        checkLimitSwitch();
-
+    public void periodic(double armAngleDegrees, OPERATION_MODE operationMode) {
+        limitSwitchPressed = limitSwitch.isPressed();
         encoderPosition = -(extensionEncoder.getCurrentPosition() - encoderOffset) / 8192d;
+
+        if (DEBUG_MODE){
+            setDefaultCoefficients();
+            holdPointPID.setPID(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
+        }
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;
+
+        if (operationMode == OPERATION_MODE.HOLD_POINT && motionProfile.getTargetPosition() != 0) {
+            power = holdPointPID.calculate(getPosition(), motionProfile.getTargetPosition()) + feedForwardPower;
+
+            if (prevOperationMode != OPERATION_MODE.HOLD_POINT) {
+                prevOperationMode = OPERATION_MODE.HOLD_POINT;
+                VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "SLIDES HOLDING POINT");
+            }
+        }
         power = clamp(power, -1, 1);
 
 
-        if (!overridePower) {
-            if (operationMode == OperationMode.NORMAL) {
-                setDefaultCoefficients();
+        if (limitSwitchPressed && motionProfile.getTargetPosition() == 0) {
+            extensionMotor1.setPower(0);
+            extensionMotor2.setPower(0);
 
-                if (reachedTargetPositionNoOverride()) {
-                    extensionMotor0.setPower(0);
+            if (!prevLimitSwitchPressed) {
+                timer.reset();
+            }
 
-                    if (getTargetExtension() == TargetPosition.RETRACTED.extension) {
-                        extensionMotor1.setPower(0);
-                        extensionMotor2.setPower(0);
+            else if (timer.seconds() < 0.4){
+                extensionMotor0.setPower(-0.3);
+            }
 
-                    } else{
-                        extensionMotor1.setPower(power);
-                        extensionMotor2.setPower(power);
-                    }
+            else if (timer.seconds() > 0.4) {
+                setMotorPower(0);
 
-                } else setMotorPower(power);
-            } else setMotorPower(power);
+                if (timer.seconds() > 0.7 && !encoderReset) {
+                    resetEncoder();
+                    encoderReset = true;
+                }
+            }
         }
+
+        else {
+            encoderReset = false;
+
+            if (overridePowerState) {
+                extensionMotor0.setPower(clamp(overridePowerValue, -0.5, 0.5));
+                extensionMotor1.setPower(0);
+                extensionMotor2.setPower(0);
+            }
+
+            else if (reachedTargetPosition()) {
+                extensionMotor0.setPower(0);
+                extensionMotor1.setPower(power);
+                extensionMotor2.setPower(power);
+            }
+            else {setMotorPower(power);}
+        }
+
+        prevLimitSwitchPressed = limitSwitchPressed;
+
+        Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+        telemetry.addData("ARM SLIDE SUBSYSTEM POWER TIMER: ", timer.seconds());
+        telemetry.addData("ARM SLIDE SUBSYSTEM ENCODER RESET: ", encoderReset ? 1 : 0);
+        telemetry.addData("ARM SLIDE SUBSYSTEM LIMIT SWITCH STATE: ", limitSwitchPressed);
+        telemetry.addData("ARM SLIDE SUBSYSTEM PREV LIMIT SWITCH STATE: ", prevLimitSwitchPressed);
     }
 }
