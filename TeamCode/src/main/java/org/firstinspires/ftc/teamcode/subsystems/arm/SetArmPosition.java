@@ -7,9 +7,11 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERAT
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.SAMPLE_SCORE_HEIGHT;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
+import com.arcrobotics.ftclib.command.FunctionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
@@ -23,6 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.hang.commands.SetHangPosition;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -39,12 +42,8 @@ public class SetArmPosition extends SequentialCommandGroup{
         addRequirements(getArm());
     }
 
-    public SetArmPosition(boolean interpolation){
-        arm = getArm();
-        arm.setInterpolation(interpolation);
-    }
+    public SetArmPosition() {arm = getArm();}
 
-    public SetArmPosition() {this(false);}
 
     private Command safeSetTargetPoint(Point targetPoint, Command ifCameraIsInTheWay){
         return new ConditionalCommand(
@@ -84,8 +83,43 @@ public class SetArmPosition extends SequentialCommandGroup{
         );
     }
 
+
     private Command safeSetTargetPoint(Point point){
         return safeSetTargetPoint(point, moveToTargetWhileAvoidingCamera(point));
+    }
+
+
+    //Stupid way to make command scheduling dynamic, it takes info on runtime, not on scheduling
+    //to maintain everything else this is come crazy chatGPT shit
+    public Command scheduleDynamicCommand(Supplier<Command> commandSupplier) {
+        return new FunctionalCommand(
+                () -> {},
+                () -> {},
+                (interrupted) -> {},
+                () -> commandSupplier.get().isFinished()
+        ) {
+            private Command actualCommand;
+
+            @Override
+            public void initialize() {
+                actualCommand = commandSupplier.get();
+                if (actualCommand != null) {actualCommand.initialize();}
+            }
+
+            @Override
+            public void execute() {
+                if (actualCommand != null) {actualCommand.execute();}
+            }
+
+            @Override
+            public boolean isFinished() {return actualCommand == null || actualCommand.isFinished();}
+
+            @Override
+            public void end(boolean interrupted) {if (actualCommand != null) {actualCommand.end(interrupted);}}
+
+            @Override
+            public Set<Subsystem> getRequirements() {return commandSupplier.get().getRequirements();}
+        };
     }
 
     public Command extensionAndAngleDegrees(double magnitude, double angleDegrees){
@@ -93,80 +127,105 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
     public Command XY(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
-        Point targetPoint = arm.calculateTargetPointFromRealWordCoordinates(x_cm, y_cm, reference);
-        return new ConditionalCommand(
-                new LogCommand("SET ARM POSITION.XY", Level.SEVERE, "ARM ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
-                        .andThen(new WaitUntilCommand(arm::motionProfilePathsAtParametricEnd).interruptOn(interruptCondition)
-                ),
-                safeSetTargetPoint(targetPoint),
-                ()-> !arm.motionProfilePathsAtParametricEnd()
+        return scheduleDynamicCommand(
+                ()-> new ConditionalCommand(
+                        new LogCommand("SET ARM POSITION.XY", Level.SEVERE, "ARM ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
+                                .andThen(new WaitUntilCommand(arm::motionProfilePathsAtParametricEnd).interruptOn(interruptCondition)
+                        ),
+                        safeSetTargetPoint(arm.calculateTargetPointFromRealWordCoordinates(x_cm, y_cm, reference)),
+                        ()-> !arm.motionProfilePathsAtParametricEnd()
+                )
         );
-    }
-
-
-    //Stupid way to make command scheduling dynamic, so that commands take current arm position data
-    //when run, not when scheduled
-    public Command scheduleDynamicCommand(Supplier<Command> commandSupplier) {
-        return new InstantCommand(() -> commandSupplier.get().schedule());
     }
 
 
     private Command moveToTargetWhileAvoidingCamera(Point target){
         return new SequentialCommandGroup(
                 new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "MAKING A CAMERA AVOIDANCE MANEUVER"),
+
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                new WaitCommand(100),
+                new WaitCommand(20),
 
-                safeSetTargetPoint(new Point(0, arm.currentAngleDegrees()),
-                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "SOMETHING WENT WRONG ON RETRACTION")
+                scheduleDynamicCommand(
+                        ()-> safeSetTargetPoint(new Point(0, arm.getTargetAngleDegrees()),
+                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "SOMETHING WENT WRONG ON RETRACTION"))
                 ),
 
-                safeSetTargetPoint(new Point(0, target.angleDegrees()),
+                new LogCommand("SET ARM POS COMMAND", Level.SEVERE, ()-> ("FIRST SECTION PASSED, NOW GOING TO: " + target.angleDegrees() + "; 0")),
+
+                scheduleDynamicCommand(
+                        ()-> safeSetTargetPoint(new Point(0, target.angleDegrees()),
                         new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "SOMETHING WENT WRONG WHILE ROTATING TO TARGET")
-                ),
+                )),
 
-                safeSetTargetPoint(new Point(target.magnitude(), target.angleDegrees()),
+                new LogCommand("SET ARM POS COMMAND", Level.SEVERE, ()-> ("SECOND SECTION PASSED, NOW GOING TO: " + target.angleDegrees() + target.magnitude())),
+
+                scheduleDynamicCommand(
+                        ()-> safeSetTargetPoint(new Point(target.magnitude(), target.angleDegrees()),
                         new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "SOMETHING WENT WRONG WHILE EXTENDING ARM TO TARGET")
-                ),
+                )),
 
                 new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "END OF CAMERA AVOIDANCE MANEUVER")
         );
     }
 
     public Command extension(double extension){
-        return new SequentialCommandGroup(
-                new CustomConditionalCommand(
-                        new LogCommand("SET ARM POSITION.EXTENSION", Level.SEVERE, "SLIDES ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
-                                .andThen(new WaitUntilCommand(()-> !arm.areSlidesMoving()).interruptOn(interruptCondition)
+        return scheduleDynamicCommand(
+                ()-> new SequentialCommandGroup(
+                        new CustomConditionalCommand(
+                                new LogCommand("SET ARM POSITION.EXTENSION", Level.SEVERE, "SLIDES ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
+                                        .andThen(new WaitUntilCommand(()-> !arm.areSlidesMoving()).interruptOn(interruptCondition)
+                                ),
+                                ()-> (arm.areSlidesMoving() && arm.getTargetExtension() != extension)
                         ),
-                        ()-> (arm.areSlidesMoving() && arm.getTargetExtension() != extension)
-                ),
-                scheduleDynamicCommand(()-> new SetArmPosition().extensionAndAngleDegrees(extension, arm.getTargetAngleDegrees()))
+                        new SetArmPosition().extensionAndAngleDegrees(extension, arm.getTargetAngleDegrees())
+                )
+
         );
     }
 
     public Command extensionRelative(double delta){
-        return scheduleDynamicCommand(()-> new SetArmPosition().extension(arm.getTargetExtension() + delta));
+        return scheduleDynamicCommand(
+                ()-> new SequentialCommandGroup(
+                        new CustomConditionalCommand(
+                                new LogCommand("SET ARM POSITION.EXTENSION", Level.SEVERE, "SLIDES ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
+                                        .andThen(new WaitUntilCommand(()-> !arm.areSlidesMoving()).interruptOn(interruptCondition)
+                                        ),
+                                ()-> (arm.areSlidesMoving() && arm.getTargetExtension() != arm.getTargetExtension() + delta)
+                        ),
+                        new SetArmPosition().extensionAndAngleDegrees(arm.getTargetExtension() + delta, arm.getTargetAngleDegrees())
+                )
+        );
     }
 
+
     public Command angleDegrees(double angleDegrees){
-        return new SequentialCommandGroup(
-                new CustomConditionalCommand(
-                        new LogCommand("SET ARM POSITION.ANGLE_DEGREES", Level.SEVERE, "ROTATOR ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
-                                .andThen(new WaitUntilCommand(()-> !arm.isRotatorMoving()).interruptOn(interruptCondition)
-                        ),
-                        ()-> (arm.isRotatorMoving() && arm.getTargetAngleDegrees() != angleDegrees)
-                ),
-                scheduleDynamicCommand(()-> new SetArmPosition().extensionAndAngleDegrees(arm.getTargetExtension(), angleDegrees))
+        return scheduleDynamicCommand(
+                ()-> new SequentialCommandGroup(
+                    new CustomConditionalCommand(
+                            new LogCommand("SET ARM POSITION.ANGLE_DEGREES", Level.SEVERE, "ROTATOR ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
+                                    .andThen(new WaitUntilCommand(()-> !arm.isRotatorMoving()).interruptOn(interruptCondition)
+                            ),
+                            ()-> (arm.isRotatorMoving() && arm.getTargetAngleDegrees() != angleDegrees)
+                    ),
+                    new SetArmPosition().extensionAndAngleDegrees(arm.getTargetExtension(), angleDegrees)
+                )
+
         );
     }
 
     public Command X(double x, OFFSET_REFERENCE_PLANE reference){
-        return scheduleDynamicCommand(()-> new SetArmPosition().XY(x, arm.getTargetY(), reference));
+        return scheduleDynamicCommand(() -> {
+            double currentY = arm.getTargetY();
+            return new SetArmPosition().XY(x, currentY, reference);
+        });
     }
 
     public Command Y(double y, OFFSET_REFERENCE_PLANE reference){
-        return scheduleDynamicCommand(()-> new SetArmPosition().XY(arm.getTargetX(), y, reference));
+        return scheduleDynamicCommand(() -> {
+            double currentX = arm.getTargetX();
+            return new SetArmPosition().XY(currentX, y, reference);
+        });
     }
 
     public Command MANUALLY_INTERRUPT_CURRENT_COMMAND(){
@@ -177,10 +236,13 @@ public class SetArmPosition extends SequentialCommandGroup{
         );
     }
 
+    public Command SET_INTERRUPT_CONDITION(BooleanSupplier state){
+        return new InstantCommand(()-> interruptCondition = state);
+    }
+
     private Command setArmState(ArmState.State state){
         return new InstantCommand(()-> ArmState.set(state));
     }
-
 
 
     private Command intake(double extension, double angle, double twist){
@@ -224,17 +286,26 @@ public class SetArmPosition extends SequentialCommandGroup{
                        new SequentialCommandGroup(
                                new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SPECIMEN SCORE STATE"),
 
-                               new SetArmPosition().extensionRelative(0.2).withTimeout(1000),
+                               new SetArmPosition().extensionRelative(0.2),
+
+                               new LogCommand("RETRACT ARM", Level.SEVERE, "SPECIMEN SCORED"),
+
+                               new WaitCommand(500),
+
                                new SetClawState(ClawConfiguration.GripperState.OPEN),
                                new WaitCommand(150),
-                               new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                               new WaitCommand(50),
-                               new SetArmPosition().extension(0),
-                               new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                               new SetArmPosition().angleDegrees(0),
+
+                               new SetArmPosition().extensionAndAngleDegrees(0, 0).alongWith(
+                                       new SequentialCommandGroup(
+                                               new WaitCommand(400),
+                                               new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                                               new WaitCommand(300),
+                                               new SetClawState(ClawConfiguration.GripperState.CLOSED)
+                                       )
+                               ),
                                setArmState(ArmState.State.IN_ROBOT)
                        ),
-                       ()-> ArmState.isCurrentState(ArmState.State.SPECIMEN_SCORE)
+                       ()-> ArmState.isCurrentState(ArmState.State.SPECIMEN_SCORE_FRONT)
                 ),
 
 
@@ -242,12 +313,12 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new SequentialCommandGroup(
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SAMPLE SCORE STATE"),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new WaitCommand(100),
+                                new WaitCommand(150),
 
                                 new ParallelCommandGroup(
                                         new SequentialCommandGroup(
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
-                                                new WaitCommand(200),
+                                                new WaitCommand(250),
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                                 new SetClawState(ClawConfiguration.GripperState.CLOSED)
                                         ),
@@ -257,7 +328,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetArmPosition().angleDegrees(0),
                                 setArmState(ArmState.State.IN_ROBOT)
                         ),
-                        ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)
+                        ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)
                 ),
 
 
@@ -345,11 +416,32 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
-                                new LogCommand("SCORE SPECIMEN", Level.SEVERE, "SCORING SPECIMEN FROM IN ROBOT STATE"),
-                                new SetArmPosition().XY(20, 55, OFFSET_REFERENCE_PLANE.FRONT).alongWith(
-                                        new WaitUntilCommand(()-> arm.currentExtension() > 0.1).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN))
+                                new LogCommand("SCORE SPECIMEN FRONT", Level.SEVERE, "SCORING SPECIMEN FRONT FROM IN ROBOT STATE"),
+                                new SetArmPosition().extensionAndAngleDegrees(0.46, 55).alongWith(
+                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 20).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN))
                                 ),
-                                setArmState(ArmState.State.SPECIMEN_SCORE)
+                                setArmState(ArmState.State.SPECIMEN_SCORE_FRONT)
+                        ),
+                        ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
+                )
+        );
+    }
+
+
+    public Command scoreSpecimenBack(){
+        return new SequentialCommandGroup(
+                new CustomConditionalCommand(
+                        retract(),
+                        ()-> !ArmState.isCurrentState(ArmState.State.IN_ROBOT)
+                ),
+
+                new CustomConditionalCommand(
+                        new SequentialCommandGroup(
+                                new LogCommand("SCORE SPECIMEN BACK", Level.SEVERE, "SCORING SPECIMEN BACK FROM IN ROBOT STATE"),
+                                new SetArmPosition().extensionAndAngleDegrees(0.4, 120).alongWith(
+                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 90).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
+                                ),
+                                setArmState(ArmState.State.SPECIMEN_SCORE_BACK)
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
                 )

@@ -12,16 +12,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRTestOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
-import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import pedroPathing.tuners.constants.FConstants;
+import pedroPathing.tuners.constants.LConstants;
 
 @Config
 @Photon
@@ -38,7 +35,7 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
     boolean prevSquare = false;
     boolean prevCircle = false;
 
-    Follower f;
+    Follower follower;
     GamepadEx gamepad;
     RumbleControls rc;
 
@@ -50,13 +47,13 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 
     @Override
     public void Init(){
-        Constants.setConstants(FConstants.class, LConstants.class);
+        FConstants.initialize();
 
         VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
-        f = new Follower(hardwareMap);
-        f.setStartingPose(new Pose());
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        follower.setStartingPose(new Pose());
 
         gamepad = new GamepadEx(gamepad1);
         rc = new RumbleControls(gamepad1);
@@ -106,7 +103,7 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
         prevCircle = gamepad1.circle;
 
 
-        f.update();
+        follower.update();
         VLRSubsystem.getInstance(Chassis.class).drive(0, 0, 0);
 
         telemetry.update();

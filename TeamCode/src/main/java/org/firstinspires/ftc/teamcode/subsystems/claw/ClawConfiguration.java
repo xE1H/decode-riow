@@ -20,8 +20,8 @@ public interface ClawConfiguration {
     double analog_voltage_right = 0;
 
     enum VerticalRotation {
-        DOWN(1),
-        UP(0.2),
+        DOWN(0.97),
+        UP(0.05),
         SAFE(0),
         DEPOSIT(0.35);
 
