@@ -30,7 +30,8 @@ public class ArmState {
         SAMPLE_INTAKE,
         SAMPLE_SCORE,
         SPECIMEN_INTAKE,
-        SPECIMEN_SCORE,
+        SPECIMEN_SCORE_FRONT,
+        SPECIMEN_SCORE_BACK,
         HANG_SECOND_STAGE,
         HANG_THIRD_STAGE
     }

@@ -18,7 +18,7 @@ dependencies {
     implementation 'org.firstinspires.ftc:FtcCommon:10.2.0'
     implementation 'org.firstinspires.ftc:Vision:10.2.0'
     implementation 'androidx.appcompat:appcompat:1.2.0' // keep at 1.2.0, else it breaks
-    implementation 'com.pedropathing:beta:1.0.8-beta3'
+    implementation 'com.pedropathing:pedro:1.0.9'
     implementation 'com.pedropathing:ftclib:1.0.7'
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
     implementation 'org.ftclib.ftclib:core:2.1.1'

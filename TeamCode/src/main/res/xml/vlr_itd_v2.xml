@@ -12,11 +12,11 @@
 
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <ServoHub name="Servo Hub 3" port="3">
-            <Servo name="angle" port="0" />
-            <ContinuousRotationServo name="rightHang" port="1" />
-            <ContinuousRotationServo name="leftHang" port="3" />
-            <Servo name="twist" port="4" />
-            <Servo name="claw" port="5" />
+            <Servo name="angle" port="1" />
+            <ContinuousRotationServo name="rightHang" port="4" />
+            <ContinuousRotationServo name="leftHang" port="5" />
+            <Servo name="twist" port="2" />
+            <Servo name="claw" port="3" />
         </ServoHub>
 
         <LynxModule name="Control Hub" port="173">

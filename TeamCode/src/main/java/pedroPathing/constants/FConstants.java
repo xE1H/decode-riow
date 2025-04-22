@@ -26,6 +26,8 @@ public class FConstants {
         FollowerConstants.forwardZeroPowerAcceleration = -45.08;
         FollowerConstants.lateralZeroPowerAcceleration = -70.7502;
 
+        FollowerConstants.turnHeadingErrorThreshold = 0.05; // default is 0.01
+
         // TODO tune everything after this from scratch
         //FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.15,0,0.008,0); // original
         FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.5, 0, 0.063, 0); // secondary original

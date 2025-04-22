@@ -7,7 +7,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorCo
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_EXTENSION_CM;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.Point;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
@@ -22,8 +22,6 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     private Point targetPoint = new Point(0, 0);
     private Point prevTargetPoint = new Point(0, 0);
 
-    private boolean interpolation = false;
-    private ElapsedTime interpolationTimer = new ElapsedTime();
     private OPERATION_MODE operationMode = OPERATION_MODE.NORMAL;
 
     private SAMPLE_SCORE_HEIGHT sampleScoreHeight = SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
@@ -107,11 +105,6 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public  double getTargetY() {return clamp(targetPoint.getY(), 0, 1);}
 
-    public void setInterpolation(boolean interpolation) {
-        this.interpolation = interpolation;
-        interpolationTimer.reset();
-    }
-
     public void setOperationMode(OPERATION_MODE operationMode) {this.operationMode = operationMode;}
 
     public void setSampleScoreHeight(SAMPLE_SCORE_HEIGHT sampleScoreHeight){
@@ -123,26 +116,6 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     @Override
     public void periodic(){
-        if (interpolation) {
-            double delta = Math.hypot(targetPoint.getX() - prevTargetPoint.getX(), targetPoint.getY() - prevTargetPoint.getY());
-            double currentScalar = clamp(interpolationTimer.seconds() * delta / interpolationTimeConstant, 0 ,1);
-
-            if (currentScalar < 1){
-                double currentX = prevTargetPoint.getX() + (targetPoint.getX() - prevTargetPoint.getX()) * currentScalar;
-                double currentY = prevTargetPoint.getY() + (targetPoint.getY() - prevTargetPoint.getY()) * currentScalar;
-
-                Point interpolatedTarget = new Point(currentX, currentY);
-
-                rotator.setTargetPosition(interpolatedTarget.angleDegrees(), interpolatedTarget.magnitude());
-                slides.setTargetPosition(interpolatedTarget.magnitude());
-            }
-            else if (currentScalar == 1 && !targetPoint.equals(prevTargetPoint)){
-                rotator.setTargetPosition(targetPoint.angleDegrees(), targetPoint.magnitude());
-                slides.setTargetPosition(targetPoint.magnitude());
-                prevTargetPoint = targetPoint;
-            }
-        }
-
         if (!prevTargetPoint.equals(targetPoint)){
 
             rotator.setTargetPosition(targetPoint.angleDegrees(), targetPoint.magnitude());
@@ -152,8 +125,6 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
         rotator.periodic(targetPoint.magnitude(), operationMode);
         slides.periodic(targetPoint.angleDegrees(), operationMode);
-
-        //System.out.println("TARGET MAGNITUDE: " + targetPoint.magnitude() + " TARGET ANGLE: " + targetPoint.angleDegrees());
     }
 
     public boolean isBetween(double num, double num1, double num2){

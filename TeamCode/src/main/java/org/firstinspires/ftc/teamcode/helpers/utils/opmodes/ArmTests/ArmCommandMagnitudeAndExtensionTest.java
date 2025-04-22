@@ -38,7 +38,7 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
     boolean prevSquare = false;
     boolean prevCircle = false;
 
-    Follower f;
+    Follower follower;
     GamepadEx gamepad;
     RumbleControls rc;
 
@@ -55,8 +55,8 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
         VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
-        f = new Follower(hardwareMap);
-        f.setStartingPose(new Pose());
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        follower.setStartingPose(new Pose());
 
         gamepad = new GamepadEx(gamepad1);
         rc = new RumbleControls(gamepad1);
@@ -106,7 +106,7 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
         prevCircle = gamepad1.circle;
 
 
-        f.update();
+        follower.update();
         VLRSubsystem.getInstance(Chassis.class).drive(0, 0, 0);
 
         telemetry.update();
