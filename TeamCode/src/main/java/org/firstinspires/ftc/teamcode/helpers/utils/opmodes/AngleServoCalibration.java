@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
 import static org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.ANGLE_SERVO;
+import static org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.GRAB_SERVO;
 import static org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.TWIST_SERVO;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -17,7 +18,7 @@ public class AngleServoCalibration extends OpMode {
 
     @Override
     public void init() {
-        servo = hardwareMap.get(Servo.class, ANGLE_SERVO);
+        servo = hardwareMap.get(Servo.class, TWIST_SERVO);
     }
 
     @Override

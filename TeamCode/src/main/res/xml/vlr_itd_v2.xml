@@ -15,8 +15,8 @@
             <Servo name="angle" port="1" />
             <ContinuousRotationServo name="rightHang" port="4" />
             <ContinuousRotationServo name="leftHang" port="5" />
-            <Servo name="twist" port="2" />
-            <Servo name="claw" port="3" />
+            <Servo name="twist" port="3" />
+            <Servo name="claw" port="2" />
         </ServoHub>
 
         <LynxModule name="Control Hub" port="173">

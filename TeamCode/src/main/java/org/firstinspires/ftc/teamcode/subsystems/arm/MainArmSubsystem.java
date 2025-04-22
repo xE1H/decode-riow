@@ -136,17 +136,17 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     }
 
     public boolean isCameraInTheWayToNewTarget(Point target){
-        double prevTarget = prevTargetPoint.angleDegrees();
+        double prevTarget = targetPoint.angleDegrees();
         boolean minBool = isBetween(EXCLUSION_ZONE_MIN_ANGLE, prevTarget, target.angleDegrees());
         boolean maxBool = isBetween(EXCLUSION_ZONE_MAX_ANGLE, prevTarget, target.angleDegrees());
-        boolean prevExt = prevTargetPoint.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
+        boolean prevExt = targetPoint.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
         boolean currentExt = target.magnitude() > EXCLUSION_ZONE_MIN_EXTENSION;
 
         boolean state = (minBool || maxBool) && (prevExt || currentExt);
 
         if (state){
             logger.log(Level.SEVERE, "CAMERA IS IN THE WAY, INDIVIDUAL BOOLEANS ARE " + minBool + maxBool + prevExt + currentExt);
-            logger.log(Level.SEVERE, "PREV TARGET: " + prevTargetPoint.angleDegrees() + "; "  + prevTargetPoint.magnitude());
+            logger.log(Level.SEVERE, "PREV TARGET: " + targetPoint.angleDegrees() + "; "  + targetPoint.magnitude());
             logger.log(Level.SEVERE, "CURRENT TARGET: " + target.angleDegrees() + "; " + target.magnitude());
         }
         return state;

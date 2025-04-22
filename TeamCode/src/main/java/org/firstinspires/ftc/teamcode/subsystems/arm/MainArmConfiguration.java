@@ -7,7 +7,7 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 public class MainArmConfiguration {
 
     public static double EXCLUSION_ZONE_MIN_ANGLE = 27;
-    public static double EXCLUSION_ZONE_MAX_ANGLE = 55;
+    public static double EXCLUSION_ZONE_MAX_ANGLE = 50;
     public static double EXCLUSION_ZONE_MIN_EXTENSION = 0.1;
 
     //dimensions taken from cad

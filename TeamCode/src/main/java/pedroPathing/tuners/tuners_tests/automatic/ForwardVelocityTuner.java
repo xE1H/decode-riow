@@ -1,17 +1,14 @@
 package pedroPathing.tuners.tuners_tests.automatic;
-import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
-import static com.pedropathing.follower.FollowerConstants.leftRearMotorName;
-import static com.pedropathing.follower.FollowerConstants.rightFrontMotorName;
-import static com.pedropathing.follower.FollowerConstants.rightRearMotorName;
-import static com.pedropathing.follower.FollowerConstants.leftFrontMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.leftRearMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.rightFrontMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
+
+import static com.pedropathing.follower.FollowerConstants.*;
+import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration.MOTOR_LEFT_BACK;
+import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration.MOTOR_LEFT_FRONT;
+import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration.MOTOR_RIGHT_BACK;
+import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration.MOTOR_RIGHT_FRONT;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -27,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import pedroPathing.tuners.constants.FConstants;
+import pedroPathing.tuners.constants.LConstants;
 
 /**
  * This is the ForwardVelocityTuner autonomous follower OpMode. This runs the robot forwards at max
@@ -58,7 +55,7 @@ public class ForwardVelocityTuner extends OpMode {
 
     private PoseUpdater poseUpdater;
 
-    public static double DISTANCE = 48;
+    public static double DISTANCE = 36;
     public static double RECORD_NUMBER = 10;
 
     private Telemetry telemetryA;
@@ -71,12 +68,13 @@ public class ForwardVelocityTuner extends OpMode {
      */
     @Override
     public void init() {
+        FConstants.initialize();
         poseUpdater = new PoseUpdater(hardwareMap, FConstants.class, LConstants.class);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, leftFrontMotorName);
-        leftRear = hardwareMap.get(DcMotorEx.class, leftRearMotorName);
-        rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
-        rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
+        leftFront = hardwareMap.get(DcMotorEx.class, MOTOR_LEFT_FRONT);
+        leftRear = hardwareMap.get(DcMotorEx.class, MOTOR_LEFT_BACK);
+        rightRear = hardwareMap.get(DcMotorEx.class, MOTOR_RIGHT_BACK);
+        rightFront = hardwareMap.get(DcMotorEx.class, MOTOR_RIGHT_FRONT);
         leftFront.setDirection(leftFrontMotorDirection);
         leftRear.setDirection(leftRearMotorDirection);
         rightFront.setDirection(rightFrontMotorDirection);
