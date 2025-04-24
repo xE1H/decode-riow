@@ -6,9 +6,9 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 @Config
 public class MainArmConfiguration {
 
-    public static double EXCLUSION_ZONE_MIN_ANGLE = 27;
+    public static double EXCLUSION_ZONE_MIN_ANGLE = 20;
     public static double EXCLUSION_ZONE_MAX_ANGLE = 50;
-    public static double EXCLUSION_ZONE_MIN_EXTENSION = 0.1;
+    public static double EXCLUSION_ZONE_MIN_EXTENSION = 0.05;
 
     //dimensions taken from cad
     public static Vector2d ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER = new Vector2d(15.25, 13.76);
@@ -42,5 +42,11 @@ public class MainArmConfiguration {
         SAMPLE_SCORE_HEIGHT (double extension){
             this.extension = extension;
         }
+    }
+
+
+    public enum GAME_PIECE_TYPE {
+        SAMPLE,
+        SPECIMEN
     }
 }

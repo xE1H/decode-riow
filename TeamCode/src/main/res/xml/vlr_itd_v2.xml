@@ -7,6 +7,7 @@
             <goBILDA5202SeriesMotor name="MotorArm2" port="2" />
             <goBILDA5202SeriesMotor name="MotorArm3" port="3" />
             <RevTouchSensor name="SlideLimit" port="2" />
+            <AnalogInput name="clawAnalogProximity" port="2" />
         </LynxModule>
     </LynxUsbDevice>
 

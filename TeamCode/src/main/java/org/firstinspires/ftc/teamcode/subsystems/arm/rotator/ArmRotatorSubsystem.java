@@ -180,7 +180,7 @@ public class ArmRotatorSubsystem {
         if (currentBeamBreakState && motionProfile.getTargetPosition() == 0) {
             if (!prevBreamBreakState) {timer.reset();}
             else if(timer.seconds() < 0.4){
-                power = -0.02;
+                power = -0.07;
             }
             else if (timer.seconds() > 0.4) {
                 power = 0;
