@@ -1,13 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems.claw;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 
 
 public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawConfiguration {
     private Servo angleServo, twistServo, grabServos;
+    private AnalogInput proximitySensor;
 
 
     private VerticalRotation targetAngle = VerticalRotation.UP;
@@ -22,9 +27,11 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         twistServo = hardwareMap.get(Servo.class, TWIST_SERVO);
         grabServos = hardwareMap.get(Servo.class, GRAB_SERVO);
 
+        proximitySensor = hardwareMap.get(AnalogInput.class, ANALOG_PROXIMITY);
+
         setTargetAngle(VerticalRotation.UP);
         setHorizontalRotation(HorizontalRotation.NORMAL);
-        setTargetState(GripperState.CLOSED);
+        setTargetState(GripperState.CLOSED_LOOSE);
     }
 
 
@@ -46,15 +53,29 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
     }
 
     public void setHorizontalRotation(double rotationPos) {
-        twistServo.setPosition(clamp((1 + rotationPos) * 0.5, HORIZONTAL_ROTATION_MIN, HORIZONTAL_ROTATION_MAX));
+        twistServo.setPosition(clamp(rotationPos, HORIZONTAL_ROTATION_MIN, HORIZONTAL_ROTATION_MAX));
     }
+
+//    public void setHorizontalRotation(double rotationPos) {
+//        twistServo.setPosition(clamp((1 + rotationPos) * 0.5, HORIZONTAL_ROTATION_MIN, HORIZONTAL_ROTATION_MAX));
+//    }
+    //WHY? ^
 
     public void setTargetState(GripperState state) {
         clawState = state;
         grabServos.setPosition(state.pos);
     }
 
+    public boolean isSamplePresent(){
+        return proximitySensor.getVoltage() < CLAW_ANALOG_PROXIMITY_THRESHOLD;
+    }
+
     public void disable() {
         angleServo.getController().pwmDisable();
+    }
+
+    @Override
+    public void periodic(){
+        FtcDashboard.getInstance().getTelemetry().addData("CLAW ANALOG SENSOR: ", proximitySensor.getVoltage());
     }
 }

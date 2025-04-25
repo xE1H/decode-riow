@@ -97,6 +97,8 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public double getTargetAngleDegrees() {return clamp(targetPoint.angleDegrees(), 0, 180);}
 
+    public double getPrevTargetAngleDegrees() {return clamp(prevTargetPoint.angleDegrees(), 0, 180);}
+
     public double getTargetAngleRads() {return clamp(targetPoint.angleRads(), 0, Math.PI);}
 
     public double getTargetExtension() {return clamp(targetPoint.magnitude(), 0, 1);}

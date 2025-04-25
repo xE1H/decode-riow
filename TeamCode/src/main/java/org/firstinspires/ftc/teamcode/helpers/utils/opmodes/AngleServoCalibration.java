@@ -14,11 +14,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Photon
 @Config
 public class AngleServoCalibration extends OpMode {
-    Servo servo;
+    Servo servo, servo1;
 
     @Override
     public void init() {
-        servo = hardwareMap.get(Servo.class, TWIST_SERVO);
+        servo = hardwareMap.get(Servo.class, GRAB_SERVO);
     }
 
     @Override

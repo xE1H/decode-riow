@@ -80,7 +80,7 @@ public class ArmRotatorSubsystem {
     public void setTargetPosition(double angleDegrees, double slideExtension) {
         VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "NEW ROTATOR ANGLE OF " + angleDegrees + " JUST SET");
 
-        if (operationMode == OPERATION_MODE.NORMAL) {
+        if (operationMode == OPERATION_MODE.NORMAL && angleDegrees != 0) {
             double p = mapToRange(slideExtension, 0, 1, FEEDBACK_PROPORTIONAL_GAIN, EXTENDED_FEEDBACK_PROPORTIONAL_GAIN);
             double i = mapToRange(slideExtension, 0, 1, FEEDBACK_INTEGRAL_GAIN, EXTENDED_FEEDBACK_INTEGRAL_GAIN);
             double d = mapToRange(slideExtension, 0, 1, FEEDBACK_DERIVATIVE_GAIN, EXTENDED_FEEDBACK_DERIVATIVE_GAIN);
@@ -91,6 +91,9 @@ public class ArmRotatorSubsystem {
             double maxVelocity = mapToRange(slideExtension, 0, 1, MAX_VELOCITY, EXTENDED_MAX_VELOCITY);
 
             motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
+        }
+        else{
+            setDefaultCoefficients();
         }
         motionProfile.setTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
     }
@@ -179,15 +182,16 @@ public class ArmRotatorSubsystem {
 
         if (currentBeamBreakState && motionProfile.getTargetPosition() == 0) {
             if (!prevBreamBreakState) {timer.reset();}
-            else if(timer.seconds() < 0.4){
-                power = -0.02;
-            }
-            else if (timer.seconds() > 0.4) {
-                power = 0;
+            else if(timer.seconds() < 1) {
+                power = -0.3;
+
                 if (timer.seconds() > 0.6 && !encoderReset) {
                     resetEncoder();
                     encoderReset = true;
                 }
+            }
+            else {
+                power = 0;
             }
         }
         else {encoderReset = false;}
