@@ -8,7 +8,7 @@
 //import com.pedropathing.util.Constants;
 //import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 //
-//import org.firstinspires.ftc.teamcode.Points_sample;
+//import org.firstinspires.ftc.teamcode.auto.sample.Points_sample;
 //import org.firstinspires.ftc.teamcode.commands.sample.SubmersibleGrab;
 //import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 //import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;

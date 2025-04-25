@@ -17,7 +17,7 @@ public interface ClawConfiguration {
     enum VerticalRotation {
         DOWN(1),
         UP(0.105),
-        DEPOSIT(0.35);
+        DEPOSIT(0.4);
 
         public final double pos;
         VerticalRotation(double pos) {

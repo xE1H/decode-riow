@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.commands.sample;
+package org.firstinspires.ftc.teamcode.auto.sample;
 
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 

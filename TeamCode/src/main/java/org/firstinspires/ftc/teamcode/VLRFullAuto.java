@@ -1,10 +1,10 @@
 //package org.firstinspires.ftc.teamcode;
 //
-//import static org.firstinspires.ftc.teamcode.Points_sample.BUCKET_HIGH_SCORE_POSE;
-//import static org.firstinspires.ftc.teamcode.Points_sample.BUCKET_HIGH_SCORE_TRUE_POSE;
-//import static org.firstinspires.ftc.teamcode.Points_sample.SUB_GRAB_POSE;
-//import static org.firstinspires.ftc.teamcode.Points_sample.SUB_PRE_BEZIER_POSE;
-//import static org.firstinspires.ftc.teamcode.Points_sample.SUB_PRE_PREGRAB_POSE;
+//import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.BUCKET_HIGH_SCORE_POSE;
+//import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.BUCKET_HIGH_SCORE_TRUE_POSE;
+//import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.SUB_GRAB_POSE;
+//import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.SUB_PRE_BEZIER_POSE;
+//import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.SUB_PRE_PREGRAB_POSE;
 //import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 //
 //import com.arcrobotics.ftclib.command.CommandScheduler;
