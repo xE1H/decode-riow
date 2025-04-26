@@ -1,6 +1,8 @@
 package pedroPathing.tuners.tuners_tests.localization;
 
 import static com.pedropathing.follower.FollowerConstants.*;
+import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.START_POSE;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -49,6 +51,7 @@ public class LocalizationTest extends OpMode {
     public void init() {
         FConstants fConstants = new FConstants();
         poseUpdater = new PoseUpdater(hardwareMap, FConstants.class, LConstants.class);
+        poseUpdater.setStartingPose(START_POSE);
 
         dashboardPoseTracker = new DashboardPoseTracker(poseUpdater);
 

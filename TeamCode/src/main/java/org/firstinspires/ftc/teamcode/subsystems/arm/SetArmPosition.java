@@ -286,11 +286,12 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new WaitCommand(50),
 
                                 new ParallelCommandGroup(
-                                        new SetArmPosition().angleDegrees(55).andThen(new SetClawState(ClawConfiguration.GripperState.CLOSED)),
-                                        new WaitCommand(50).andThen(new SetArmPosition().extension(0)),
-                                        new WaitCommand(120).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
+                                        new SetArmPosition().angleDegrees(55),
+                                        new WaitCommand(100).andThen(new SetArmPosition().extension(0)),
+                                        new WaitCommand(250).andThen(new SetClawState(ClawConfiguration.GripperState.CLOSED), new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
                                 ),
 
+                                new WaitUntilCommand(()-> arm.currentExtension() < 0.06),
                                 new SetArmPosition().angleDegrees(0),
                                 setArmState(ArmState.State.IN_ROBOT)
                         ),

@@ -183,7 +183,7 @@ public class ArmRotatorSubsystem {
         if (currentBeamBreakState && motionProfile.getTargetPosition() == 0) {
             if (!prevBreamBreakState) {timer.reset();}
             else if(timer.seconds() < 1) {
-                power = -0.3;
+                power = -0.07;
 
                 if (timer.seconds() > 0.6 && !encoderReset) {
                     resetEncoder();
@@ -195,7 +195,7 @@ public class ArmRotatorSubsystem {
         else {
             encoderReset = false;
             if (motionProfile.getTargetPosition() == 0 && currentAngle > 3 && currentAngle < 10){
-                power = -0.3;
+                power = -0.07;
             }
         }
 

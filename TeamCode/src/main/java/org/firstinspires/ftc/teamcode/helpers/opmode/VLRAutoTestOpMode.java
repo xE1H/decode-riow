@@ -31,8 +31,8 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode{
 
     @Override
     public void run(){
-        Constants.setConstants(FConstants.class, LConstants.class);
         cs = CommandScheduler.getInstance();
+        FConstants.initialize();
 
         VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class);
         VLRSubsystem.initializeAll(hardwareMap);
