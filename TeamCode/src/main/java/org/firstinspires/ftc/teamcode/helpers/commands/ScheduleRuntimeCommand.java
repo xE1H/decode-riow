@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 /**
  * A wrapper command that creates command on runtime, not on scheduling
  * <p>
- * Useful commands use robot's current states, angles or other data and we want the command scheduler
+ * Useful for commands that use robot's current states, angles or other data and we want the command scheduler
  * to check them on runtime, not on scheduling
  */
 

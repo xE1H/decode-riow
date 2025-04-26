@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.sample;//package org.firstinspires.ftc.teamcode.commands.specimen;
+package org.firstinspires.ftc.teamcode.auto.sample;
 
 import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.*;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
+import org.firstinspires.ftc.teamcode.subsystems.blinkin.SetPattern;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
@@ -27,12 +28,11 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private int currentSample = 0;
 
     public AutonomousPeriodActionSample(Follower follower) {
-
-
         addCommands(
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
+                new SetPattern().rainbow(),
 
                 //SCORE PRELOAD AND PICK UP FIRST SAMPLE FROM SPIKE MARK
                 new ParallelCommandGroup(
@@ -40,8 +40,8 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                                 new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
                                 new WaitUntilCommand(()-> follower.atPose(BUCKET_HIGH_SCORE_POSE, 4, 4, Math.toRadians(8))),
                                 new InstantCommand(()-> sampleScored = true),
-                                new SetArmPosition().retract(),
-                                new SetArmPosition().intakeSample(0.3)
+                                new SetArmPosition().retract().alongWith(new SetPattern().oceanPalette()),
+                                new SetArmPosition().intakeSample(0.3).andThen(new SetPattern().rainbow())
                         ),
 
                         new SequentialCommandGroup(
@@ -93,7 +93,6 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                                 ()-> new FollowPath(follower, bezierPath(GRAB_POSES[currentSample], BUCKET_HIGH_SCORE_POSE)
                                 .setLinearHeadingInterpolation(GRAB_POSES[currentSample].getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build())
                         ),
-
 
                         new WaitUntilCommand(()-> sampleScored),
                         new InstantCommand(()-> sampleScored = false),

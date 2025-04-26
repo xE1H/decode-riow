@@ -190,11 +190,15 @@ public class ArmRotatorSubsystem {
                     encoderReset = true;
                 }
             }
-            else {
-                power = 0;
+            else {power = 0;}
+        }
+        else {
+            encoderReset = false;
+            if (motionProfile.getTargetPosition() == 0 && currentAngle > 3 && currentAngle < 10){
+                power = -0.3;
             }
         }
-        else {encoderReset = false;}
+
         prevBreamBreakState = currentBeamBreakState;
 
         Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
