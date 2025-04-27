@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.auto.specimen;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.localization.Pose;
