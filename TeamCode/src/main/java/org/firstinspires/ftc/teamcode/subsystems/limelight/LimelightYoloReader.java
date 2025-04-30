@@ -69,6 +69,25 @@ public class LimelightYoloReader {
         return samples;
     }
 
+    public int getFrameTimeDelta() {
+        JSONObject json = sendGetRequest("/detection_boxes.json");
+        if (json == null) {
+            logger.warning("Failed to get time delta: JSON null");
+            return -1;
+        }
+        // Get frame_time_delta field
+        try {
+            if (json.has("frame_time_delta")) {
+                return json.getInt("frame_time_delta");
+            } else {
+                logger.warning("No frame time delta found in current frame");
+            }
+        } catch (Exception e) {
+            logger.warning("Error parsing frame time delta: " + e.getMessage());
+        }
+        return -1;
+    }
+
     /**
      * Get the best sample from the current frame
      *

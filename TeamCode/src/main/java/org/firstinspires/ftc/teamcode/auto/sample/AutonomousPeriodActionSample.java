@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto.sample;
 
-import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.*;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.*;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 
 import com.arcrobotics.ftclib.command.Command;
@@ -86,8 +86,6 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
     private Command subCycle(Follower follower, int sample){
         return new SequentialCommandGroup(
-                new WaitCommand(1000),
-
                 new SubmersibleGrab(follower, alliance, reader),
                 new WaitCommand(300),
 
@@ -95,7 +93,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                         new SequentialCommandGroup(
                                 new SetArmPosition().retract(),
                                 new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
-                                new WaitUntilCommand(()-> follower.atPose(BUCKET_HIGH_SCORE_POSE, 4, 4, Math.toRadians(5))),
+                                new WaitUntilCommand(()-> follower.atPose(BUCKET_HIGH_SCORE_POSE, 2, 2, Math.toRadians(2.5))),
                                 new InstantCommand(()-> sampleScored = true),
                                 new SetArmPosition().retract()
                         ),

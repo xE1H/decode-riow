@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
-import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.SUB_GRAB;
-import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.SUB_GRAB_0;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;
@@ -16,9 +15,7 @@ import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 @TeleOp(name = "LimelightAimer", group = "Utils")

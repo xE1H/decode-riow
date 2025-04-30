@@ -4,10 +4,10 @@ import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.localization.Pose;
 
 @Config
-public class Points_sample {
+public class PointsSample {
     public static Pose START_POSE = new Pose(10, 111.5, 0);
 
-    public static Pose BUCKET_HIGH_SCORE_POSE = new Pose(23, 118, rad(-45));
+    public static Pose BUCKET_HIGH_SCORE_POSE = new Pose(23, 118.5, rad(-45));
 
     public static Pose FIRST_MARK_GRAB = new Pose(29, 118.4, 0);
 
