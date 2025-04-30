@@ -59,7 +59,7 @@ public class LimelightYoloReader {
 
                 Limelight.Sample.Color color = clsMap.getOrDefault(classId, Limelight.Sample.Color.UNKNOWN);
 
-                logger.info("Detected sample " + classId + ", world: (" + worldX + ", " + worldY + ")");
+                //logger.info("Detected sample " + classId + ", world: (" + worldX + ", " + worldY + ")");
                 samples.add(new Limelight.Sample(color, worldX, worldY, 0.0));
             }
         } catch (Exception e) {

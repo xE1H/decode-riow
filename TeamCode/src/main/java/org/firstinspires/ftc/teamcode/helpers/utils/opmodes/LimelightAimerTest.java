@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
-import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.SUB_GRAB;
+import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.SUB_GRAB_0;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;
@@ -34,22 +34,20 @@ public class LimelightAimerTest extends VLRLinearOpMode {
         VLRSubsystem.initializeAll(hardwareMap);
 
         Follower f  = new Follower(hardwareMap, pedroPathing.tuners.constants.FConstants.class, pedroPathing.tuners.constants.LConstants.class);
-        f.setStartingPose(SUB_GRAB);
+        f.setStartingPose(SUB_GRAB_0);
         CommandScheduler cs = CommandScheduler.getInstance();
         LimelightYoloReader reader = new LimelightYoloReader();
-        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(0.6);
 
 
         waitForStart();
 
-        while (!go) {
-            sleep(10);
-        }
+//        while (!go) {
+//            sleep(10);
+//        }
 
         cs.schedule(new SequentialCommandGroup(
                 new SubmersibleGrab(f, Alliance.BLUE, reader),
-                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                new SetArmPosition().extension(0)
+                new SetArmPosition().retract()
         ));
 
         while (opModeIsActive()) {
