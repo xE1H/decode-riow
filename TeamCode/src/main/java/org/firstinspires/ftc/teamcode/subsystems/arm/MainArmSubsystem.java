@@ -170,6 +170,10 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public void disableSlidePowerOverride() {slides.disablePowerOverride();}
 
+    public void enableRotatorPowerOverride(double power) {rotator.enablePowerOverride(power);}
+
+    public void disableRotatorPowerOverride() {rotator.disablePowerOverride();}
+
     public double currentExtension() {return slides.getExtension();}
 
     public double currentAngleDegrees() {return rotator.getAngleDegrees();}
