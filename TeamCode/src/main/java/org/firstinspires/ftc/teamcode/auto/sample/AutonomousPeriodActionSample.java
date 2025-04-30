@@ -97,7 +97,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                         ),
 
                         new SequentialCommandGroup(
-                                new WaitCommand(3000),
+                                new WaitCommand(300),
                                 new FollowPath(follower, bezierPath(SUB_GRAB, SUB_GRAB_CONTROL_2, SUB_GRAB_CONTROL_1, SUB_GRAB_0)
                                         .setTangentHeadingInterpolation().setReversed(true).build()),
                                 new FollowPath(follower, bezierPath(SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)

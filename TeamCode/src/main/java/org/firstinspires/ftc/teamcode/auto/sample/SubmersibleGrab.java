@@ -96,7 +96,7 @@ public class SubmersibleGrab extends SequentialCommandGroup {
         submersibleGrabCommand.addCommands(
                 new ParallelCommandGroup(
                         new MoveRelative(f, -sample.getX(), 0),
-                        new SetArmPosition().intakeSampleAuto((0.77415 * (sample.getY() + 1)) / MAX_POSITION, angle / 180)
+                        new SetArmPosition().intakeSampleAuto((0.7742 * (sample.getY() + 1.25)) / MAX_POSITION, angle / 180)
                         //                        new SetArmPosition().extensionAndAngleDegrees((0.7742 * (sample.getY() + 1.5)) / MAX_POSITION, 2),
 //                        new SequentialCommandGroup(
 //                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),

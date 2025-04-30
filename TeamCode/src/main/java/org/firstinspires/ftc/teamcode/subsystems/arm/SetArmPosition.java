@@ -220,14 +220,16 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("INTAKE SAMPLE COMMAND", "INTAKING SAMPLE FROM IN ROBOT STATE"),
 
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                                new SetClawTwist(twist),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                new SetArmPosition().angleDegrees(2.5),
                                 new SetArmPosition().extension(extension).alongWith(
                                         new SequentialCommandGroup(
                                                 new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.15, 0.15 ,1)),
-                                                new SetClawAngle(angle),
-                                                new SetClawTwist(twist)
+                                                new SetClawAngle(angle)
                                         )
-                                )
+                                ),
+                                new SetArmPosition().angleDegrees(0)
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
                 )
