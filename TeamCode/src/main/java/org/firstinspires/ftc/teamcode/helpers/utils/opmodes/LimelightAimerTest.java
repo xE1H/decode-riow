@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
+import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.SUB_GRAB;
 import static org.firstinspires.ftc.teamcode.auto.sample.Points_sample.SUB_GRAB_0;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -34,7 +35,7 @@ public class LimelightAimerTest extends VLRLinearOpMode {
         VLRSubsystem.initializeAll(hardwareMap);
 
         Follower f  = new Follower(hardwareMap, pedroPathing.tuners.constants.FConstants.class, pedroPathing.tuners.constants.LConstants.class);
-        f.setStartingPose(SUB_GRAB_0);
+        f.setStartingPose(SUB_GRAB);
         CommandScheduler cs = CommandScheduler.getInstance();
         LimelightYoloReader reader = new LimelightYoloReader();
 

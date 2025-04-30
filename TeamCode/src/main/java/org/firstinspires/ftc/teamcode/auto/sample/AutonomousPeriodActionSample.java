@@ -26,8 +26,13 @@ import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private boolean sampleScored = false;
+    private Alliance alliance;
+    private LimelightYoloReader reader;
 
     public AutonomousPeriodActionSample(Follower follower, Alliance alliance, LimelightYoloReader reader) {
+        this.alliance = alliance;
+        this.reader = reader;
+
         addCommands(
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
@@ -82,10 +87,9 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private Command subCycle(Follower follower, int sample){
         return new SequentialCommandGroup(
                 new WaitCommand(1000),
-                new SetArmPosition().intakeSample(0.65),
-                new WaitCommand(200),
-                //new SubmersibleGrab(follower, alliance, reader),
-                //new WaitCommand(300),
+
+                new SubmersibleGrab(follower, alliance, reader),
+                new WaitCommand(300),
 
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
