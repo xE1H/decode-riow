@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 import pedroPathing.tuners.constants.FConstants;
 import pedroPathing.tuners.constants.LConstants;
@@ -38,11 +39,12 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode{
         VLRSubsystem.initializeAll(hardwareMap);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        LimelightYoloReader reader = new LimelightYoloReader();
 
         f = new Follower(hardwareMap, FConstants.class, LConstants.class);
         f.setStartingPose(StartPose());
 
-        autoCommand = autoCommand(f);
+        autoCommand = autoCommand(f, reader);
         cs.schedule(autoCommand.andThen(new InstantCommand(()-> autoFinished = true)));
 
         waitForStart();
@@ -76,6 +78,6 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode{
     public void Start() {}
     public void Stop(){}
     public void InitLoop(){}
-    public abstract Command autoCommand(Follower f);
+    public abstract Command autoCommand(Follower f, LimelightYoloReader reader);
     public abstract Pose StartPose();
 }

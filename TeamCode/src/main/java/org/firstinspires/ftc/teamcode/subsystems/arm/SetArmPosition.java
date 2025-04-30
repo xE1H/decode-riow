@@ -220,14 +220,16 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("INTAKE SAMPLE COMMAND", "INTAKING SAMPLE FROM IN ROBOT STATE"),
 
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                                new SetClawTwist(twist),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                new SetArmPosition().angleDegrees(2.5),
                                 new SetArmPosition().extension(extension).alongWith(
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.1, 0.15 ,1)),
-                                                new SetClawAngle(angle),
-                                                new SetClawTwist(twist)
+                                                new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.15, 0.15 ,1)),
+                                                new SetClawAngle(angle)
                                         )
-                                )
+                                ),
+                                new SetArmPosition().angleDegrees(0)
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
                 )
@@ -288,10 +290,10 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new ParallelCommandGroup(
                                         new SetArmPosition().angleDegrees(55),
                                         new WaitCommand(100).andThen(new SetArmPosition().extension(0)),
-                                        new WaitCommand(250).andThen(new SetClawState(ClawConfiguration.GripperState.CLOSED), new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
+                                        new WaitCommand(250).andThen(new SetClawState(ClawConfiguration.GripperState.OPEN), new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
                                 ),
 
-                                new WaitUntilCommand(()-> arm.currentExtension() < 0.06),
+                                new WaitUntilCommand(()-> arm.currentExtension() < 0.03),
                                 new SetArmPosition().angleDegrees(0),
                                 setArmState(ArmState.State.IN_ROBOT)
                         ),
