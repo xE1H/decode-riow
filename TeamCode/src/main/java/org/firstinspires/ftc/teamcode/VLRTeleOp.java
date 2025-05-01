@@ -41,6 +41,8 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 
+import java.util.logging.Logger;
+
 import pedroPathing.tuners.constants.FConstants;
 import pedroPathing.tuners.constants.LConstants;
 
@@ -53,8 +55,8 @@ public class VLRTeleOp extends VLRLinearOpMode {
     LimelightYoloReader reader = new LimelightYoloReader();
 
     MainArmConfiguration.SAMPLE_SCORE_HEIGHT armState = MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
-    boolean slideResetActive = true;
-    boolean rotatorResetActive = true;
+    boolean slideResetActive = false;
+    boolean rotatorResetActive = false;
 
     RumbleControls rc;
 
@@ -107,6 +109,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
         while (opModeIsActive()) {
             gp.update();
 
+
             if (followerActive) f.update();
             else {
                 // Not defining these controls through DriverControls cuz ts pmo
@@ -139,21 +142,25 @@ public class VLRTeleOp extends VLRLinearOpMode {
     }
 
     private void startSlideOverride() {
+        Logger.getLogger("SlideOverride").fine("Start override");
         slideResetActive = true;
         VLRSubsystem.getArm().enableSlidePowerOverride(-0.3);
     }
 
     private void endSlideOverride() {
+        Logger.getLogger("SlideOverride").fine("End override");
         slideResetActive = false;
         VLRSubsystem.getArm().disableSlidePowerOverride();
     }
 
     private void startRotatorOverride() {
+        Logger.getLogger("RotatorOverride").fine("Start override");
         rotatorResetActive = true;
         VLRSubsystem.getArm().enableRotatorPowerOverride(-0.1);
     }
 
     private void endRotatorOverride() {
+        Logger.getLogger("RotatorOverride").fine("End override");
         rotatorResetActive = false;
         VLRSubsystem.getArm().disableRotatorPowerOverride();
     }
@@ -200,22 +207,21 @@ public class VLRTeleOp extends VLRLinearOpMode {
                         new ParallelCommandGroup(
                                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                new SetArmPosition().retract(),
-                                new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)
-                                        .setLinearHeadingInterpolation(SUB_GRAB.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build()
+                                new SequentialCommandGroup(
+                                        new SetArmPosition().retract(),
+                                        new SetArmPosition().scoreSample(armState)
                                 ),
                                 new SequentialCommandGroup(
-                                        new WaitCommand(1600),
-                                        new ParallelCommandGroup(
-                                                new InstantCommand() {
-                                                    @Override
-                                                    public void run() {
-                                                        followerActive = false;
-                                                        rc.singleBlip();
-                                                    }
-                                                },
-                                                new SetArmPosition().scoreSample(armState)
-                                        )
+                                        new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)
+                                                .setLinearHeadingInterpolation(SUB_GRAB.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build()
+                                        ),
+                                        new InstantCommand() {
+                                            @Override
+                                            public void run() {
+                                                followerActive = false;
+                                                rc.singleBlip();
+                                            }
+                                        }
                                 )
                         )
 
