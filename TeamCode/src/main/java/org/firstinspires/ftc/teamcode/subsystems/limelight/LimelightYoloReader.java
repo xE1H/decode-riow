@@ -88,6 +88,13 @@ public class LimelightYoloReader {
         return -1;
     }
 
+    public void requestFrame() {
+        JSONObject json = sendGetRequest("/request_frame");
+        if (json == null) {
+            logger.info("Failed to request frame: JSON null");
+        }
+    }
+
     /**
      * Get the best sample from the current frame
      *

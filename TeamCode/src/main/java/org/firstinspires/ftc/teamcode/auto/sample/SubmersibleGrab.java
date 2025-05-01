@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
+import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.RequestLimelightFrame;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.WaitUntilNextLimelightFrame;
 
 import java.util.logging.Level;
@@ -36,15 +37,14 @@ public class SubmersibleGrab extends SequentialCommandGroup {
         Logger logger = Logger.getLogger("SubmersibleGrab");
         addCommands(
                 new LogCommand("SubmersibleGrab", Level.INFO, "Sub grab command"),
-                new ParallelCommandGroup(
-                        //new WaitUntilNextLimelightUpdate(),
-                        new SequentialCommandGroup(
-                                new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT),
-                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)
-                        )
-                ),
+
+                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+
+
+                new RequestLimelightFrame(reader),
                 new WaitUntilNextLimelightFrame(reader),
+
                 new InstantCommand() {
                     @Override
                     public void run() {

@@ -212,8 +212,8 @@ public class ArmRotatorSubsystem {
         }
         else {
             encoderReset = false;
-            if (motionProfile.getTargetPosition() == 0 && currentAngle > 3 && currentAngle < 10){
-                power = -0.07;
+            if (motionProfile.getTargetPosition() == 0 && currentAngle <= 10){
+                power = -0.08;
             }
         }
 

@@ -23,8 +23,15 @@ public class WaitUntilNextLimelightFrame extends CommandBase {
     }
 
     @Override
+    public void execute() {
+        System.out.println("WAIT UNTIL NEXT LIMELIGHT FRAME COMMAND, ELAPSED TIME: " +  elapsedTime.seconds() + "s, DELTA: " + reader.getFrameTimeDelta());
+    }
+
+    @Override
     public boolean isFinished() {
         if (!started) return false;
+
+        //if (elapsedTime.milliseconds() > 1000) return true;
 
         if (reader.getFrameTimeDelta() == -1) return false;
 

@@ -15,8 +15,6 @@ public class LimelightVerification extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        VLRSubsystem.requireSubsystems(ClawSubsystem.class);
-        VLRSubsystem.initializeAll(hardwareMap);
         LimelightYoloReader reader = new LimelightYoloReader();
 
         //VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(0);
@@ -25,10 +23,12 @@ public class LimelightVerification extends VLRLinearOpMode {
 
         while (opModeIsActive()) {
             telemetry.addData("JSON output", reader.getRawJSONRequest("/detection_boxes.json"));
+            reader.getRawJSONRequest("/request_frame");
 //            if (reader.getBestSample() != null) {
 //                VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(Math.toDegrees(reader.getBestSample().getAngle()) / 180);
 //            }
             telemetry.update();
+            sleep(500);
         }
     }
 }

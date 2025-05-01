@@ -4,12 +4,10 @@ import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.BUCKET_HIG
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.START_POSE;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB_0;
-import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB_CONTROL_1;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
-import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -34,8 +32,6 @@ import org.firstinspires.ftc.teamcode.persistence.PoseSaver;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
-import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
@@ -57,6 +53,8 @@ public class VLRTeleOp extends VLRLinearOpMode {
     LimelightYoloReader reader = new LimelightYoloReader();
 
     MainArmConfiguration.SAMPLE_SCORE_HEIGHT armState = MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
+    boolean slideResetActive = true;
+    boolean rotatorResetActive = true;
 
     RumbleControls rc;
 
@@ -84,11 +82,11 @@ public class VLRTeleOp extends VLRLinearOpMode {
         gp.add(new ButtonCtl(GamepadKeys.Button.A, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> toggleFollower()));
 
         gp.add(new ButtonCtl(GamepadKeys.Button.X, ButtonCtl.Trigger.STATE_JUST_CHANGED, (Boolean a) -> {
-            if (a) startSlideOverride();
+            if (!slideResetActive) startSlideOverride();
             else endSlideOverride();
         }));
         gp.add(new ButtonCtl(GamepadKeys.Button.Y, ButtonCtl.Trigger.STATE_JUST_CHANGED, (Boolean a) -> {
-            if (a) startRotatorOverride();
+            if (!rotatorResetActive) startRotatorOverride();
             else endRotatorOverride();
         }));
 
@@ -141,18 +139,22 @@ public class VLRTeleOp extends VLRLinearOpMode {
     }
 
     private void startSlideOverride() {
+        slideResetActive = true;
         VLRSubsystem.getArm().enableSlidePowerOverride(-0.3);
     }
 
     private void endSlideOverride() {
+        slideResetActive = false;
         VLRSubsystem.getArm().disableSlidePowerOverride();
     }
 
     private void startRotatorOverride() {
+        rotatorResetActive = true;
         VLRSubsystem.getArm().enableRotatorPowerOverride(-0.1);
     }
 
     private void endRotatorOverride() {
+        rotatorResetActive = false;
         VLRSubsystem.getArm().disableRotatorPowerOverride();
     }
 

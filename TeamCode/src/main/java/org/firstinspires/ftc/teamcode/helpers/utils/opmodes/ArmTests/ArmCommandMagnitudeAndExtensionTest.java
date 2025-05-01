@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRTestOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
@@ -62,10 +63,10 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 
     @Override
     public void Loop() {
-        if (extension != prevExtension){
-            prevExtension = extension;
-            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(extension));
-        }
+//        if (extension != prevExtension){
+//            prevExtension = extension;
+//            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(extension));
+//        }
 //
 //        if (angle != prevAngle){
 //            prevAngle = angle;
@@ -73,11 +74,11 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 //        }
 
         if (gamepad1.triangle && !prevTriangle){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(110));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET));
         }
 
         else if (gamepad1.cross && !prevCross){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(70));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().retract());
         }
 
 //        if (gamepad1.triangle && !prevTriangle){
