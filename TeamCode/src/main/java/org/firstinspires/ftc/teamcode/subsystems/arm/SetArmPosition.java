@@ -173,7 +173,6 @@ public class SetArmPosition extends SequentialCommandGroup{
                     ),
                     new SetArmPosition().extensionAndAngleDegrees(arm.getTargetExtension(), angleDegrees)
                 )
-
         );
     }
 
@@ -222,8 +221,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                 new SetClawTwist(twist),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new SetArmPosition().angleDegrees(2),
-                                new SetArmPosition().extension(extension).alongWith(
+                                new SetArmPosition().extensionAndAngleDegrees(extension, 2).alongWith(
                                         new SequentialCommandGroup(
                                                 new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.25, 0.08 ,1)),
                                                 new SetClawAngle(angle)
@@ -332,11 +330,6 @@ public class SetArmPosition extends SequentialCommandGroup{
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SPECIMEN OR SAMPLE INTAKE STATE"),
-
-//                                new CustomConditionalCommand(
-//                                        new SetArmPosition().extensionRelative(0.075),
-//                                        ()-> ArmState.isCurrentState(ArmState.State.SPECIMEN_INTAKE)
-//                                ),
 
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
                                 new WaitCommand(170),

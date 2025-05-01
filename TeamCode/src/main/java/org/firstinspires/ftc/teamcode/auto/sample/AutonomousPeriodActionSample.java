@@ -71,7 +71,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                                 new SequentialCommandGroup(
                                         new WaitCommand(200),
                                         new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
-                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() < 35),
+                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() < 15),
                                         new SetArmPosition().intakeSample(0.34)
                                 )
                         )
@@ -153,7 +153,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                                 new SetArmPosition().retract(),
                                 new SequentialCommandGroup(
                                         new WaitCommand(300),
-                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() < 35),
+                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() < 25),
                                         new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
                                         new ConditionalCommand(
                                                 new SetArmPosition().intakeSampleAuto(0.31, sample == 4 ? 0.3 : 0.5),
