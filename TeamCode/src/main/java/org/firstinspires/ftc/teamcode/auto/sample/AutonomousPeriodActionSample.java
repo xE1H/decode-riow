@@ -16,6 +16,8 @@ import com.pedropathing.localization.Pose;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
+import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
@@ -37,7 +39,6 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                //new SetPattern().rainbow(),
 
                 //SCORE PRELOAD AND PICK UP FIRST SAMPLE FROM SPIKE MARK
                 scorePreload(follower),
@@ -52,7 +53,8 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                 grabAndScoreSpikeMarkSample(follower, 4),
 
                 subCycle(follower, 5),
-                subCycle(follower, 6)
+                subCycle(follower, 6),
+                subCycle(follower, 7)
         );
     }
 
@@ -62,10 +64,17 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
         return new ParallelCommandGroup(
                 new SequentialCommandGroup(
                         new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
-                        new WaitUntilCommand(()-> follower.atPose(BUCKET_HIGH_SCORE_POSE, 4, 4, Math.toRadians(8))),
+                        new WaitUntilCommand(()-> follower.atPose(BUCKET_HIGH_SCORE_POSE, 3, 3, Math.toRadians(3))),
                         new InstantCommand(()-> sampleScored = true),
-                        new SetArmPosition().retract(), //.alongWith(new SetPattern().oceanPalette()),
-                        new SetArmPosition().intakeSample(0.3) //.andThen(new SetPattern().rainbow())
+                        new ParallelCommandGroup(
+                                new SetArmPosition().retract(),
+                                new SequentialCommandGroup(
+                                        new WaitCommand(200),
+                                        new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
+                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() < 35),
+                                        new SetArmPosition().intakeSample(0.34)
+                                )
+                        )
                 ),
 
                 new SequentialCommandGroup(
@@ -74,7 +83,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                         ),
                         new WaitUntilCommand(()-> sampleScored),
                         new InstantCommand(()-> sampleScored = false),
-                        new WaitCommand(150),
+                        new WaitCommand(200),
                         new FollowPath(follower, bezierPath(BUCKET_HIGH_SCORE_POSE, FIRST_MARK_GRAB)
                                 .setLinearHeadingInterpolation(BUCKET_HIGH_SCORE_POSE.getHeading(), FIRST_MARK_GRAB.getHeading()).build()
                         )
@@ -86,8 +95,8 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
     private Command subCycle(Follower follower, int sample){
         return new SequentialCommandGroup(
+                new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
                 new SubmersibleGrab(follower, alliance, reader),
-                new WaitCommand(300),
 
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
@@ -99,7 +108,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                         ),
 
                         new SequentialCommandGroup(
-                                new WaitCommand(300),
+                                new WaitCommand(200),
                                 new FollowPath(follower, bezierPath(SUB_GRAB, SUB_GRAB_CONTROL_2, SUB_GRAB_CONTROL_1, SUB_GRAB_0)
                                         .setTangentHeadingInterpolation().setReversed(true).build()),
                                 new FollowPath(follower, bezierPath(SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)
@@ -111,13 +120,13 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
                                 new CustomConditionalCommand(
                                         new SequentialCommandGroup(
-                                                new FollowPath(follower, bezierPath(BUCKET_HIGH_SCORE_POSE, SUB_GRAB_0)
+                                                new FollowPath(follower, bezierPath(BUCKET_HIGH_SCORE_POSE, SUB_GRAB_0).setPathEndTimeoutConstraint(50)
                                                         .setConstantHeadingInterpolation(SUB_GRAB_0.getHeading()).build()),
                                                 new FollowPath(follower, bezierPath(SUB_GRAB_0, SUB_GRAB_CONTROL_1, SUB_GRAB_CONTROL_2, SUB_GRAB)
                                                         .setTangentHeadingInterpolation().build())
                                         ),
 
-                                        ()-> sample <= 5
+                                        ()-> sample <= 6
                                 )
                         )
                 )
@@ -129,16 +138,31 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private Command grabAndScoreSpikeMarkSample(Follower follower, int sample){
         return new ParallelCommandGroup(
                 new SequentialCommandGroup(
-                        new SetArmPosition().retract(),
-                        new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
+                        new ParallelCommandGroup(
+                                new SetArmPosition().retract(),
+                                new SequentialCommandGroup(
+                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.15),
+                                        new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
+                                        new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET)
+                                )
+                        ),
                         new WaitUntilCommand(()-> follower.atPose(BUCKET_HIGH_SCORE_POSE, 4, 4, Math.toRadians(5))),
                         new InstantCommand(()-> sampleScored = true),
-                        new SetArmPosition().retract(),
-                        new ConditionalCommand(
-                                new SetArmPosition().intakeSampleAuto(0.3, sample == 4 ? 0.3 : 0.5),
-                                new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                ()-> sample < 4
+                        new SetArmPosition().setArmState(ArmState.State.SAMPLE_SCORE),
+                        new ParallelCommandGroup(
+                                new SetArmPosition().retract(),
+                                new SequentialCommandGroup(
+                                        new WaitCommand(300),
+                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() < 35),
+                                        new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
+                                        new ConditionalCommand(
+                                                new SetArmPosition().intakeSampleAuto(0.31, sample == 4 ? 0.3 : 0.5),
+                                                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                                ()-> sample < 4
+                                        )
+                                )
                         )
+
                 ),
 
 
@@ -156,7 +180,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                                         .setLinearHeadingInterpolation(BUCKET_HIGH_SCORE_POSE.getHeading(), sample != 4 ? GRAB_POSES[sample - 1].getHeading() : new Pose().getHeading()).build()),
 
                                 new SequentialCommandGroup(
-                                        new FollowPath(follower, bezierPath(BUCKET_HIGH_SCORE_POSE, SUB_GRAB_0)
+                                        new FollowPath(follower, bezierPath(BUCKET_HIGH_SCORE_POSE, SUB_GRAB_0).setPathEndTimeoutConstraint(80)
                                                 .setConstantHeadingInterpolation(SUB_GRAB_0.getHeading()).build()),
                                         new FollowPath(follower, bezierPath(SUB_GRAB_0, SUB_GRAB_CONTROL_1, SUB_GRAB_CONTROL_2, SUB_GRAB)
                                                 .setTangentHeadingInterpolation().build())

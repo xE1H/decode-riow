@@ -36,14 +36,10 @@ public class SubmersibleGrab extends SequentialCommandGroup {
         Logger logger = Logger.getLogger("SubmersibleGrab");
         addCommands(
                 new LogCommand("SubmersibleGrab", Level.INFO, "Sub grab command"),
-                new ParallelCommandGroup(
-                        //new WaitUntilNextLimelightUpdate(),
-                        new SequentialCommandGroup(
-                                new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT),
-                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)
-                        )
-                ),
+
+                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+
                 new WaitUntilNextLimelightFrame(reader),
                 new InstantCommand() {
                     @Override

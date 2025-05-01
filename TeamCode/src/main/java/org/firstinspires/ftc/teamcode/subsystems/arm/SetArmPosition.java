@@ -222,14 +222,15 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                 new SetClawTwist(twist),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new SetArmPosition().angleDegrees(2.5),
+                                new SetArmPosition().angleDegrees(2),
                                 new SetArmPosition().extension(extension).alongWith(
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.15, 0.15 ,1)),
+                                                new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.25, 0.08 ,1)),
                                                 new SetClawAngle(angle)
                                         )
                                 ),
-                                new SetArmPosition().angleDegrees(0)
+                                new SetArmPosition().angleDegrees(0),
+                                new WaitCommand(20)
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
                 )
@@ -283,17 +284,16 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new SequentialCommandGroup(
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SAMPLE SCORE STATE"),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new WaitCommand(100),
+                                new WaitCommand(70),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
-                                new WaitCommand(50),
+                                new WaitCommand(10),
 
                                 new ParallelCommandGroup(
-                                        new SetArmPosition().angleDegrees(55),
-                                        new WaitCommand(100).andThen(new SetArmPosition().extension(0)),
-                                        new WaitCommand(250).andThen(new SetClawState(ClawConfiguration.GripperState.OPEN), new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
+                                        new SetArmPosition().extensionAndAngleDegrees(0, 54, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
+                                        new WaitCommand(250).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
                                 ),
 
-                                new WaitUntilCommand(()-> arm.currentExtension() < 0.03),
+                                new WaitUntilCommand(()-> arm.currentExtension() < 0.05),
                                 new SetArmPosition().angleDegrees(0),
                                 setArmState(ArmState.State.IN_ROBOT)
                         ),
@@ -366,9 +366,9 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new ParallelCommandGroup(
                                         new WaitCommand(300).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)),
                                         new SetArmPosition().angleDegrees(101),
-                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 62).andThen(new SetArmPosition().extension(sampleScoreHeight.extension)),
+                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 40).andThen(new SetArmPosition().extension(sampleScoreHeight.extension)),
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentExtension() > sampleScoreHeight.extension - 0.2),
+                                                new WaitUntilCommand(()-> arm.currentExtension() > sampleScoreHeight.extension - 0.27),
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT)
                                         )
                                 ),
