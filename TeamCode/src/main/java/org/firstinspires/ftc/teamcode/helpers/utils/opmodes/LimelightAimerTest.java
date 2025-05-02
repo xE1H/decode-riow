@@ -10,6 +10,7 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrab;
+import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
@@ -44,7 +45,7 @@ public class LimelightAimerTest extends VLRLinearOpMode {
 //        }
 
         cs.schedule(new SequentialCommandGroup(
-                new SubmersibleGrab(f, Alliance.BLUE, reader),
+                new SubmersibleGrabV2(f, reader),
                 new SetArmPosition().retract()
         ));
 
