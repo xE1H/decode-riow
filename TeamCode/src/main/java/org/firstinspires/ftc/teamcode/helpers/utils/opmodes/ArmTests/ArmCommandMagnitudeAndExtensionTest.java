@@ -81,6 +81,10 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
             CommandScheduler.getInstance().schedule(new SetArmPosition().retract());
         }
 
+        else if (gamepad1.square && !prevSquare){
+            CommandScheduler.getInstance().schedule(new SetArmPosition().intakeSample(0.34));
+        }
+
 //        if (gamepad1.triangle && !prevTriangle){
 //            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(1));
 //        }

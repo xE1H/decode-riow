@@ -39,11 +39,13 @@ public class SubmersibleGrab extends SequentialCommandGroup {
                 new LogCommand("SubmersibleGrab", Level.INFO, "Sub grab command"),
 
                 new SetClawState(ClawConfiguration.GripperState.OPEN),
+                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 
 
                 new RequestLimelightFrame(reader),
                 new WaitUntilNextLimelightFrame(reader),
+
 
                 new InstantCommand() {
                     @Override
