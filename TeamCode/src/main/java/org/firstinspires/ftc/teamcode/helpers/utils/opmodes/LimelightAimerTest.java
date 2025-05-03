@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.rad;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrab;
@@ -32,8 +35,8 @@ public class LimelightAimerTest extends VLRLinearOpMode {
         VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
-        Follower f  = new Follower(hardwareMap, pedroPathing.tuners.constants.FConstants.class, pedroPathing.tuners.constants.LConstants.class);
-        f.setStartingPose(SUB_GRAB);
+        Follower f = new Follower(hardwareMap, pedroPathing.tuners.constants.FConstants.class, pedroPathing.tuners.constants.LConstants.class);
+        f.setStartingPose(new Pose(0, 0, rad(-45)));
         CommandScheduler cs = CommandScheduler.getInstance();
         LimelightYoloReader reader = new LimelightYoloReader();
 
@@ -45,6 +48,7 @@ public class LimelightAimerTest extends VLRLinearOpMode {
 //        }
 
         cs.schedule(new SequentialCommandGroup(
+                new WaitCommand(2000),
                 new SubmersibleGrabV2(f, reader),
                 new SetArmPosition().retract()
         ));

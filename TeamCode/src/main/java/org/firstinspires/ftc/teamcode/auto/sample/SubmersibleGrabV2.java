@@ -5,7 +5,9 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfig
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.pedropathing.commands.HoldPoint;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
@@ -36,7 +38,7 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
 
     private final SequentialCommandGroup submersibleGrabCommand = new SequentialCommandGroup();
 
-    double angle = 90;
+    double sampleAngle = 90;
 
     public SubmersibleGrabV2(Follower f, LimelightYoloReader reader, RumbleControls rc) {
         addCommands(
@@ -58,15 +60,15 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
                             logger.warning("No best sample found");
                             if (rc != null) rc.doubleBlip();
                         } else {
-                            angle = Math.toDegrees(sample.getAngle());
-                            if (angle == -360) {
+                            sampleAngle = Math.toDegrees(sample.getAngle());
+                            if (sampleAngle == -360) {
                                 logger.warning("Best sample has no angle data");
                                 if (rc != null) rc.doubleBlip();
                                 return;
                             }
-                            if (angle < 0) angle += 180;
+                            if (sampleAngle < 0) sampleAngle += 180;
 
-                            logger.info("Going for sample: " + sample.getColor() + " in X: " + sample.getX() + ", Y: " + sample.getY() + ", angle: " + angle);
+                            logger.info("Going for sample: " + sample.getColor() + " in X: " + sample.getX() + ", Y: " + sample.getY() + ", angle: " + sampleAngle);
 
                             generateSubmersibleGrabCommand(f, sample);
                         }
@@ -78,11 +80,12 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
     }
 
     private void generateSubmersibleGrabCommand(Follower f, LimelightYoloReader.Limelight.Sample sample) {
+        logger.info("Current pose X: " + f.getPose().getX() + ", Y: " + f.getPose().getY() + ", heading: " + f.getPose().getHeading());
         double angle = f.getPose().getHeading() - Math.PI / 2; // Offset orientation by 90 deg to not mess up the distances
 
-        double xAbs = f.getPose().getX() - sample.getX() * Math.cos(angle) + (sample.getY() + DISTANCE_TO_ROBOT_FRONT) * Math.sin(angle);
-        double yAbs = f.getPose().getY() - sample.getX() * Math.sin(angle) - (sample.getY() + DISTANCE_TO_ROBOT_FRONT) * Math.cos(angle);
-        logger.finer("Absolute coordinates X: " + xAbs + ", Y: " + yAbs);
+        double xAbs = -(f.getPose().getX() - sample.getX() * Math.cos(angle) + (sample.getY() + DISTANCE_TO_ROBOT_FRONT) * Math.sin(angle));
+        double yAbs = -(f.getPose().getY() - sample.getX() * Math.sin(angle) - (sample.getY() + DISTANCE_TO_ROBOT_FRONT) * Math.cos(angle));
+        logger.info("Absolute coordinates X: " + xAbs + ", Y: " + yAbs);
 
         boolean isInSubmersible = xAbs > SUBMERSIBLE_BOUNDS_X1 && xAbs < SUBMERSIBLE_BOUNDS_X2 && yAbs > SUBMERSIBLE_BOUNDS_Y1 && yAbs < SUBMERSIBLE_BOUNDS_Y2;
         if (isInSubmersible) {
@@ -93,13 +96,31 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
             // Vector to sample
             double vectorX = xAbs - f.getPose().getX();
             double vectorY = yAbs - f.getPose().getY();
-            logger.finer("Vector to sample X: " + vectorX + ", Y: " + vectorY);
+            logger.info("Vector to sample X: " + vectorX + ", Y: " + vectorY);
+            double vectorAngle = Math.atan2(vectorY, vectorX);
+            double vectorLen = Math.sqrt(Math.pow(vectorX, 2) + Math.pow(vectorY, 2));
+            logger.info("Vector angle: " + vectorAngle);
+            logger.info("Vector length: " + vectorLen);
 
             double strafeLength = -(vectorX * Math.cos(angle) + vectorY * Math.sin(angle));
-            double forwardLength = -(vectorX * Math.sin(angle) - vectorY * Math.cos(angle));
-            logger.finer("Strafe length: " + strafeLength + ", Forward length: " + forwardLength);
+            double forwardLength = -(vectorX * Math.sin(angle) - vectorY * Math.cos(angle)) - DISTANCE_TO_ROBOT_FRONT;
+            logger.info("Strafe length: " + strafeLength + ", Slide extension length: " + forwardLength);
 
+            Pose currentPose = f.getPose();
+            currentPose.setHeading(vectorAngle);
+            submersibleGrabCommand.addCommands(
+                    new ParallelCommandGroup(
+                            new InstantCommand() {
+                                @Override
+                                public void run() {
+                                    f.turnTo(Math.toDegrees(vectorAngle));
+                                }
+                            },
 
+//                            new HoldPoint(f, currentPose).withTimeout(1000),
+                            new SetArmPosition().intakeSampleAuto((0.7742 * (vectorLen - DISTANCE_TO_ROBOT_FRONT + 1.5)) / MAX_POSITION, ((sampleAngle - f.getPose().getHeading() + vectorAngle) / -180.0) + 1)
+                    )
+            );
         }
 
 //        submersibleGrabCommand.addCommands(
