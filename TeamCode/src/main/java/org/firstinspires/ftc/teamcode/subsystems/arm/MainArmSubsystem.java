@@ -7,7 +7,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorCo
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_EXTENSION_CM;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.Point;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
@@ -30,6 +29,11 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     protected void initialize(HardwareMap hardwareMap){
         rotator = new ArmRotatorSubsystem(hardwareMap);
         slides = new ArmSlideSubsystem(hardwareMap);
+
+        if (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)){
+            targetPoint = new Point(slides.getTargetExtension(), rotator.getTargetPosition());
+            prevTargetPoint = targetPoint;
+        }
     }
 
     public void setTargetPoint(Point point) {

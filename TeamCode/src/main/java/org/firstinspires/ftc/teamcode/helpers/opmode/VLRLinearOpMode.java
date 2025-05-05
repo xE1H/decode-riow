@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CommandRunner;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +28,8 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
     public void runOpMode() {
         VLRSubsystem.clearSubsystems(); // Clear all subsystems
         executorService = Executors.newCachedThreadPool();
+
+        ArmState.initialize();
 
         commandRunner = new CommandRunner(this::opModeIsActive, hardwareMap);
         executorService.submit(commandRunner);

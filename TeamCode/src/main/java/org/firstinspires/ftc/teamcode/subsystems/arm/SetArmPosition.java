@@ -331,7 +331,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 ),
 
                                 new WaitUntilCommand(()-> arm.currentExtension() < 0.2),
-                                new WaitUntilCommand(()-> arm.currentExtension() < 0.08).withTimeout(1000),
+                                new WaitUntilCommand(()-> arm.currentExtension() < 0.1).withTimeout(1000),
                                 new SetArmPosition().angleDegrees(0),
                                 setArmState(ArmState.State.IN_ROBOT)
                         ),
@@ -372,7 +372,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SPECIMEN OR SAMPLE INTAKE STATE"),
 
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                                new WaitCommand(170),
+                                new WaitCommand(140),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                                 new SetArmPosition().extension(0),
@@ -389,7 +389,7 @@ public class SetArmPosition extends SequentialCommandGroup{
         return new SequentialCommandGroup(
                 new CustomConditionalCommand(
                         retract(),
-                        ()-> !ArmState.isCurrentState(ArmState.State.IN_ROBOT)
+                        ()-> !ArmState.isCurrentState(ArmState.State.IN_ROBOT, ArmState.State.SAMPLE_INTAKE)
                 ),
 
                 new CustomConditionalCommand(
@@ -408,7 +408,39 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 setArmState(ArmState.State.SAMPLE_SCORE)
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
+                ),
+
+                new CustomConditionalCommand(
+                        new SequentialCommandGroup(
+                                new LogCommand("SCORE SAMPLE", Level.SEVERE, "SCORING SAMPLE FROM IN ROBOT STATE"),
+
+                                new SetClawState(ClawConfiguration.GripperState.CLOSED),
+                                new WaitCommand(140),
+                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+
+                                new ParallelCommandGroup(
+                                        new SetArmPosition().extension(0),
+
+                                        new SequentialCommandGroup(
+                                                new WaitUntilCommand(()-> arm.currentExtension() < 0.2),
+                                                new ParallelCommandGroup(
+                                                        new WaitCommand(300).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)),
+                                                        new SetArmPosition().angleDegrees(101),
+                                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 17).andThen(new SetArmPosition().extension(sampleScoreHeight.extension)),
+                                                        new SequentialCommandGroup(
+                                                                new WaitUntilCommand(()-> arm.currentExtension() > sampleScoreHeight.extension - 0.27),
+                                                                new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT)
+                                                        )
+                                                )
+                                        )
+                                ),
+                                setArmState(ArmState.State.SAMPLE_SCORE)
+                        ),
+                        ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_INTAKE)
                 )
+
+
         );
     }
 
@@ -532,6 +564,25 @@ public class SetArmPosition extends SequentialCommandGroup{
                         )
                 ),
                 ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
+        );
+    }
+
+    public Command retractAfterAuto(){
+        return new CustomConditionalCommand(
+                new SequentialCommandGroup(
+                        new ParallelCommandGroup(
+                                new SequentialCommandGroup(
+                                        new SetArmPosition().extensionAndAngleDegrees(0.71, 95, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
+                                        new WaitCommand(100),
+                                        new SetArmPosition().extensionAndAngleDegrees(0, 52, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE)
+                                ),
+                                new WaitCommand(150).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
+                        ),
+                        new WaitCommand(200),
+                        new SetArmPosition().angleDegrees(0),
+                        new SetArmPosition().setArmState(ArmState.State.IN_ROBOT)
+                ),
+                ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)
         );
     }
 }

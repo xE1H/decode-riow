@@ -40,6 +40,8 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         cs = CommandScheduler.getInstance();
         FConstants.initialize();
 
+        f = new Follower(hardwareMap, FConstants.class, LConstants.class);
+
         VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
@@ -47,7 +49,6 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         LimelightYoloReader reader = new LimelightYoloReader();
         reader.setAllowedColors(Arrays.asList(BLUE, YELLOW));
 
-        f = new Follower(hardwareMap, FConstants.class, LConstants.class);
         f.setStartingPose(StartPose());
         beforeEndRunnable = () -> PoseSaver.setPedroPose(f.getPose());
 

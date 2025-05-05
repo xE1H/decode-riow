@@ -31,7 +31,7 @@ public class MotionProfile {
 
     private final PIDController pid;
 
-    private double t = 0;
+    private double t = 1;
 
     private Type profileType;
 

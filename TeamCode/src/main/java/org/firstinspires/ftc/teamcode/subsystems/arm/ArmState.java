@@ -2,19 +2,26 @@ package org.firstinspires.ftc.teamcode.subsystems.arm;
 
 
 public class ArmState {
-    private static State currentState = State.IN_ROBOT;
+    private static volatile State currentState;
+
+    public static void initialize(){
+        if (currentState == null) {currentState = State.IN_ROBOT;}
+    }
 
     public static State get() {
+        initialize();
         return currentState;
     }
 
     public static void set(State stateValue) {currentState = stateValue;}
 
     public static boolean isCurrentState(State state) {
+        initialize();
         return currentState == state;
     }
 
     public static boolean isCurrentState(State ...states) {
+        initialize();
         for (State state : states) {
             if (currentState == state) {return true;}
         }
