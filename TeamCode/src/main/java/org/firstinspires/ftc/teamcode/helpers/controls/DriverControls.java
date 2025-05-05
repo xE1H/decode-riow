@@ -67,6 +67,13 @@ public class DriverControls {
     }
 
     /**
+     * Removes all control definitions from the list.
+     */
+    public void clear() {
+        this.controls.clear();
+    }
+
+    /**
      * Sets the handler for left stick input.
      *
      * @param control The BiConsumer to handle left stick input (y, x).

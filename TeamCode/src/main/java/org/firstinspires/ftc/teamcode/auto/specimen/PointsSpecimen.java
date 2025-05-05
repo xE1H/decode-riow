@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.localization.Pose;
 
 @Config
-public class Points_specimen {
+public class PointsSpecimen {
 
     public static Pose START_POSE = new Pose(10, 57, Math.toRadians(0));
 
@@ -32,4 +32,9 @@ public class Points_specimen {
     public static Pose SCORE_SPECIMEN_BACK_4 = new Pose(31, 65, Math.toRadians(-180));
 
     public static Pose SCORE_SPECIMEN_BACK_5 = new Pose(31, 70, Math.toRadians(-180));
+
+    public static Pose SUB_GRAB_SPEC = new Pose(64, 120 - 95.5, Math.toRadians(90));
+    public static Pose SUB_GRAB_SPEC_CONTROL = new Pose(55.2, 12, Math.toRadians(0));
+
+    public static Pose SUB_GRAB_SPEC_DEPOSIT = new Pose(25, 14.5, 0);
 }

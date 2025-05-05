@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.auto.specimen.Points_specimen.START_POSE;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.START_POSE;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.outoftheboxrobotics.photoncore.Photon;

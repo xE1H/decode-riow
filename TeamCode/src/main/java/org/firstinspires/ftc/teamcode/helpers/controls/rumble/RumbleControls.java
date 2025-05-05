@@ -14,8 +14,8 @@ public class RumbleControls {
         gamepad.rumble(1, 1, 100);
     }
 
-    public void rumbleBlips() {
-        gamepad.rumbleBlips(10);
+    public void rumbleBlips(int n) {
+        gamepad.rumbleBlips(n);
     }
 
     public void doubleBlip() {

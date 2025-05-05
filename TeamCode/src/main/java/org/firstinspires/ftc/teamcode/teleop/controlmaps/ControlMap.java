@@ -1,0 +1,15 @@
+package org.firstinspires.ftc.teamcode.teleop.controlmaps;
+
+import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
+
+
+public abstract class ControlMap {
+    DriverControls gp;
+
+    public ControlMap(DriverControls driverControls) {
+        gp = driverControls;
+        initialize();
+    }
+
+    public abstract void initialize();
+}

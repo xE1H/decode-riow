@@ -40,7 +40,11 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
+import org.firstinspires.ftc.teamcode.teleop.controlmaps.GlobalMap;
+import org.firstinspires.ftc.teamcode.teleop.controlmaps.SampleMap;
+import org.firstinspires.ftc.teamcode.teleop.controlmaps.SpecimenMap;
 
+import java.sql.Driver;
 import java.util.logging.Logger;
 
 import pedroPathing.tuners.constants.FConstants;
@@ -51,14 +55,10 @@ import pedroPathing.tuners.constants.LConstants;
 public class VLRTeleOp extends VLRLinearOpMode {
     Follower f;
     CommandScheduler cs;
-    boolean followerActive = false;
-    LimelightYoloReader reader = new LimelightYoloReader();
-
-    MainArmConfiguration.SAMPLE_SCORE_HEIGHT armState = MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
-    boolean slideResetActive = false;
-    boolean rotatorResetActive = false;
-
     RumbleControls rc;
+
+    boolean sampleMapActive = true;
+
 
     @Override
     public void run() {
@@ -84,36 +84,25 @@ public class VLRTeleOp extends VLRLinearOpMode {
         DriverControls gp = new DriverControls(gpEx);
         rc = new RumbleControls(gamepad1);
 
-        gp.add(new ButtonCtl(GamepadKeys.Button.A, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> toggleFollower()));
+        // GlobalMap is for general controls that are not specific to samples/specimen
+        GlobalMap globalMap = new GlobalMap(gp, f, rc);
+        globalMap.initialize();
 
-        gp.add(new ButtonCtl(GamepadKeys.Button.X, ButtonCtl.Trigger.STATE_JUST_CHANGED, (Boolean a) -> {
-            if (!slideResetActive) startSlideOverride();
-            else endSlideOverride();
-        }));
-        gp.add(new ButtonCtl(GamepadKeys.Button.Y, ButtonCtl.Trigger.STATE_JUST_CHANGED, (Boolean a) -> {
-            if (!rotatorResetActive) startRotatorOverride();
-            else endRotatorOverride();
-        }));
+        SampleMap sampleMap = new SampleMap(gp, cs, globalMap);
+        sampleMap.initialize(); // initialize sample controls as default
 
-        gp.add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> toggleArmLowState()));
+        SpecimenMap specimenMap = new SpecimenMap(gp, cs, globalMap);
 
-        gp.add(new ButtonCtl(GamepadKeys.Button.LEFT_BUMPER, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> subGrab()));
-        gp.add(new ButtonCtl(GamepadKeys.Button.RIGHT_BUMPER, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> deposit()));
+        // Add switch control for swithing between the maps
+        addSwitchCtrl(gp, globalMap, sampleMap, specimenMap);
 
-        gp.add(new TriggerCtl(GamepadKeys.Trigger.RIGHT_TRIGGER, (Double a) -> {
-            if (a > 0.3) retractArm();
-        }));
-
-        // todo wipe and hang
         waitForStart();
         cs.schedule(new SetArmPosition().retractAfterAuto());
-
 
         while (opModeIsActive()) {
             gp.update();
 
-
-            if (followerActive) f.update();
+            if (globalMap.followerActive) f.update();
             else {
                 // Not defining these controls through DriverControls cuz ts pmo
                 VLRSubsystem.getInstance(Chassis.class).drive(gpEx.getLeftY(), -gpEx.getLeftX(), -0.3 * gpEx.getRightX());
@@ -122,114 +111,20 @@ public class VLRTeleOp extends VLRLinearOpMode {
         }
     }
 
-    //
-    // FOLLOWER
-    //
-    private void toggleFollower() {
-        followerActive = !followerActive;
-
-        if (followerActive) {
-            rc.doubleBlip();
-            f.holdPoint(f.getPose());
-        } else {
-            rc.singleBlip();
-        }
+    private void addSwitchCtrl(DriverControls gp, GlobalMap globalMap, SampleMap sampleMap, SpecimenMap specimenMap) {
+        gp.add(new ButtonCtl(GamepadKeys.Button.LEFT_STICK_BUTTON, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> {
+            gp.clear();
+            globalMap.initialize();
+            if (sampleMapActive) {
+                sampleMapActive = false;
+                specimenMap.initialize();
+                rc.rumbleBlips(6);
+            } else {
+                sampleMapActive = true;
+                sampleMap.initialize();
+                rc.rumbleBlips(3);
+            }
+            addSwitchCtrl(gp, globalMap, sampleMap, specimenMap);
+        }));
     }
-
-    //
-    // UTILS
-    //
-    private void wipe(double x) {
-        // x here should be 0-1
-        VLRSubsystem.getInstance(Wiper.class).wipe(x);
-    }
-
-    private void startSlideOverride() {
-        Logger.getLogger("SlideOverride").fine("Start override");
-        slideResetActive = true;
-        VLRSubsystem.getArm().enableSlidePowerOverride(-0.3);
-    }
-
-    private void endSlideOverride() {
-        Logger.getLogger("SlideOverride").fine("End override");
-        slideResetActive = false;
-        VLRSubsystem.getArm().disableSlidePowerOverride();
-    }
-
-    private void startRotatorOverride() {
-        Logger.getLogger("RotatorOverride").fine("Start override");
-        rotatorResetActive = true;
-        VLRSubsystem.getArm().enableRotatorPowerOverride(-0.1);
-    }
-
-    private void endRotatorOverride() {
-        Logger.getLogger("RotatorOverride").fine("End override");
-        rotatorResetActive = false;
-        VLRSubsystem.getArm().disableRotatorPowerOverride();
-    }
-
-    //
-    // ARM OPS
-    //
-    private void retractArm() {
-        cs.schedule(new SetArmPosition().retract());
-    }
-
-    private void toggleArmLowState() {
-        if (armState == MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET) {
-            armState = MainArmConfiguration.SAMPLE_SCORE_HEIGHT.LOW_BASKET;
-        } else {
-            armState = MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
-        }
-    }
-
-    // TODO - HANG
-
-    private void subGrab() {
-        followerActive = true;
-        f.holdPoint(new Pose(f.getPose().getX(), f.getPose().getY(), SUB_GRAB.getHeading()));
-        double headingError = Math.abs(f.getPose().getHeading() - SUB_GRAB.getHeading());
-
-        cs.schedule(
-                new SequentialCommandGroup(
-                        new LogCommand("SubGrabTeleop", "Heading error: " + headingError),
-                        new WaitCommand((long) (headingError * 30)),
-                        new SubmersibleGrab(f, Alliance.BLUE, reader, rc),
-                        new WaitCommand(230),
-                        new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                        new WaitCommand(150),
-                        new SetArmPosition().retract()
-                )
-        );
-    }
-
-    private void deposit() {
-        followerActive = true;
-        cs.schedule(
-                new SequentialCommandGroup(
-                        new ParallelCommandGroup(
-                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                new SequentialCommandGroup(
-                                        new SetArmPosition().retract(),
-                                        new SetArmPosition().scoreSample(armState)
-                                ),
-                                new SequentialCommandGroup(
-                                        new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)
-                                                .setLinearHeadingInterpolation(SUB_GRAB.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build()
-                                        ),
-                                        new InstantCommand() {
-                                            @Override
-                                            public void run() {
-                                                followerActive = false;
-                                                rc.singleBlip();
-                                            }
-                                        }
-                                )
-                        )
-
-                )
-        );
-    }
-
 }
