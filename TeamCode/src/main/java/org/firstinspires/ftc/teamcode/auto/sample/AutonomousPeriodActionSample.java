@@ -44,12 +44,8 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
         this.reader = reader;
 
         addCommands(
-                new org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand() {
-                    @Override
-                    public void run() {
-                        autoTimer = new ElapsedTime();
-                    }
-                },
+                new InstantCommand(() -> autoTimer.reset()),
+
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
@@ -79,18 +75,9 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
         return new ParallelCommandGroup(
                 new SequentialCommandGroup(
                         new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
-                        new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE, 2, 2, Math.toRadians(3))),
+                        new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE, 3, 3, Math.toRadians(4))),
                         new InstantCommand(() -> sampleScored = true),
                         new SetArmPosition().intakeSample(0.34)
-//                        new ParallelCommandGroup(
-//                                new SetArmPosition().retract(),
-//                                new SequentialCommandGroup(
-//                                        new WaitCommand(200),
-//                                        new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
-//                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() < 15),
-//                                        new SetArmPosition().intakeSample(0.34)
-//                                )
-//                        )
                 ),
 
                 new SequentialCommandGroup(
@@ -110,6 +97,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
     private Command subCycle(Follower follower, int sample) {
         return new SequentialCommandGroup(
+                new WaitCommand(50),
                 new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
                 new SubmersibleGrab(follower, alliance, reader),
 
@@ -117,27 +105,36 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                         new SequentialCommandGroup(
                                 new SetArmPosition().retract(),
 
-                                new org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand() {
-                                    @Override
-                                    public void run() {
-                                        if (sample == 7) {
-                                            elapsedTime = autoTimer.seconds();
-                                        }
-                                    }
-                                },
+                                new CustomConditionalCommand(
+                                        new InstantCommand(()-> elapsedTime = autoTimer.seconds()),
+                                        ()-> sample == 7
+                                ),
 
                                 new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
-                                new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE, 2, 2, Math.toRadians(2.5))),
+                                new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE_SUB, 0.75, 0.75, Math.toRadians(2))),
                                 new InstantCommand(() -> sampleScored = true),
-                                new SetArmPosition().retract()
+
+                                new ConditionalCommand(
+                                        new SetArmPosition().retract(),
+
+                                        ///dont retract ofter 7th sample cause no time bruh
+                                        new SequentialCommandGroup(
+                                                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                                new WaitCommand(130),
+                                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                                                new WaitCommand(50),
+                                                new SetArmPosition().extensionAndAngleDegrees(0.82, 111)
+                                        ),
+                                        ()-> sample <= 6
+                                )
                         ),
 
                         new SequentialCommandGroup(
-                                new WaitCommand(120),
+                                new WaitCommand(100),
                                 new FollowPath(follower, bezierPath(SUB_GRAB, SUB_GRAB_CONTROL_2, SUB_GRAB_CONTROL_1, SUB_GRAB_0)
                                         .setTangentHeadingInterpolation().setReversed(true).build(), false).setCompletionThreshold(jointPathTValue),
                                 new LogCommand("Auto bombo", "Passed 1st path"),
-                                new FollowPath(follower, bezierPath(SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE_SUB)
+                                new FollowPath(follower, bezierPath(SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE_SUB).setZeroPowerAccelerationMultiplier(1.75)
                                         .setConstantHeadingInterpolation(BUCKET_HIGH_SCORE_POSE.getHeading()).build()),
                                 new LogCommand("Auto bombo", "Passed 2nd path"),
 
@@ -164,14 +161,8 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private Command grabAndScoreSpikeMarkSample(Follower follower, int sample) {
         return new ParallelCommandGroup(
                 new SequentialCommandGroup(
-                        new ParallelCommandGroup(
-                                new SetArmPosition().retract(),
-                                new SequentialCommandGroup(
-                                        new WaitUntilCommand(() -> VLRSubsystem.getArm().currentExtension() < 0.15),
-                                        new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
-                                        new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET)
-                                )
-                        ),
+                        new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
+
                         new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE, 4, 4, Math.toRadians(5))),
                         new InstantCommand(() -> sampleScored = true),
                         new SetArmPosition().setArmState(ArmState.State.SAMPLE_SCORE),

@@ -31,8 +31,8 @@ public class ArmRotatorSubsystem {
 
     private MotionProfile motionProfile;
 
-    private double encoderPosition = 0;
-    private double encoderOffset = 0;
+    private static volatile double encoderPosition;
+    private static volatile double encoderOffset;
 
     private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
     private ElapsedTime timer = new ElapsedTime();
@@ -49,15 +49,10 @@ public class ArmRotatorSubsystem {
 
 
     public ArmRotatorSubsystem (HardwareMap hardwareMap) {
-        ArmState.resetAll();
-
         motor = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         thoughBoreEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
-        thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
         breamBreak = hardwareMap.get(RevTouchSensor.class, BEAM_BREAK_NAME);
 
         motionProfile = new MotionProfile(
@@ -75,8 +70,23 @@ public class ArmRotatorSubsystem {
                 ACCELERATION_GAIN);
 
         motionProfile.enableTelemetry(true);
-        motionProfile.setTargetPosition(0);
         timer.reset();
+
+        if  (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)){
+            thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            updateEncoderPosition();
+            motionProfile.setTargetPosition(getAngleDegrees());
+        }
+
+        else {
+            encoderOffset = 0;
+            thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motionProfile.setTargetPosition(0);
+            updateEncoderPosition();
+        }
+
+
     }
 
 
@@ -108,6 +118,10 @@ public class ArmRotatorSubsystem {
 
     public boolean reachedTargetPosition() {
         return reachedPosition(motionProfile.getTargetPosition());
+    }
+
+    public double getTargetPosition(){
+        return motionProfile.getTargetPosition();
     }
 
 
@@ -167,8 +181,13 @@ public class ArmRotatorSubsystem {
     }
 
 
-    public void periodic(double slideExtension, OPERATION_MODE operationMode) {
+    private void updateEncoderPosition(){
         encoderPosition = (thoughBoreEncoder.getCurrentPosition() - encoderOffset);
+    }
+
+
+    public void periodic(double slideExtension, OPERATION_MODE operationMode) {
+        updateEncoderPosition();
         double currentAngle = getAngleDegrees();
         boolean currentBeamBreakState = breamBreak.isPressed();
 

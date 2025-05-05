@@ -19,6 +19,7 @@ import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrab;
+import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
@@ -29,6 +30,7 @@ import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
@@ -65,11 +67,11 @@ public class VLRTeleOp extends VLRLinearOpMode {
         LimelightYoloReader reader = new LimelightYoloReader();
 
         cs = CommandScheduler.getInstance();
+        f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
         VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class, Wiper.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
-        f = new Follower(hardwareMap, FConstants.class, LConstants.class);
         if (!PoseSaver.isPoseSaved()) {
             // Set default sample start pos
             f.setStartingPose(START_POSE);
@@ -102,8 +104,8 @@ public class VLRTeleOp extends VLRLinearOpMode {
         }));
 
         // todo wipe and hang
-
         waitForStart();
+        cs.schedule(new SetArmPosition().retractAfterAuto());
 
 
         while (opModeIsActive()) {
