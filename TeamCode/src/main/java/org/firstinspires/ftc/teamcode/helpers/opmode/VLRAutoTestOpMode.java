@@ -60,6 +60,8 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
             reader.setAllowedColors(Arrays.asList(RED, YELLOW));
         }
 
+        ac.review("Selected alliance: " + color.text);
+
         f.setStartingPose(StartPose());
 
         autoCommand = autoCommand(f, reader);
