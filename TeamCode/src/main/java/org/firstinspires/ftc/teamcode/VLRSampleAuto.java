@@ -7,7 +7,6 @@ import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.auto.sample.AutonomousPeriodActionSample;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;

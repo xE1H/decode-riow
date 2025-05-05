@@ -6,6 +6,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
@@ -71,8 +72,9 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
     }
 
     public static void initializeOne(HardwareMap hardwareMap, Class<? extends VLRSubsystem<?>> subsystem) {
+        //noinspection unchecked
         requireSubsystems(subsystem);
-        instances.get(subsystem).initialize(hardwareMap);
+        Objects.requireNonNull(instances.get(subsystem)).initialize(hardwareMap);
     }
 
     /**
@@ -101,7 +103,7 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
         for (Class<?> sub : instances.keySet()) {
             if (sub == subsystem) {
                 try {
-                    return instances.get(sub).logger;
+                    return Objects.requireNonNull(instances.get(sub)).logger;
                 } catch (Exception e) {
                     throw new RuntimeException("Error getting logger for " + subsystem.getName(), e);
                 }

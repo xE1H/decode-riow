@@ -5,13 +5,11 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfig
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.pedropathing.commands.HoldPoint;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
-import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;

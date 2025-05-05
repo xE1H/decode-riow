@@ -21,11 +21,10 @@ import java.util.logging.Logger;
 @Config
 public class CommandRunner implements Runnable {
     final OpModeRunningInterface runningInterface;
-    private HardwareMap hardwareMap;
-    private LoopTimeMonitor loopTimeMonitor = new LoopTimeMonitor();
+    private final HardwareMap hardwareMap;
 
     public static boolean debugCommandScheduler = false;
-    private static Logger logger = Logger.getLogger("CommandRunner");
+    private static final Logger logger = Logger.getLogger("CommandRunner");
 
     public CommandRunner(OpModeRunningInterface runningInterface, HardwareMap hardwareMap) {
         this.runningInterface = runningInterface;
@@ -61,17 +60,12 @@ public class CommandRunner implements Runnable {
 
         while (runningInterface.isOpModeRunning()) {
             while (runningInterface.isOpModeRunning()) {
-                //loopTimeMonitor.loopStart();
 
                 for (LynxModule hub : allHubs) {
                     hub.clearBulkCache();
                 }
 
                 CommandScheduler.getInstance().run();
-                //loopTimeMonitor.loopEnd();
-
-                //double cycleTime = loopTimeMonitor.getAverageTime(5, LoopTimeMonitor.ElementSelectionType.TOP_PERCENTILE_ELEMENTS) / 1000;
-                //System.out.println("COMMAND THREAD CYCLE TIME: " + 1.0 / cycleTime);
             }
         }
     }

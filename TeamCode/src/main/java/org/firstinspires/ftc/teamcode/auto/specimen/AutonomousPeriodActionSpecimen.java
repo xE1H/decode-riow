@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.specimen;//package org.firstinspires.ftc.teamcode.commands.specimen;
+package org.firstinspires.ftc.teamcode.auto.specimen;
 
 import static org.firstinspires.ftc.teamcode.auto.specimen.Points_specimen.*;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;

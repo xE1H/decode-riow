@@ -24,7 +24,7 @@ public class MotionProfile {
     private double initialPosition;
     private double initialTime;
 
-    private double creep;
+    private final double creep;
 
     private final String telemetryName;
     private boolean isTelemetryEnabled = false;
@@ -33,7 +33,7 @@ public class MotionProfile {
 
     private double t = 1;
 
-    private Type profileType;
+    private final Type profileType;
 
 
     public MotionProfile(Telemetry telemetry, String telemetryName, Type profileType, double acceleration, double deceleration, double maxVelocity, double creep, double p, double i, double d, double v, double a) {

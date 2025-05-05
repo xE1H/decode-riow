@@ -44,6 +44,7 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
 
         f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
+        //noinspection unchecked
         VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
@@ -101,8 +102,6 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
 
     public void Loop() {
     }
-
-    ;
 
     public void Init() {
     }

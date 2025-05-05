@@ -6,9 +6,9 @@ import java.util.Iterator;
 
 
 public class LoopTimeMonitor {
-    private ElapsedTime et = new ElapsedTime();
+    private final ElapsedTime et = new ElapsedTime();
     private boolean isLooping = false;
-    private TreeSet<Long> loopTimes = new TreeSet<>();
+    private final TreeSet<Long> loopTimes = new TreeSet<>();
 
     public enum ElementSelectionType {
         TOP_N_ELEMENTS,

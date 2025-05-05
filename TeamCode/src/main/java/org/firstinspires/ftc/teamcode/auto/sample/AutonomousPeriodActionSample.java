@@ -19,7 +19,6 @@ import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
-import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
@@ -33,18 +32,18 @@ import java.util.logging.Level;
 
 public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private boolean sampleScored = false;
-    private Alliance alliance;
-    private LimelightYoloReader reader;
-    private ElapsedTime autoTimer = new ElapsedTime();
+    private final Alliance alliance;
+    private final LimelightYoloReader reader;
+    private final ElapsedTime autoTimer = new ElapsedTime();
     private double elapsedTime = 0;
-    private double jointPathTValue = 0.5;
+    private final double jointPathTValue = 0.5;
 
     public AutonomousPeriodActionSample(Follower follower, Alliance alliance, LimelightYoloReader reader) {
         this.alliance = alliance;
         this.reader = reader;
 
         addCommands(
-                new InstantCommand(() -> autoTimer.reset()),
+                new InstantCommand(autoTimer::reset),
 
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),

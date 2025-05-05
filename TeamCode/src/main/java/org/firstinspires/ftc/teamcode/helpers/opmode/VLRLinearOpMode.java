@@ -40,6 +40,7 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
         if (beforeEndRunnable != null) beforeEndRunnable.run();
         executorService.shutdownNow(); // force shutdown of ALL threads
         try {
+            //noinspection ResultOfMethodCallIgnored
             executorService.awaitTermination(100, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             logger.warning("Force shutdown of all threads timed out");

@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.helpers.utils;
 
 public class Point {
-    private double magnitude, angleDegrees;
+    private final double magnitude;
+    private final double angleDegrees;
 
     public Point (double magnitude, double angleDegrees){
         this.angleDegrees = angleDegrees;

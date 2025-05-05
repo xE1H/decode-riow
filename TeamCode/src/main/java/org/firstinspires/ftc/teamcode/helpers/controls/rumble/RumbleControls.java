@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class RumbleControls {
 
-    private Gamepad gamepad;
+    private final Gamepad gamepad;
 
     public RumbleControls(Gamepad gamepad) {
         this.gamepad = gamepad;
@@ -34,8 +34,8 @@ public class RumbleControls {
 
         for (int i = 0; i < 360; i++) {
             double sin = Math.sin((double) i * Math.PI / 180);
-            double standart = (sin + 1) / 2;
-            effect.addStep(standart, 1 - standart, 10);
+            double standard = (sin + 1) / 2;
+            effect.addStep(standard, 1 - standard, 10);
         }
 
 
