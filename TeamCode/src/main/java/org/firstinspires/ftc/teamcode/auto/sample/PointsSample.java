@@ -9,7 +9,7 @@ public class PointsSample {
 
     public static Pose BUCKET_HIGH_SCORE_POSE = new Pose(24, 118.5, rad(-45));
 
-    public static Pose BUCKET_HIGH_SCORE_POSE_SUB = new Pose(24.5, 118, rad(-45));
+    public static Pose BUCKET_HIGH_SCORE_POSE_SUB = new Pose(22.5, 120, rad(-45));
 
     public static Pose FIRST_MARK_GRAB = new Pose(29, 118.4, 0);
 

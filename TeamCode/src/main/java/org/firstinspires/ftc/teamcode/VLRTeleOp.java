@@ -77,7 +77,11 @@ public class VLRTeleOp extends VLRLinearOpMode {
             f.setStartingPose(START_POSE);
             telemetry.addLine("No saved pose found, using default");
             telemetry.update();
-        } else f.setStartingPose(PoseSaver.getPedroPose());
+        } else {
+            telemetry.addData("Saved pose: ", PoseSaver.getPedroPose());
+            telemetry.update();
+            f.setStartingPose(PoseSaver.getPedroPose());
+        }
 
         GamepadEx gpEx = new GamepadEx(gamepad1);
         DriverControls gp = new DriverControls(gpEx);

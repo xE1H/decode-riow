@@ -9,7 +9,8 @@ public final class PoseSaver {
     static boolean poseSaved = false;
 
     public static void setPedroPose(Pose pose) {
-        Logger.getLogger("PoseSaver").fine("Saved pedro pose");
+        Logger.getLogger("PoseSaver").info("Saved pedro pose");
+        Logger.getLogger("PoseSaver").info("Pedro pose: " + pose.toString());
         pedroPose = pose;
         poseSaved = true;
     }

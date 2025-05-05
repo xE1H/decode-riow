@@ -372,7 +372,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SPECIMEN OR SAMPLE INTAKE STATE"),
 
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                                new WaitCommand(140),
+                                new WaitCommand(240),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                                 new SetArmPosition().extension(0),

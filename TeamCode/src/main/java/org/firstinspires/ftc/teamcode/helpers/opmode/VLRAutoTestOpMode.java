@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.helpers.opmode;
 
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.BLUE;
+import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.RED;
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.YELLOW;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -12,6 +13,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.helpers.autoconfig.AutoConfigurator;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
@@ -47,10 +49,18 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         LimelightYoloReader reader = new LimelightYoloReader();
-        reader.setAllowedColors(Arrays.asList(BLUE, YELLOW));
+
+        AutoConfigurator ac = new AutoConfigurator(telemetry, gamepad1);
+        AutoConfigurator.Choice color = ac.multipleChoice("Select alliance:", new AutoConfigurator.Choice("Blue"),
+                new AutoConfigurator.Choice("Red"));
+
+        if (color.text.equals("Blue")) {
+            reader.setAllowedColors(Arrays.asList(BLUE, YELLOW));
+        } else {
+            reader.setAllowedColors(Arrays.asList(RED, YELLOW));
+        }
 
         f.setStartingPose(StartPose());
-        beforeEndRunnable = () -> PoseSaver.setPedroPose(f.getPose());
 
         autoCommand = autoCommand(f, reader);
         cs.schedule(autoCommand.andThen(new InstantCommand(() -> autoFinished = true)));
@@ -66,7 +76,7 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         }
 
         waitForStart();
-
+        boolean poseSaved = false;
         Start();
         while (opModeIsActive()) {
             Loop();
@@ -76,6 +86,10 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
                 if (!prevAutoFinished) {
                     prevAutoFinished = true;
                     autoTime = autoTimer.seconds();
+                }
+                if (!poseSaved) {
+                    PoseSaver.setPedroPose(f.getPose());
+                    poseSaved = true;
                 }
                 System.out.println("TOTAL AUTO TIME: " + autoTime);
             }

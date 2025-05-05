@@ -111,7 +111,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                                 ),
 
                                 new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
-                                new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE_SUB, 0.75, 0.75, Math.toRadians(2))),
+                                new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE_SUB, 3, 3, Math.toRadians(2))),
                                 new InstantCommand(() -> sampleScored = true),
 
                                 new ConditionalCommand(
