@@ -43,6 +43,7 @@ public class ArmSlideSubsystem {
     private boolean prevLimitSwitchPressed = false;
     private boolean encoderReset = true;
 
+    private OPERATION_MODE operationMode = OPERATION_MODE.NORMAL;
     private OPERATION_MODE prevOperationMode = OPERATION_MODE.NORMAL;
 
     private ElapsedTime timer = new ElapsedTime();
@@ -106,6 +107,7 @@ public class ArmSlideSubsystem {
 
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
         motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
+        updateCoefficientsForOperationMode();
     }
 
 
@@ -196,7 +198,7 @@ public class ArmSlideSubsystem {
         encoderOffset = extensionEncoder.getCurrentPosition();
     }
 
-    public void updateCoefficientsForOperationMode(OPERATION_MODE operationMode){
+    public void updateCoefficientsForOperationMode(){
         if (operationMode == OPERATION_MODE.HANG) {setHangCoefficients();}
         else if (operationMode == OPERATION_MODE.NORMAL) {setDefaultCoefficients();}
     }
@@ -211,8 +213,13 @@ public class ArmSlideSubsystem {
         limitSwitchPressed = limitSwitch.isPressed();
         updateEncoderPosition();
 
+        this.operationMode = operationMode;
+        if (operationMode == OPERATION_MODE.HOLD_POINT && prevOperationMode != OPERATION_MODE.HOLD_POINT){
+            VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "SLIDES HOLDING POINT");
+        }
+        if (prevOperationMode != operationMode) {prevOperationMode = operationMode;}
+
         if (DEBUG_MODE){
-            setDefaultCoefficients();
             holdPointPID.setPID(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
         }
 
@@ -221,13 +228,8 @@ public class ArmSlideSubsystem {
 
         if (operationMode == OPERATION_MODE.HOLD_POINT && motionProfile.getTargetPosition() != 0) {
             power = holdPointPID.calculate(getPosition(), motionProfile.getTargetPosition()) + feedForwardPower;
-
-            if (prevOperationMode != OPERATION_MODE.HOLD_POINT) {
-                prevOperationMode = OPERATION_MODE.HOLD_POINT;
-                VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "SLIDES HOLDING POINT");
-            }
         }
-        power = clamp(power, -0.9, 9);
+        power = clamp(power, -1, 1);
 
 
         if (limitSwitchPressed && motionProfile.getTargetPosition() == 0) {
@@ -266,7 +268,9 @@ public class ArmSlideSubsystem {
                 extensionMotor1.setPower(power);
                 extensionMotor2.setPower(power);
             }
-            else {setMotorPower(power);}
+            else {
+                setMotorPower(power);
+            }
         }
 
         prevLimitSwitchPressed = limitSwitchPressed;
@@ -276,5 +280,6 @@ public class ArmSlideSubsystem {
         telemetry.addData("ARM SLIDE SUBSYSTEM ENCODER RESET: ", encoderReset ? 1 : 0);
         telemetry.addData("ARM SLIDE SUBSYSTEM LIMIT SWITCH STATE: ", limitSwitchPressed);
         telemetry.addData("ARM SLIDE SUBSYSTEM PREV LIMIT SWITCH STATE: ", prevLimitSwitchPressed);
+
     }
 }

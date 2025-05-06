@@ -52,7 +52,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                         new SequentialCommandGroup(
                                 new SetArmPosition().retract().alongWith(
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() < 15),
+                                                new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() < 22),
                                                 new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
                                                 new SetArmPosition().intakeSample(0.35)
                                         )
@@ -61,7 +61,6 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                                 new WaitUntilCommand(()-> follower.getPose().getY() < 15),
                                 new InstantCommand(()-> firstSpikeMarkSamplePickedUp = true),
 
-                                new SetArmPosition().setArmState(ArmState.State.SAMPLE_INTAKE),
                                 scoreSampleIntoHumanPlayerArea().andThen(new SetArmPosition().intakeSample(0.35)),
 
                                 new WaitUntilCommand(()-> follower.getPose().getY() < 6),
@@ -92,12 +91,12 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
 
 
                                 new WaitUntilCommand(()-> firstSpikeMarkSamplePickedUp),
-                                new WaitCommand(150),
+                                new WaitCommand(200),
                                 new FollowPath(follower, bezierPath(PICK_UP_SAMPLE_1, PICK_UP_SAMPLE_2)
                                         .setConstantHeadingInterpolation(PICK_UP_SAMPLE_2.getHeading()).build()),
 
                                 new WaitUntilCommand(()-> secondSpikeMarkSamplePickedUp),
-                                new WaitCommand(150),
+                                new WaitCommand(200),
                                 new FollowPath(follower, bezierPath(PICK_UP_SAMPLE_2, PICK_UP_SAMPLE_3)
                                         .setLinearHeadingInterpolation(PICK_UP_SAMPLE_2.getHeading(), PICK_UP_SAMPLE_3.getHeading()).build()),
 

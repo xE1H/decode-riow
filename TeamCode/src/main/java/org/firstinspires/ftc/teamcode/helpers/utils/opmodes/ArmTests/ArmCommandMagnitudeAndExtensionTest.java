@@ -21,11 +21,13 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
+import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
+import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 
 import pedroPathing.tuners.constants.FConstants;
 import pedroPathing.tuners.constants.LConstants;
@@ -59,11 +61,11 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
     public void Init(){
         FConstants.initialize();
 
-        ///VERY CRITICAL
+        ///VERY CRITICAL follower must be before subsystem init cause it reveres arm motors
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(new Pose());
 
-        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, Chassis.class, ClawSubsystem.class);
+        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, Chassis.class, ClawSubsystem.class, HangSubsystem.class, BlinkinSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         gamepad = new GamepadEx(gamepad1);
@@ -84,16 +86,17 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 //        }
 
         if (gamepad1.triangle && !prevTriangle){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET));
+            follower.setMaxPower(0);
+            CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad1.right_bumper && gamepad1.left_bumper));
         }
 
-        else if (gamepad1.cross && !prevCross){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().retract());
-        }
-
-        else if (gamepad1.square && !prevSquare){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().intakeSample(0.34));
-        }
+//        else if (gamepad1.cross && !prevCross){
+//            CommandScheduler.getInstance().schedule(new SetArmPosition().retract());
+//        }
+//
+//        else if (gamepad1.square && !prevSquare){
+//            CommandScheduler.getInstance().schedule(new SetArmPosition().intakeSample(0.34));
+//        }
 
 //        if (gamepad1.triangle && !prevTriangle){
 //            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(1));
