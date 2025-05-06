@@ -69,6 +69,11 @@ public class HangSubsystem extends VLRSubsystem<HangSubsystem> implements HangCo
         overridePower = false;
     }
 
+    public void disable(){
+        left.getController().pwmDisable();
+        right.getController().pwmDisable();
+    }
+
 
     public double getAngle(double voltage){ return voltage / 3.3 * 360;}
 

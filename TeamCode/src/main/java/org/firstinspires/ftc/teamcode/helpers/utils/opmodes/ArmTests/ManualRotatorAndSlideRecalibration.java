@@ -11,8 +11,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-
-@Config
 //@Disabled
 @TeleOp(group = "Utils")
 public class ManualRotatorAndSlideRecalibration extends OpMode {
@@ -38,6 +36,6 @@ public class ManualRotatorAndSlideRecalibration extends OpMode {
 
         slideMotor0.setPower(slide);
         slideMotor1.setPower(slide);
-        slideMotor2.setPower(slide);
+        //slideMotor2.setPower(slide);
     }
 }

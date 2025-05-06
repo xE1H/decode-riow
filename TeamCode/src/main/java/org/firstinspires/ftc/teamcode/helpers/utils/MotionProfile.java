@@ -107,6 +107,11 @@ public class MotionProfile {
     }
 
 
+    public double getP(){
+        return pid.getP();
+    }
+
+
     public double getPower(double currentPosition) {
         if (targetPosition != prevTargetPosition) {
             prevTargetPosition = targetPosition;

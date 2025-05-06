@@ -72,6 +72,8 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
 
     public void disable() {
         angleServo.getController().pwmDisable();
+        twistServo.getController().pwmDisable();
+        grabServos.getController().pwmDisable();
     }
 
     @Override

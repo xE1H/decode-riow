@@ -45,9 +45,8 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         setTargetPoint(new Point(magnitude, angleDegrees));
     }
 
-    public void updateCoefficients(OPERATION_MODE operationMode){
-        rotator.updateCoefficientsForOperationMode(operationMode);
-        slides.updateCoefficientsForOperationMode(operationMode);
+    public void setRotatorPowerLimit(double powerLimit){
+        rotator.setPowerLimit(powerLimit);
     }
 
     public Point calculateTargetPointFromRealWordCoordinates(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
@@ -111,7 +110,13 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public  double getTargetY() {return clamp(targetPoint.getY(), 0, 1);}
 
-    public void setOperationMode(OPERATION_MODE operationMode) {this.operationMode = operationMode;}
+    public void setOperationMode(OPERATION_MODE operationMode) {
+        this.operationMode = operationMode;
+    }
+
+    public boolean isCurrentOperationMode(OPERATION_MODE operationMode){
+        return this.operationMode == operationMode;
+    }
 
     public void setSampleScoreHeight(SAMPLE_SCORE_HEIGHT sampleScoreHeight){
         this.sampleScoreHeight = sampleScoreHeight;
@@ -137,8 +142,8 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         return num > Math.min(num1, num2) && num < Math.max(num1, num2);
     }
 
-    public boolean isTargetPointValid(double targetAngle){
-        return !isBetween(targetAngle, EXCLUSION_ZONE_MIN_ANGLE, EXCLUSION_ZONE_MAX_ANGLE);
+    public boolean isTargetPointValid(double targetAngle, double magnitude){
+        return !(isBetween(targetAngle, EXCLUSION_ZONE_MIN_ANGLE, EXCLUSION_ZONE_MAX_ANGLE) && magnitude > EXCLUSION_ZONE_MIN_EXTENSION);
     }
 
     public boolean isCameraInTheWayToNewTarget(Point target){

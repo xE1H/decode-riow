@@ -47,6 +47,8 @@ public class ArmRotatorSubsystem {
     private boolean powerOverride_state = false;
     private double powerOverride_value = 0;
 
+    private double powerLimit = 1;
+
 
     public ArmRotatorSubsystem (HardwareMap hardwareMap) {
         motor = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME);
@@ -106,7 +108,7 @@ public class ArmRotatorSubsystem {
             motionProfile.updateCoefficients(acceleration, deceleration, maxVelocity, p, i, d, v, a);
         }
         else{
-            setDefaultCoefficients();
+            updateCoefficientsForOperationMode();
         }
         motionProfile.setTargetPosition(clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE));
     }
@@ -136,9 +138,9 @@ public class ArmRotatorSubsystem {
                 MAX_VELOCITY_HANG,
                 FEEDBACK_PROPORTIONAL_GAIN_HANG,
                 FEEDBACK_INTEGRAL_GAIN_HANG,
-                FEEDBACK_DERIVATIVE_GAIN,
-                VELOCITY_GAIN,
-                ACCELERATION_GAIN);
+                FEEDBACK_DERIVATIVE_GAIN_HANG,
+                VELOCITY_GAIN_HANG,
+                ACCELERATION_GAIN_HANG);
     }
 
 
@@ -159,9 +161,10 @@ public class ArmRotatorSubsystem {
         return motionProfile.getT();
     }
 
-    public void updateCoefficientsForOperationMode(OPERATION_MODE operationMode){
-        this.operationMode = operationMode;
-        if (operationMode == OPERATION_MODE.HANG) {setHangCoefficients();}
+    public void updateCoefficientsForOperationMode(){
+        if (operationMode == OPERATION_MODE.HANG) {
+            setHangCoefficients();
+        }
         else if (operationMode == OPERATION_MODE.NORMAL) {setDefaultCoefficients();}
     }
 
@@ -171,6 +174,8 @@ public class ArmRotatorSubsystem {
     }
 
     public void enablePowerOverride(double power){
+        System.out.println("ROTATOR POWER OVERRIDE ENABLED");
+
         powerOverride_state = true;
         powerOverride_value = power;
     }
@@ -178,6 +183,8 @@ public class ArmRotatorSubsystem {
     public void disablePowerOverride(){
         powerOverride_value = 0;
         powerOverride_state = false;
+
+        System.out.println("ROTATOR POWER OVERRIDE DISABLED");
     }
 
 
@@ -185,42 +192,47 @@ public class ArmRotatorSubsystem {
         encoderPosition = (thoughBoreEncoder.getCurrentPosition() - encoderOffset);
     }
 
+    public void setPowerLimit(double powerLimit){
+        this.powerLimit = powerLimit;
+    }
+
 
     public void periodic(double slideExtension, OPERATION_MODE operationMode) {
         updateEncoderPosition();
         double currentAngle = getAngleDegrees();
         boolean currentBeamBreakState = breamBreak.isPressed();
+        this.operationMode = operationMode;
+
+        if (operationMode == OPERATION_MODE.HOLD_POINT && prevOperationMode != OPERATION_MODE.HOLD_POINT){
+            VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "ROTATOR HOLDING POINT");
+        }
+        if (prevOperationMode != operationMode) {prevOperationMode = operationMode;}
+
 
         if (DEBUG_MODE){
-            setDefaultCoefficients();
             holdPointPID.setPID(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
-        }
-
-        if (powerOverride_state){
-            motor.setPower(powerOverride_value);
-            return;
+            updateCoefficientsForOperationMode();
         }
 
         double feedForward = mapToRange(slideExtension, 0, 1, FEEDFORWARD_GAIN, EXTENDED_FEEDFORWARD_GAIN);
+        if(operationMode == OPERATION_MODE.HANG){
+            feedForward = FEEDFORWARD_GAIN_HANG;
+        }
+
         double feedForwardPower = Math.cos(Math.toRadians(currentAngle)) * feedForward;
         double power = motionProfile.getPower(currentAngle) + feedForwardPower;
 
         if (operationMode == OPERATION_MODE.HOLD_POINT && motionProfile.getTargetPosition() != 0){
             power = holdPointPID.calculate(currentAngle, motionProfile.getTargetPosition()) + feedForwardPower;
-
-            if (prevOperationMode != OPERATION_MODE.HOLD_POINT){
-                prevOperationMode = OPERATION_MODE.HOLD_POINT;
-                VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "ROTATOR HOLDING POINT");
-            }
         }
 
-        power = clamp(power, -1, 1);
+        power = clamp(power, -powerLimit, powerLimit);
 
 
         if (currentBeamBreakState && motionProfile.getTargetPosition() == 0) {
             if (!prevBreamBreakState) {timer.reset();}
             else if(timer.seconds() < 1) {
-                power = -0.07;
+                power = -0.08;
 
                 if (timer.seconds() > 0.6 && !encoderReset) {
                     resetEncoder();
@@ -239,8 +251,9 @@ public class ArmRotatorSubsystem {
         prevBreamBreakState = currentBeamBreakState;
 
         Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
-        telemetry.addData("ARM ROTATOR SUBSYSTEM BEAM BREAK", breamBreak.getValue());
+        telemetry.addData("ROTATOR POWER: ", power);
 
-        motor.setPower(power);
+        if (powerOverride_state) {motor.setPower(powerOverride_value);}
+        else {motor.setPower(power);}
     }
 }

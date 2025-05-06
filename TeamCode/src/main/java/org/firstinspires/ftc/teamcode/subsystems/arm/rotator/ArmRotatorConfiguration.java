@@ -45,10 +45,13 @@ public class ArmRotatorConfiguration {
 
     public static double ACCELERATION_HANG = 3000;
     public static double DECELERATION_HANG = 2500;
-    public static double MAX_VELOCITY_HANG = 40;
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.07;
-    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0;//.0001;
-    public static double FEEDFORWARD_GAIN_HANG = 0;//.1;
+    public static double MAX_VELOCITY_HANG = 50;
+    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.1;
+    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.0002;//.0001;
+    public static double FEEDBACK_DERIVATIVE_GAIN_HANG = 0.0006;
+    public static double VELOCITY_GAIN_HANG = 0.002;
+    public static double ACCELERATION_GAIN_HANG = 0.00009;
+    public static double FEEDFORWARD_GAIN_HANG = -0.1;
 
     public static double FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT = 0.14;
     public static double FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT = 0.001;
