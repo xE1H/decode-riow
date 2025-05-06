@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 public class GlobalMap extends ControlMap {
@@ -87,5 +88,9 @@ public class GlobalMap extends ControlMap {
         Logger.getLogger("RotatorOverride").fine("End override");
         rotatorResetActive = false;
         VLRSubsystem.getArm().disableRotatorPowerOverride();
+    }
+
+    public void setLimelightColors(List<LimelightYoloReader.Limelight.Sample.Color> colors) {
+        reader.setAllowedColors(colors);
     }
 }

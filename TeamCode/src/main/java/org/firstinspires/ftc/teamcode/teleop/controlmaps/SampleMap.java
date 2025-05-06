@@ -15,14 +15,13 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrab;
+import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.trigger.TriggerCtl;
-import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
@@ -85,14 +84,11 @@ public class SampleMap extends ControlMap {
 
     private void subGrab() {
         globalMap.followerActive = true;
-        f.holdPoint(new Pose(f.getPose().getX(), f.getPose().getY(), SUB_GRAB.getHeading()));
-        double headingError = Math.abs(f.getPose().getHeading() - SUB_GRAB.getHeading());
+        f.holdPoint(f.getPose());
 
         cs.schedule(
                 new SequentialCommandGroup(
-                        new LogCommand("SubGrabTeleop", "Heading error: " + headingError),
-                        new WaitCommand((long) (headingError * 30)),
-                        new SubmersibleGrab(f, Alliance.BLUE, globalMap.reader, rc, false),
+                        new SubmersibleGrabV2(f, globalMap.reader, rc),
                         new WaitCommand(230),
                         new SetClawState(ClawConfiguration.GripperState.CLOSED),
                         new WaitCommand(150),

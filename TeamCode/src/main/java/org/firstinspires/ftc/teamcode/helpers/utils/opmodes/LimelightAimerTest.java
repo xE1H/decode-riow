@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 
-import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.rad;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -12,9 +11,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrab;
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
-import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;

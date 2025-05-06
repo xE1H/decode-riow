@@ -98,7 +98,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
         return new SequentialCommandGroup(
                 new WaitCommand(50),
                 new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
-                new SubmersibleGrab(follower, alliance, reader),
+                new SubmersibleGrabV2(follower, reader),
 
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(

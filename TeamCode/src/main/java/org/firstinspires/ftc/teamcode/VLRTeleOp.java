@@ -1,51 +1,36 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.BUCKET_HIGH_SCORE_POSE;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.START_POSE;
-import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB;
-import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB_0;
-import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
+import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.BLUE;
+import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.RED;
+import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.YELLOW;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.outoftheboxrobotics.photoncore.Photon;
-import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrab;
-import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
-import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
-import org.firstinspires.ftc.teamcode.helpers.controls.trigger.TriggerCtl;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
+import org.firstinspires.ftc.teamcode.helpers.persistence.AllianceSaver;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
-import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
-import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 import org.firstinspires.ftc.teamcode.teleop.controlmaps.GlobalMap;
 import org.firstinspires.ftc.teamcode.teleop.controlmaps.SampleMap;
 import org.firstinspires.ftc.teamcode.teleop.controlmaps.SpecimenMap;
 
-import java.sql.Driver;
-import java.util.logging.Logger;
+import java.util.Arrays;
+import java.util.Collections;
 
 import pedroPathing.tuners.constants.FConstants;
 import pedroPathing.tuners.constants.LConstants;
@@ -58,6 +43,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
     RumbleControls rc;
 
     boolean sampleMapActive = true;
+    boolean isBlue = true;
 
 
     @Override
@@ -70,15 +56,21 @@ public class VLRTeleOp extends VLRLinearOpMode {
         VLRSubsystem.initializeAll(hardwareMap);
 
         if (!PoseSaver.isPoseSaved()) {
+            telemetry.addLine("No saved pose found, using default");
             // Set default sample start pos
             f.setStartingPose(START_POSE);
-            telemetry.addLine("No saved pose found, using default");
-            telemetry.update();
         } else {
             telemetry.addData("Saved pose: ", PoseSaver.getPedroPose());
-            telemetry.update();
             f.setStartingPose(PoseSaver.getPedroPose());
         }
+
+        if (AllianceSaver.getAlliance() == null) {
+            telemetry.addLine("No saved alliance found, defaulting to Blue");
+        } else if (AllianceSaver.getAlliance() == Alliance.RED) {
+            isBlue = false;
+        }
+        telemetry.update();
+
 
         GamepadEx gpEx = new GamepadEx(gamepad1);
         DriverControls gp = new DriverControls(gpEx);
@@ -116,13 +108,23 @@ public class VLRTeleOp extends VLRLinearOpMode {
             gp.clear();
             globalMap.initialize();
             if (sampleMapActive) {
+                if (isBlue) {
+                    globalMap.setLimelightColors(Collections.singletonList(BLUE));
+                } else {
+                    globalMap.setLimelightColors(Collections.singletonList(RED));
+                }
                 sampleMapActive = false;
                 specimenMap.initialize();
-                rc.rumbleBlips(6);
+                rc.rumbleBlips(4);
             } else {
+                if (isBlue) {
+                    globalMap.setLimelightColors(Arrays.asList(BLUE, YELLOW));
+                } else {
+                    globalMap.setLimelightColors(Arrays.asList(RED, YELLOW));
+                }
                 sampleMapActive = true;
                 sampleMap.initialize();
-                rc.rumbleBlips(3);
+                rc.rumbleBlips(2);
             }
             addSwitchCtrl(gp, globalMap, sampleMap, specimenMap);
         }));

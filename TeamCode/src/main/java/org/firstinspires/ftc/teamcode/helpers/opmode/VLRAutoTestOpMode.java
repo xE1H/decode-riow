@@ -14,6 +14,8 @@ import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.helpers.autoconfig.AutoConfigurator;
+import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
+import org.firstinspires.ftc.teamcode.helpers.persistence.AllianceSaver;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
@@ -55,13 +57,19 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         AutoConfigurator.Choice color = ac.multipleChoice("Select alliance:", new AutoConfigurator.Choice("Blue"),
                 new AutoConfigurator.Choice("Red"));
 
-        if (color.text.equals("Blue")) {
+        boolean isBlue = color.text.equals("Blue");
+
+        if (isBlue) {
             reader.setAllowedColors(Arrays.asList(BLUE, YELLOW));
         } else {
             reader.setAllowedColors(Arrays.asList(RED, YELLOW));
         }
 
         ac.review("Selected alliance: " + color.text);
+        AllianceSaver.setAlliance(isBlue ? Alliance.BLUE : Alliance.RED);
+
+        telemetry.addLine("Selected alliance: " + color.text);
+        telemetry.update();
 
         f.setStartingPose(StartPose());
 
