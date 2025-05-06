@@ -27,8 +27,10 @@ public class SubmersibleGrab extends SequentialCommandGroup {
     private SequentialCommandGroup submersibleGrabCommand = new SequentialCommandGroup();
 
     double angle = 90;
+    boolean inverted;
 
-    public SubmersibleGrab(Follower f, Alliance alliance, LimelightYoloReader reader, RumbleControls rc) {
+    public SubmersibleGrab(Follower f, Alliance alliance, LimelightYoloReader reader, RumbleControls rc, boolean inverted) {
+        this.inverted = inverted;
         Logger logger = Logger.getLogger("SubmersibleGrab");
         addCommands(
                 new LogCommand("SubmersibleGrab", Level.INFO, "Sub grab command"),
@@ -91,7 +93,7 @@ public class SubmersibleGrab extends SequentialCommandGroup {
     private void generateSubmersibleGrabCommand(Follower f, LimelightYoloReader.Limelight.Sample sample) {
         submersibleGrabCommand.addCommands(
                 new ParallelCommandGroup(
-                        new MoveRelative(f, -sample.getX(), 0),
+                        new MoveRelative(f, -sample.getX() * (inverted ? -1 : 1), 0),
                         new SetArmPosition().intakeSampleAuto((0.7742 * (sample.getY() + 1.5)) / MAX_POSITION, (angle / -180.0) + 1)
 
                 )
@@ -100,6 +102,6 @@ public class SubmersibleGrab extends SequentialCommandGroup {
 
 
     public SubmersibleGrab(Follower f, Alliance alliance, LimelightYoloReader reader) {
-        this(f, alliance, reader, null);
+        this(f, alliance, reader, null, false);
     }
 }

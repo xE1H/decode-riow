@@ -8,7 +8,6 @@ public abstract class ControlMap {
 
     public ControlMap(DriverControls driverControls) {
         gp = driverControls;
-        initialize();
     }
 
     public abstract void initialize();

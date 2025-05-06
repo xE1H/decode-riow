@@ -16,9 +16,9 @@ public class PointsSpecimen {
 
     public static Pose PICK_UP_SAMPLE_3 = new Pose(29, 4, Math.toRadians(-21.75));
 
-    public static Pose DEPOSIT_SAMPLE_3_START = new Pose(29,16, Math.toRadians(0));
+    public static Pose DEPOSIT_SAMPLE_3_START = new Pose(29, 16, Math.toRadians(0));
 
-    public static Pose DEPOSIT_SAMPLE_3_END = new Pose(25,16, Math.toRadians(0));
+    public static Pose DEPOSIT_SAMPLE_3_END = new Pose(25, 16, Math.toRadians(0));
 
 
     public static Pose SCORE_SECOND_SPECIMEN = new Pose(34.25, 57, Math.toRadians(0));
@@ -34,7 +34,7 @@ public class PointsSpecimen {
     public static Pose SCORE_SPECIMEN_BACK_5 = new Pose(31, 70, Math.toRadians(-180));
 
     public static Pose SUB_GRAB_SPEC = new Pose(64, 120 - 95.5, Math.toRadians(90));
-    public static Pose SUB_GRAB_SPEC_CONTROL = new Pose(55.2, 12, Math.toRadians(0));
+    public static Pose SUB_GRAB_SPEC_CONTROL = new Pose(55.2, 17, Math.toRadians(0));
 
-    public static Pose SUB_GRAB_SPEC_DEPOSIT = new Pose(25, 14.5, 0);
+    public static Pose SUB_GRAB_SPEC_DEPOSIT = new Pose(23, 19.5, 0);
 }

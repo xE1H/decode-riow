@@ -25,6 +25,8 @@ public class GlobalMap extends ControlMap {
 
     public GlobalMap(DriverControls driverControls, Follower f, RumbleControls rc) {
         super(driverControls);
+        this.f = f;
+        this.rc = rc;
     }
 
     @Override

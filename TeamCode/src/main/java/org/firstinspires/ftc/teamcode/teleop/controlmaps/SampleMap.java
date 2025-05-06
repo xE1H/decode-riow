@@ -11,13 +11,16 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.commands.FollowPath;
+import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrab;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
+import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.trigger.TriggerCtl;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
@@ -31,12 +34,19 @@ public class SampleMap extends ControlMap {
     GlobalMap globalMap;
     CommandScheduler cs;
 
+    Follower f;
+    RumbleControls rc;
+
+    ElapsedTime retractTimer = new ElapsedTime();
+
     MainArmConfiguration.SAMPLE_SCORE_HEIGHT armState = MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
 
 
     public SampleMap(DriverControls driverControls, CommandScheduler cs, GlobalMap globalMap) {
         super(driverControls);
         this.cs = cs;
+        this.f = globalMap.f;
+        this.rc = globalMap.rc;
         this.globalMap = globalMap;
     }
 
@@ -57,7 +67,10 @@ public class SampleMap extends ControlMap {
     // ARM OPS
     //
     private void retractArm() {
-        cs.schedule(new SetArmPosition().retract());
+        if (retractTimer.milliseconds() > 800) {
+            cs.schedule(new SetArmPosition().retract());
+            retractTimer.reset();
+        }
     }
 
     private void toggleArmLowState() {
@@ -72,14 +85,14 @@ public class SampleMap extends ControlMap {
 
     private void subGrab() {
         globalMap.followerActive = true;
-        globalMap.f.holdPoint(new Pose(globalMap.f.getPose().getX(), globalMap.f.getPose().getY(), SUB_GRAB.getHeading()));
-        double headingError = Math.abs(globalMap.f.getPose().getHeading() - SUB_GRAB.getHeading());
+        f.holdPoint(new Pose(f.getPose().getX(), f.getPose().getY(), SUB_GRAB.getHeading()));
+        double headingError = Math.abs(f.getPose().getHeading() - SUB_GRAB.getHeading());
 
         cs.schedule(
                 new SequentialCommandGroup(
                         new LogCommand("SubGrabTeleop", "Heading error: " + headingError),
                         new WaitCommand((long) (headingError * 30)),
-                        new SubmersibleGrab(globalMap.f, Alliance.BLUE, globalMap.reader, globalMap.rc),
+                        new SubmersibleGrab(f, Alliance.BLUE, globalMap.reader, rc, false),
                         new WaitCommand(230),
                         new SetClawState(ClawConfiguration.GripperState.CLOSED),
                         new WaitCommand(150),
@@ -100,14 +113,14 @@ public class SampleMap extends ControlMap {
                                         new SetArmPosition().scoreSample(armState)
                                 ),
                                 new SequentialCommandGroup(
-                                        new FollowPath(globalMap.f, bezierPath(globalMap.f.getPose(), SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)
+                                        new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)
                                                 .setLinearHeadingInterpolation(SUB_GRAB.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build()
                                         ),
                                         new InstantCommand() {
                                             @Override
                                             public void run() {
                                                 globalMap.followerActive = false;
-                                                globalMap.rc.singleBlip();
+                                                rc.singleBlip();
                                             }
                                         }
                                 )
