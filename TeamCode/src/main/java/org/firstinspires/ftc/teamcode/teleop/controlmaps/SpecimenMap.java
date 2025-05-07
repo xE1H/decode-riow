@@ -190,7 +190,8 @@ public class SpecimenMap extends ControlMap {
                     new CustomConditionalCommand(
                             new SequentialCommandGroup(
                                     // This means that there is not much time to actually react and cancel the sequence if the grab failed. (only have time until the arm fully retracts)
-                                    // Might need to start driving, and have some sort of cancellation, where it goes back if it fails.
+                                    // Might need to start driving, and have some sort of cancellation, as to where it goes back to the grab pos if it fails.
+                                    // This also means that the retraction will be blocking, and the path won't start until the arm has retracted.
                                     new SetArmPosition().intakeSpecimen(0.44),
                                     new DisableFollower()
                             ),
