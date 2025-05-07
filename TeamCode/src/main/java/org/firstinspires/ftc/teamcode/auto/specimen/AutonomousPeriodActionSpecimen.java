@@ -43,8 +43,9 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                                 new WaitUntilCommand(()-> follower.getPose().getX() > 35.25).andThen(new SetArmPosition().extensionRelative(0.17))
                         ),
 
+                        new WaitCommand(100).andThen(
                         new FollowPath(follower, bezierPath(START_POSE, SCORE_PRELOAD_AND_SUB_PICKUP)
-                                .setConstantHeadingInterpolation(SCORE_PRELOAD_AND_SUB_PICKUP.getHeading()).build())
+                                .setConstantHeadingInterpolation(SCORE_PRELOAD_AND_SUB_PICKUP.getHeading()).build()))
                 ),
 
                 //SCORING SPIKE MARK SAMPLE INTO HUMAN PLAYER AREA
@@ -77,7 +78,10 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                                         new SetArmPosition().angleDegrees(155),
                                         new SequentialCommandGroup(
                                                 new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() > 140),
-                                                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                                new SetClawState(ClawConfiguration.GripperState.OPEN)
+                                        ),
+                                        new SequentialCommandGroup(
+                                                new WaitUntilCommand(()-> VLRSubsystem.getArm().currentAngleDegrees() > 120),
                                                 new SetClawAngle(0.52)
                                         )
                                 )
@@ -91,21 +95,21 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
 
 
                                 new WaitUntilCommand(()-> firstSpikeMarkSamplePickedUp),
-                                new WaitCommand(200),
+                                new WaitCommand(400),
                                 new FollowPath(follower, bezierPath(PICK_UP_SAMPLE_1, PICK_UP_SAMPLE_2)
                                         .setConstantHeadingInterpolation(PICK_UP_SAMPLE_2.getHeading()).build()),
 
                                 new WaitUntilCommand(()-> secondSpikeMarkSamplePickedUp),
-                                new WaitCommand(200),
+                                new WaitCommand(400),
                                 new FollowPath(follower, bezierPath(PICK_UP_SAMPLE_2, PICK_UP_SAMPLE_3)
                                         .setLinearHeadingInterpolation(PICK_UP_SAMPLE_2.getHeading(), PICK_UP_SAMPLE_3.getHeading()).build()),
 
                                 new WaitUntilCommand(()-> thirdSpikeMarkSamplePickedUP),
-                                new WaitCommand(150),
+                                new WaitCommand(200),
                                 new FollowPath(follower, bezierPath(PICK_UP_SAMPLE_3, DEPOSIT_SAMPLE_3_START)
                                         .setLinearHeadingInterpolation(PICK_UP_SAMPLE_3.getHeading(), DEPOSIT_SAMPLE_3_START.getHeading()).build()),
 
-                                new WaitCommand(200),
+                                new WaitCommand(500),
                                 new FollowPath(follower, bezierPath(DEPOSIT_SAMPLE_3_START, DEPOSIT_SAMPLE_3_END)
                                         .setConstantHeadingInterpolation(DEPOSIT_SAMPLE_3_END.getHeading()).build())
                         )
@@ -145,7 +149,6 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                                 new SetArmPosition().intakeSpecimen(0.44)
                         )
                 ),
-
 
 
                 new ParallelCommandGroup(

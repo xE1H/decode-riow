@@ -468,15 +468,12 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("SCORE SPECIMEN FRONT", Level.SEVERE, "SCORING SPECIMEN FRONT FROM IN ROBOT STATE"),
 
                                 new ParallelCommandGroup(
+                                        new SetArmPosition().angleDegrees(62),
+
                                         new SequentialCommandGroup(
-                                                new SetArmPosition().extensionAndAngleDegrees(0, 62),
+                                                new WaitUntilCommand(()-> arm.currentAngleDegrees() > 43),
+                                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                                                 new SetArmPosition().extensionAndAngleDegrees(0.53, 49.5)
-                                        ),
-                                        new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentAngleDegrees() > 40),
-                                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                                new WaitCommand(250),
-                                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)
                                         )
                                 ),
                                 setArmState(ArmState.State.SPECIMEN_SCORE_FRONT)
@@ -497,7 +494,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
                                 new LogCommand("SCORE SPECIMEN BACK", Level.SEVERE, "SCORING SPECIMEN BACK FROM IN ROBOT STATE"),
-                                new SetArmPosition().extensionAndAngleDegrees(0.3, 102).alongWith(
+                                new SetArmPosition().extensionAndAngleDegrees(0.3, 102, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE).alongWith(
                                         new WaitUntilCommand(()-> arm.currentAngleDegrees() > 80).andThen(new SetClawAngle(0.265))
                                 ),
                                 setArmState(ArmState.State.SPECIMEN_SCORE_BACK)
@@ -514,15 +511,15 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new LogCommand("SECOND STAGE HANG", Level.SEVERE, "STARTING LEVEL 2 HANG COMMAND"),
 
                         new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                        new SetArmPosition().angleDegrees(102.5).alongWith(
-                                new WaitUntilCommand(()-> arm.currentAngleDegrees() >= 70).andThen(new SetArmPosition().extension(0.314))
+                        new SetArmPosition().angleDegrees(94).alongWith(
+                                new WaitUntilCommand(()-> arm.currentAngleDegrees() >= 50).andThen(new SetArmPosition().extension(0.314))
                         ),
 
                         new WaitUntilCommand(gamepadCondition),
                         new SetArmPosition().extension(0.1),
                         new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HANG)),
 
-                        new SetArmPosition().angleDegrees(42),
+                        new SetArmPosition().angleDegrees(48),
                         new SetArmPosition().extension(0.03),
 
                         setArmState(ArmState.State.HANG_SECOND_STAGE)
