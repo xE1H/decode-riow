@@ -57,6 +57,14 @@ public class ButtonCtl implements ControlDefinition {
         this(button, trigger, true, action);
     }
 
+    public ButtonCtl(GamepadKeys.Button button, Trigger trigger, Runnable action) {
+        this(button, trigger, true, (Boolean a) -> action.run());
+    }
+
+    public ButtonCtl(GamepadKeys.Button button, Runnable action) {
+        this(button, Trigger.WAS_JUST_PRESSED, true, (Boolean a) -> action.run());
+    }
+
     /**
      * Executes the button control based on the current gamepad state.
      *

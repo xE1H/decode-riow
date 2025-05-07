@@ -110,9 +110,9 @@ public class AutoConfigurator {
             if (gamepad.left_stick_x > 0.5) {
                 isAccepting = true;
                 double timeElapsed = System.currentTimeMillis() - startTime;
-                double strength = Math.min(1, timeElapsed / 1000);
+                double strength = Math.min(1, timeElapsed / 500);
                 gamepad.rumble(strength, strength, Gamepad.RUMBLE_DURATION_CONTINUOUS);
-                if (timeElapsed >= 1000) {
+                if (timeElapsed >= 500) {
                     accepted = true;
                 }
             } else {

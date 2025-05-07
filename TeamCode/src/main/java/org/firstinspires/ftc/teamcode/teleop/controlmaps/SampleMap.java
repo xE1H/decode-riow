@@ -51,10 +51,10 @@ public class SampleMap extends ControlMap {
 
     @Override
     public void initialize() {
-        gp.add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> toggleArmLowState()));
+        gp.add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, this::toggleArmLowState));
 
-        gp.add(new ButtonCtl(GamepadKeys.Button.LEFT_BUMPER, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> subGrab()));
-        gp.add(new ButtonCtl(GamepadKeys.Button.RIGHT_BUMPER, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> deposit()));
+        gp.add(new ButtonCtl(GamepadKeys.Button.LEFT_BUMPER, this::subGrab));
+        gp.add(new ButtonCtl(GamepadKeys.Button.RIGHT_BUMPER, this::deposit));
 
         gp.add(new TriggerCtl(GamepadKeys.Trigger.RIGHT_TRIGGER, (Double a) -> {
             if (a > 0.3) retractArm();

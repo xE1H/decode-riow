@@ -42,7 +42,7 @@ public class PointsSpecimen {
     public static Pose SUB_GRAB_SPEC_DEPOSIT_TRANSITION = new Pose(26.5, 25.5, 0);
     public static Pose TELEOP_SPEC_HANG_TRANSITION = new Pose(26, 60, 0);
 
-    public static Pose TELEOP_SPEC_HANG_TRANSITION_FINAL = new Pose(35, 60, 0);
+    public static Pose TELEOP_SPEC_HANG_TRANSITION_FINAL_FWD = new Pose(35, 60, 0);
 
-    public static Pose TELEOP_SPEC_PICKUP = new Pose();
+    public static Pose TELEOP_SPEC_HANG_FINAL_BACK = new Pose(31, 62, Math.toRadians(-180));
 }

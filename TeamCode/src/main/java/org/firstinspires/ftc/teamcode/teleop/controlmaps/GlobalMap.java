@@ -32,13 +32,13 @@ public class GlobalMap extends ControlMap {
 
     @Override
     public void initialize() {
-        gp.add(new ButtonCtl(GamepadKeys.Button.A, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> toggleFollower()));
+        gp.add(new ButtonCtl(GamepadKeys.Button.A, this::toggleFollower));
 
-        gp.add(new ButtonCtl(GamepadKeys.Button.X, ButtonCtl.Trigger.STATE_JUST_CHANGED, (Boolean a) -> {
+        gp.add(new ButtonCtl(GamepadKeys.Button.X, ButtonCtl.Trigger.STATE_JUST_CHANGED, () -> {
             if (!slideResetActive) startSlideOverride();
             else endSlideOverride();
         }));
-        gp.add(new ButtonCtl(GamepadKeys.Button.Y, ButtonCtl.Trigger.STATE_JUST_CHANGED, (Boolean a) -> {
+        gp.add(new ButtonCtl(GamepadKeys.Button.Y, ButtonCtl.Trigger.STATE_JUST_CHANGED, () -> {
             if (!rotatorResetActive) startRotatorOverride();
             else endRotatorOverride();
         }));
