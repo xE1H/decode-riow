@@ -55,7 +55,7 @@ public class SpecimenMap extends ControlMap {
     }
 
     private void subGrabAndCycle() {
-        // Run sub grab, drop, go back. Transition to grab state after dropping by using LB
+        // Run sub grab, drop, go back. Transition to grab state after dropping by using LT
         globalMap.followerActive = true;
         f.holdPoint(f.getPose());
 
@@ -101,7 +101,10 @@ public class SpecimenMap extends ControlMap {
                                                             }
                                                         }
                                                 ),
-                                                new SetArmPosition().angleDegrees(0),
+                                                new SequentialCommandGroup(
+                                                        new WaitCommand(250),
+                                                        new SetArmPosition().angleDegrees(0)
+                                                ),
                                                 () -> globalMap.followerActive // do not continue if follower is off, since that probably means that the grab has failed
                                         )
                                 )
