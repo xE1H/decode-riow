@@ -49,6 +49,14 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         rotator.setPowerLimit(powerLimit);
     }
 
+    public void setSlidePowerLimit(double powerLimit){
+        slides.setPowerLimit(powerLimit);
+    }
+
+    public void setThirdSlideMotorEnable(boolean state){
+        slides.setThirdMotorEnable(state);
+    }
+
     public Point calculateTargetPointFromRealWordCoordinates(double x_cm, double y_cm, OFFSET_REFERENCE_PLANE reference){
         double minY = ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER.getY() + RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT.getY();
         if (y_cm < minY) {

@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
@@ -38,6 +39,8 @@ public class ArmSlideSubsystem {
     private boolean overridePowerState = false;
     private double overridePowerValue = 0;
 
+    private double powerLimit = 1;
+
     private double feedForwardGain = FEED_FORWARD_GAIN;
     private boolean limitSwitchPressed = true;
     private boolean prevLimitSwitchPressed = false;
@@ -47,6 +50,9 @@ public class ArmSlideSubsystem {
     private OPERATION_MODE prevOperationMode = OPERATION_MODE.NORMAL;
 
     private ElapsedTime timer = new ElapsedTime();
+    private ElapsedTime measurementTimer = new ElapsedTime();
+
+    private boolean disableThirdMotor = false;
 
     private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
 
@@ -209,6 +215,16 @@ public class ArmSlideSubsystem {
     }
 
 
+    public void setPowerLimit(double powerLimit){
+        this.powerLimit = powerLimit;
+    }
+
+
+    public void setThirdMotorEnable(boolean state){
+        disableThirdMotor = state;
+    }
+
+
     public void periodic(double armAngleDegrees, OPERATION_MODE operationMode) {
         limitSwitchPressed = limitSwitch.isPressed();
         updateEncoderPosition();
@@ -229,7 +245,7 @@ public class ArmSlideSubsystem {
         if (operationMode == OPERATION_MODE.HOLD_POINT && motionProfile.getTargetPosition() != 0) {
             power = holdPointPID.calculate(getPosition(), motionProfile.getTargetPosition()) + feedForwardPower;
         }
-        power = clamp(power, -1, 1);
+        power = clamp(power, -powerLimit, powerLimit);
 
 
         if (limitSwitchPressed && motionProfile.getTargetPosition() == 0) {
@@ -269,7 +285,14 @@ public class ArmSlideSubsystem {
                 extensionMotor2.setPower(power);
             }
             else {
-                setMotorPower(power);
+                extensionMotor1.setPower(power);
+                extensionMotor2.setPower(power);
+                if (disableThirdMotor){
+                    extensionMotor0.setPower(0);
+                }
+                else{
+                    extensionMotor0.setPower(power);
+                }
             }
         }
 
@@ -280,6 +303,5 @@ public class ArmSlideSubsystem {
         telemetry.addData("ARM SLIDE SUBSYSTEM ENCODER RESET: ", encoderReset ? 1 : 0);
         telemetry.addData("ARM SLIDE SUBSYSTEM LIMIT SWITCH STATE: ", limitSwitchPressed);
         telemetry.addData("ARM SLIDE SUBSYSTEM PREV LIMIT SWITCH STATE: ", prevLimitSwitchPressed);
-
     }
 }
