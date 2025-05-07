@@ -61,6 +61,15 @@ public class SpecimenMap extends ControlMap {
         gp.add(new ButtonCtl(GamepadKeys.Button.LEFT_BUMPER, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> {
             subGrabAndCycle();
         }));
+
+        gp.add(new ButtonCtl(GamepadKeys.Button.Y, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> {
+            retract();
+        }));
+
+        gp.add(new ButtonCtl(GamepadKeys.Button.RIGHT_STICK_BUTTON, ButtonCtl.Trigger.WAS_JUST_PRESSED, (Boolean a) -> {
+            relocalize();
+        }));
+
     }
 
     private void subGrabAndCycle() {
@@ -173,5 +182,14 @@ public class SpecimenMap extends ControlMap {
 
     private void hangCycle() {
         // Close claw, hang, come back. End loop after hanging by using RT.
+    }
+
+    private void relocalize() {
+        // todo relocalize
+        rc.rumbleBlips(1);
+    }
+
+    private void retract() {
+        cs.schedule(new SetArmPosition().retract());
     }
 }
