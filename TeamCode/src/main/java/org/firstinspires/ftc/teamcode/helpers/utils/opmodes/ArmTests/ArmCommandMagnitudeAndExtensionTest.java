@@ -12,6 +12,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
@@ -51,6 +52,8 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
     GamepadEx gamepad;
     RumbleControls rc;
 
+    ElapsedTime measurementTimer = new ElapsedTime();
+
 
     @Override
     public void Start(){
@@ -88,6 +91,16 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
         if (gamepad1.triangle && !prevTriangle){
             follower.setMaxPower(0);
             CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad1.right_bumper && gamepad1.left_bumper));
+        }
+
+        if (gamepad1.cross && !prevCross){
+            VLRSubsystem.getArm().setThirdSlideMotorEnable(false);
+            VLRSubsystem.getArm().enableRotatorPowerOverride(0);
+        }
+
+        if (!gamepad1.cross && prevCross){
+            VLRSubsystem.getArm().setThirdSlideMotorEnable(true);
+            VLRSubsystem.getArm().disableRotatorPowerOverride();
         }
 
 //        else if (gamepad1.cross && !prevCross){
@@ -132,7 +145,7 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 
         follower.update();
         VLRSubsystem.getInstance(Chassis.class).drive(0, 0, 0);
-
         telemetry.update();
     }
+
 }

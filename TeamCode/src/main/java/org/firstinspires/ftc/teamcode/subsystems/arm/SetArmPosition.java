@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -560,7 +561,7 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                         new SetArmPosition().extensionAndAngleDegrees(0.89, 80),
                         new SetArmPosition().angleDegrees(86),
-                        new SetArmPosition().extension(0.78),
+                        new SetArmPosition().extension(0.81),
 
                         new InstantCommand(()->VLRSubsystem.getArm().enableRotatorPowerOverride(0)),
                         new InstantCommand(()->VLRSubsystem.getArm().enableSlidePowerOverride(0)),
@@ -568,21 +569,20 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new InstantCommand(()-> VLRSubsystem.getInstance(ClawSubsystem.class).disable()),
                         new InstantCommand(()-> VLRSubsystem.getInstance(Chassis.class).stop()),
                         new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HANG)),
-
+                        new SetPattern().blank(),
 
 
                         new WaitUntilCommand(gamepadCondition),
                         new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
                         new InstantCommand(()->VLRSubsystem.getArm().disableRotatorPowerOverride()),
-                        new InstantCommand(()-> VLRSubsystem.getArm().setRotatorPowerLimit(0.3)),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1)),
-
+                        new InstantCommand(()-> VLRSubsystem.getArm().setSlidePowerLimit(0.9)),
 
                         new ParallelCommandGroup(
                                 new SetArmPosition().extension(0),
 
                                 new SequentialCommandGroup(
-                                        new WaitUntilCommand(()-> arm.currentExtension() < 0.38),
+                                        new WaitUntilCommand(()-> arm.currentExtension() < 0.3),
                                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(-0.1)),
                                         new WaitCommand(600),
                                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
@@ -591,16 +591,43 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                                 new SequentialCommandGroup(
                                         new WaitCommand(300),
-                                        new SetArmPosition().angleDegrees(90),
-                                        new WaitUntilCommand(()-> arm.currentExtension() < 0.35),
-                                        new InstantCommand(()-> VLRSubsystem.getArm().setRotatorPowerLimit(0.5)),
+                                        new SetArmPosition().angleDegrees(105),
+                                        new WaitUntilCommand(()-> arm.currentExtension() < 0.36),
                                         new SetArmPosition().angleDegrees(50),
-                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.2),
-                                        new InstantCommand(()-> VLRSubsystem.getArm().setRotatorPowerLimit(1)),
+                                        new WaitCommand(120),
                                         new SetArmPosition().angleDegrees(30)
                                 )
+//                                new SequentialCommandGroup(
+//                                        new PerpetualCommand(
+//                                                new SequentialCommandGroup(
+//                                                        new InstantCommand(()->VLRSubsystem.getArm().enableSlidePowerOverride(0)),
+//                                                        new WaitCommand(1000),
+//                                                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
+//                                                        new InstantCommand(()-> arm.setRotatorPowerLimit(0.75)),
+//                                                        new WaitCommand(1000)
+//                                                )
+//                                        ).withTimeout(3000),
+//                                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
+//                                        new LogCommand("SKIBIDI", Level.SEVERE, "SKIBIDI ROTATOR SKIBIDI DISABLED"),
+//                                        new InstantCommand(()-> VLRSubsystem.getArm().setRotatorPowerLimit(0.8))
+//                                ),
+//
+//                                new SequentialCommandGroup(
+//                                        new WaitCommand(500),
+//                                        new PerpetualCommand(
+//                                                new SequentialCommandGroup(
+//                                                        new InstantCommand(()-> arm.setThirdSlideMotorEnable(false)),
+//                                                        new WaitCommand(1000),
+//                                                        new InstantCommand(()-> arm.setThirdSlideMotorEnable(true)),
+//                                                        new WaitCommand(1000)
+//                                                )
+//                                        ).withTimeout(3000),
+//                                        new LogCommand("SKIBIDI", Level.SEVERE, "SKIBIDI SLIDE SKIBIDI DISABLED"),
+//                                        new InstantCommand(()-> arm.setThirdSlideMotorEnable(true)),
+//                                        new WaitCommand(400),
+//                                        new InstantCommand(()-> arm.setThirdSlideMotorEnable(false))
+//                                )
                         )
-
                 ),
                 ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
         );
