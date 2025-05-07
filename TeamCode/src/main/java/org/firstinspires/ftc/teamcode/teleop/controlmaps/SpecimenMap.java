@@ -243,10 +243,9 @@ public class SpecimenMap extends ControlMap {
     }
 
     private void relocalize() {
-        // todo relocalize
         rc.rumbleBlips(1);
         Logger.getLogger("Relocalize").info("Relocalizing, current pose: " + f.getPose());
-        //f.setCurrentPoseWithOffset();
+        f.setCurrentPoseWithOffset(RELOCALIZATION_POSE);
     }
 
     private void retract() {
