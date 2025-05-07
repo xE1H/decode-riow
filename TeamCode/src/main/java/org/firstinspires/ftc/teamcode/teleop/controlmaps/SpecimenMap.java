@@ -210,7 +210,7 @@ public class SpecimenMap extends ControlMap {
                                         }
                                     },
                                     new HoldPoint(f, f.getPose()), // so it doesn't run away
-                                    new SetArmPosition().extensionRelative(0.21),
+                                    new SetArmPosition().extensionRelative(0.21).withTimeout(500),
                                     new WaitCommand(200),
                                     new InstantCommand() {
                                         @Override
