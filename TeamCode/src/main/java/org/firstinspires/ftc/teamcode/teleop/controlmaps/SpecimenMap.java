@@ -1,8 +1,16 @@
 package org.firstinspires.ftc.teamcode.teleop.controlmaps;
 
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DEPOSIT_SAMPLE_3_END;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DRIVE_BACK;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SCORE_SECOND_SPECIMEN;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SUB_GRAB_SPEC;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SUB_GRAB_SPEC_CONTROL;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SUB_GRAB_SPEC_DEPOSIT;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SUB_GRAB_SPEC_DEPOSIT_TRANSITION;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SUB_GRAB_SPEC_DEPOSIT_TRANSITION_CONTROL;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.TELEOP_SPEC_HANG_TRANSITION;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.TELEOP_SPEC_HANG_TRANSITION_FINAL;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
@@ -23,6 +31,7 @@ import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
@@ -72,34 +81,83 @@ public class SpecimenMap extends ControlMap {
                                         new SetArmPosition().retract(),
                                         new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                         new SetArmPosition().angleDegrees(155)
-
                                 ),
                                 new SequentialCommandGroup(
                                         new WaitCommand(200),
-                                        new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_SPEC_CONTROL, SUB_GRAB_SPEC_DEPOSIT)
-                                                .setLinearHeadingInterpolation(f.getPose().getHeading(), SUB_GRAB_SPEC_DEPOSIT.getHeading())
-                                                .build()
-                                        ).setCompletionThreshold(0.1),
                                         new CustomConditionalCommand(
-                                                new SequentialCommandGroup(
-                                                        new WaitUntilCommand(() -> VLRSubsystem.getArm().currentAngleDegrees() > 140),
-                                                        new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                                        new WaitCommand(200),
-                                                        // TODO check if modifier is pressed and transition into hanging
-                                                        new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                                                        new SetArmPosition().angleDegrees(0),
-                                                        new FollowPath(f, bezierPath(SUB_GRAB_SPEC_DEPOSIT, SUB_GRAB_SPEC_CONTROL, SUB_GRAB_SPEC)
-                                                                .setLinearHeadingInterpolation(SUB_GRAB_SPEC_DEPOSIT.getHeading(), SUB_GRAB_SPEC.getHeading())
-                                                                .build()
-                                                        ).setCompletionThreshold(0.6),
+                                                new CustomConditionalCommand(
+                                                        new SequentialCommandGroup(
+                                                                new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_SPEC_DEPOSIT_TRANSITION_CONTROL, SUB_GRAB_SPEC_DEPOSIT_TRANSITION)
+                                                                        .setLinearHeadingInterpolation(f.getPose().getHeading(), SUB_GRAB_SPEC_DEPOSIT_TRANSITION.getHeading())
+                                                                        .build()),
+                                                                new WaitUntilCommand(() -> VLRSubsystem.getArm().currentAngleDegrees() > 140),
+                                                                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                                                new WaitCommand(200),
 
-                                                        new InstantCommand() {
-                                                            @Override
-                                                            public void run() {
-                                                                globalMap.followerActive = false;
-                                                                rc.singleBlip();
-                                                            }
-                                                        }
+                                                                new SetClawAngle(0.52),
+                                                                new WaitCommand(500),
+                                                                new InstantCommand() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        globalMap.followerActive = false;
+                                                                        rc.singleBlip();
+                                                                    }
+                                                                },
+                                                                new WaitUntilCommand(() -> gp.gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3),
+                                                                new InstantCommand() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        globalMap.followerActive = true;
+                                                                    }
+                                                                },
+                                                                new SetClawState(ClawConfiguration.GripperState.CLOSED),
+                                                                new WaitCommand(200),
+                                                                new ParallelCommandGroup(
+                                                                        new WaitCommand(50).andThen(
+                                                                                new FollowPath(f, bezierPath(SUB_GRAB_SPEC_DEPOSIT_TRANSITION, TELEOP_SPEC_HANG_TRANSITION)
+                                                                                        .setConstantHeadingInterpolation(TELEOP_SPEC_HANG_TRANSITION.getHeading()).build()).setCompletionThreshold(0.9),
+                                                                                new FollowPath(f, bezierPath(TELEOP_SPEC_HANG_TRANSITION, TELEOP_SPEC_HANG_TRANSITION_FINAL)
+                                                                                        .setConstantHeadingInterpolation(TELEOP_SPEC_HANG_TRANSITION_FINAL.getHeading()).build())
+                                                                        ),
+                                                                        new ParallelCommandGroup(
+                                                                                new SetArmPosition().angleDegrees(100).andThen(new SetArmPosition().extensionAndAngleDegrees(0.53, 50)),
+                                                                                new WaitCommand(200).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN))
+                                                                        ),
+                                                                        new WaitUntilCommand(() -> f.getPose().getX() > 33.5).andThen(new SetArmPosition().extensionRelative(0.23)).andThen(new SetArmPosition().setArmState(ArmState.State.SPECIMEN_SCORE_FRONT))
+                                                                ),
+                                                                new WaitCommand(150),
+                                                                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                                                new WaitCommand(150),
+                                                                new ParallelCommandGroup(
+                                                                        new SetArmPosition().retract(),
+                                                                        new FollowPath(f, bezierPath(TELEOP_SPEC_HANG_TRANSITION_FINAL, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER).setLinearHeadingInterpolation(TELEOP_SPEC_HANG_TRANSITION_FINAL.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build())
+                                                                )
+                                                        ),
+                                                        // NORMAL
+                                                        new SequentialCommandGroup(
+                                                                new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_SPEC_CONTROL, SUB_GRAB_SPEC_DEPOSIT)
+                                                                        .setLinearHeadingInterpolation(f.getPose().getHeading(), SUB_GRAB_SPEC_DEPOSIT.getHeading())
+                                                                        .build()).setCompletionThreshold(0.1),
+                                                                new WaitUntilCommand(() -> VLRSubsystem.getArm().currentAngleDegrees() > 140),
+                                                                new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                                                new WaitCommand(200),
+
+                                                                new SetClawState(ClawConfiguration.GripperState.CLOSED),
+                                                                new SetArmPosition().angleDegrees(0),
+                                                                new FollowPath(f, bezierPath(SUB_GRAB_SPEC_DEPOSIT, SUB_GRAB_SPEC_CONTROL, SUB_GRAB_SPEC)
+                                                                        .setLinearHeadingInterpolation(SUB_GRAB_SPEC_DEPOSIT.getHeading(), SUB_GRAB_SPEC.getHeading())
+                                                                        .build()
+                                                                ).setCompletionThreshold(0.6),
+
+                                                                new InstantCommand() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        globalMap.followerActive = false;
+                                                                        rc.singleBlip();
+                                                                    }
+                                                                }
+                                                        ),
+                                                        () -> gp.gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3
                                                 ),
                                                 new SequentialCommandGroup(
                                                         new WaitCommand(250),
