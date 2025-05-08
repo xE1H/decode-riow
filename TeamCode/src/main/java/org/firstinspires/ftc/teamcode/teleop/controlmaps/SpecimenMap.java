@@ -37,7 +37,7 @@ public class SpecimenMap extends ControlMap {
 
     static Pose RELOCALIZATION_POSE = new Pose(0, 0, 0);
 
-    int hangCycleCount = 0;
+    static volatile int hangCycleCount = 0;
 
     public SpecimenMap(DriverControls driverControls, CommandScheduler cs, GlobalMap globalMap) {
         super(driverControls);
@@ -79,6 +79,7 @@ public class SpecimenMap extends ControlMap {
                                 new SequentialCommandGroup(
                                         new SetArmPosition().retract(),
                                         new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                                        new WaitCommand(700),
                                         new SetArmPosition().angleDegrees(155)
                                 ),
                                 new SequentialCommandGroup(
@@ -93,47 +94,11 @@ public class SpecimenMap extends ControlMap {
                                                                 new WaitUntilCommand(() -> VLRSubsystem.getArm().currentAngleDegrees() > 140),
                                                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                                                 new WaitCommand(200),
-
-                                                                new SetClawAngle(0.52),
-                                                                new WaitCommand(500),
-                                                                new InstantCommand() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        globalMap.followerActive = false;
-                                                                        rc.singleBlip();
-                                                                    }
-                                                                },
-                                                                new WaitUntilCommand(() -> gp.gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3),
-                                                                new InstantCommand() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        globalMap.followerActive = true;
-                                                                    }
-                                                                },
-                                                                new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                                                                new WaitCommand(200),
+                                                                new SetArmPosition().angleDegrees(80),
                                                                 new ParallelCommandGroup(
-                                                                        new WaitCommand(50).andThen(
-                                                                                new FollowPath(f, bezierPath(SUB_GRAB_SPEC_DEPOSIT_TRANSITION, TELEOP_SPEC_HANG_TRANSITION)
-                                                                                        .setConstantHeadingInterpolation(TELEOP_SPEC_HANG_TRANSITION.getHeading()).build()).setCompletionThreshold(0.9),
-                                                                                new FollowPath(f, bezierPath(TELEOP_SPEC_HANG_TRANSITION, TELEOP_SPEC_HANG_TRANSITION_FINAL_FWD)
-                                                                                        .setConstantHeadingInterpolation(TELEOP_SPEC_HANG_TRANSITION_FINAL_FWD.getHeading()).build())
-                                                                        ),
-                                                                        new ParallelCommandGroup(
-                                                                                new SetArmPosition().angleDegrees(100).andThen(new SetArmPosition().extensionAndAngleDegrees(0.53, 50)),
-                                                                                new WaitCommand(200).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN))
-                                                                        ),
-                                                                        new WaitUntilCommand(() -> f.getPose().getX() > 33.5).andThen(new SetArmPosition().extensionRelative(0.23)).andThen(new SetArmPosition().setArmState(ArmState.State.SPECIMEN_SCORE_FRONT))
+                                                                        new FollowPath(f, bezierPath(SUB_GRAB_SPEC_DEPOSIT_TRANSITION, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER).setLinearHeadingInterpolation(SUB_GRAB_SPEC_DEPOSIT_TRANSITION.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build()),
+                                                                        new SetArmPosition().intakeSpecimen(0.44)
                                                                 ),
-                                                                new WaitCommand(150),
-                                                                new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                                                new WaitCommand(150),
-                                                                new ParallelCommandGroup(
-                                                                        new SetArmPosition().retract(),
-                                                                        new FollowPath(f, bezierPath(TELEOP_SPEC_HANG_TRANSITION_FINAL_FWD, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER).setLinearHeadingInterpolation(TELEOP_SPEC_HANG_TRANSITION_FINAL_FWD.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build())
-                                                                ),
-
-                                                                new SetArmPosition().intakeSpecimen(0.44),
                                                                 new DisableFollower()
                                                         ),
 
@@ -142,25 +107,27 @@ public class SpecimenMap extends ControlMap {
                                                         new SequentialCommandGroup(
                                                                 new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_SPEC_CONTROL, SUB_GRAB_SPEC_DEPOSIT)
                                                                         .setLinearHeadingInterpolation(f.getPose().getHeading(), SUB_GRAB_SPEC_DEPOSIT.getHeading())
-                                                                        .build()).setCompletionThreshold(0.1),
+                                                                        .build()).setCompletionThreshold(0.6),
                                                                 new WaitUntilCommand(() -> VLRSubsystem.getArm().currentAngleDegrees() > 140),
                                                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                                                 new WaitCommand(200),
 
                                                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                                                                new SetArmPosition().angleDegrees(0),
-                                                                new FollowPath(f, bezierPath(SUB_GRAB_SPEC_DEPOSIT, SUB_GRAB_SPEC_CONTROL, SUB_GRAB_SPEC)
-                                                                        .setLinearHeadingInterpolation(SUB_GRAB_SPEC_DEPOSIT.getHeading(), SUB_GRAB_SPEC.getHeading())
-                                                                        .build()
-                                                                ).setCompletionThreshold(0.6),
-
+                                                                new SetArmPosition().angleDegrees(80),
+                                                                new ParallelCommandGroup(
+                                                                        new SetArmPosition().angleDegrees(1),
+                                                                        new FollowPath(f, bezierPath(SUB_GRAB_SPEC_DEPOSIT, SUB_GRAB_SPEC)
+                                                                                .setLinearHeadingInterpolation(SUB_GRAB_SPEC_DEPOSIT.getHeading(), SUB_GRAB_SPEC.getHeading())
+                                                                                .build()
+                                                                        ).setCompletionThreshold(0.6)
+                                                                ),
                                                                 new DisableFollower()
                                                         ),
                                                         () -> gp.gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3
                                                 ),
                                                 new SequentialCommandGroup(
                                                         new WaitCommand(250),
-                                                        new SetArmPosition().angleDegrees(0)
+                                                        new SetArmPosition().angleDegrees(1)
                                                 ),
                                                 () -> globalMap.followerActive // do not continue if follower is off, since that probably means that the grab has failed
                                         )
@@ -181,7 +148,8 @@ public class SpecimenMap extends ControlMap {
             f.holdPoint(f.getPose());
 
             Pose hangPose = TELEOP_SPEC_HANG_FINAL_BACK.copy();
-            hangPose.add(new Pose(0, 2 * hangCycleCount, 0));
+            hangPose.add(new Pose(0, 2 * (hangCycleCount % 12), 0));
+            Logger.getLogger("HangCycle").info("Hang cycle count: " + hangCycleCount);
 
             addCommands(
                     new SetClawState(ClawConfiguration.GripperState.CLOSED),
@@ -197,8 +165,8 @@ public class SpecimenMap extends ControlMap {
                             ),
                             new SequentialCommandGroup(
                                     new ParallelCommandGroup(
-                                            new FollowPath(f, bezierPath(PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER, TELEOP_SPEC_HANG_TRANSITION, TELEOP_SPEC_HANG_FINAL_BACK)
-                                                    .setConstantHeadingInterpolation(TELEOP_SPEC_HANG_FINAL_BACK.getHeading()).build()),
+                                            new FollowPath(f, bezierPath(PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER, TELEOP_SPEC_HANG_TRANSITION, hangPose)
+                                                    .setConstantHeadingInterpolation(hangPose.getHeading()).build()),
                                             new SetArmPosition().scoreSpecimenBack()
                                     ),
                                     new WaitCommand(350),
@@ -208,10 +176,11 @@ public class SpecimenMap extends ControlMap {
                                         @Override
                                         public void run() {
                                             globalMap.followerActive = true;
+                                            f.holdPoint(f.getPose()); // so it doesn't run away
+
                                         }
                                     },
-                                    new HoldPoint(f, f.getPose()), // so it doesn't run away
-                                    new SetArmPosition().extensionRelative(0.21).withTimeout(500),
+                                    new SetArmPosition().extensionRelative(0.21),
                                     new WaitCommand(200),
                                     new InstantCommand() {
                                         @Override
@@ -222,13 +191,13 @@ public class SpecimenMap extends ControlMap {
                                     new ParallelCommandGroup(
                                             new SequentialCommandGroup(
                                                     new SetArmPosition().retract(),
-                                                    new WaitCommand(200),
                                                     new SetArmPosition().intakeSpecimen(0.44)
                                             ),
                                             new FollowPath(f, bezierPath(hangPose, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER)
                                                     .setLinearHeadingInterpolation(hangPose.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build()
                                             )
-                                    )
+                                    ),
+                                    new DisableFollower()
                             ),
                             () -> gp.gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.3
                     )
@@ -250,6 +219,9 @@ public class SpecimenMap extends ControlMap {
     }
 
     private void retract() {
-        cs.schedule(new SetArmPosition().retract());
+        cs.schedule(new SequentialCommandGroup(
+                new SetArmPosition().angleDegrees(1),
+                new SetArmPosition().retract()
+        ));
     }
 }

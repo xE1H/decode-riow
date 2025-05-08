@@ -31,7 +31,7 @@ public class PointsSpecimen {
 
     public static double DELTA = 2.75; //Y OFFSET FOR 4TH AND 5TH SPECIMEN
 
-    public static Pose SUB_GRAB_SPEC = new Pose(64, 120 - 95.5, Math.toRadians(90));
+    public static Pose SUB_GRAB_SPEC = new Pose(64, 24.5, Math.toRadians(90));
     public static Pose SUB_GRAB_SPEC_CONTROL = new Pose(27, 20, Math.toRadians(0));
 
     public static Pose SUB_GRAB_SPEC_DEPOSIT = new Pose(25, 19.5, 0);
@@ -42,5 +42,5 @@ public class PointsSpecimen {
 
     public static Pose TELEOP_SPEC_HANG_TRANSITION_FINAL_FWD = new Pose(35, 60, 0);
 
-    public static Pose TELEOP_SPEC_HANG_FINAL_BACK = new Pose(31, 62, Math.toRadians(-180));
+    public static Pose TELEOP_SPEC_HANG_FINAL_BACK = new Pose(31, 59.5, Math.toRadians(-180));
 }
