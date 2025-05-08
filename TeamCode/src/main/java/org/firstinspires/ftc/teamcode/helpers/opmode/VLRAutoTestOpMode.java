@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.helpers.autoconfig.AutoConfigurator;
@@ -75,8 +76,6 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         ac.review("Selected alliance: " + color.text);
         AllianceSaver.setAlliance(isBlue ? Alliance.BLUE : Alliance.RED);
 
-
-
         f.setStartingPose(StartPose());
 
         autoCommand = autoCommand(f, reader);
@@ -86,6 +85,7 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         autoTimer.reset();
 
         GlobalConfig.DEBUG_MODE = false;
+        VLRSubsystem.getInstance(BlinkinSubsystem.class).setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
 
         Init();
         while (opModeInInit()) {

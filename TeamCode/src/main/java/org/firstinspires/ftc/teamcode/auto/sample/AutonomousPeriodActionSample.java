@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.auto.sample;
 
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.*;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
-
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -14,7 +13,6 @@ import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
@@ -41,6 +39,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
         this.reader = reader;
 
         addCommands(
+                new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
                 new InstantCommand(autoTimer::reset),
 
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
