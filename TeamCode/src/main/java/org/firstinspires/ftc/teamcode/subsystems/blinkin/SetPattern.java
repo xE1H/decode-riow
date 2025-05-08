@@ -18,7 +18,11 @@ public class SetPattern extends InstantCommand {
     public SetPattern(){}
 
     public Command red(){
-        return new SetPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+        return new SetPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
+    }
+
+    public Command green(){
+        return new SetPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
     }
 
     public Command blank(){
