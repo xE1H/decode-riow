@@ -32,14 +32,12 @@ import java.util.logging.Level;
 
 public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private boolean sampleScored = false;
-    private final Alliance alliance;
     private final LimelightYoloReader reader;
     private final ElapsedTime autoTimer = new ElapsedTime();
     private double elapsedTime = 0;
     private final double jointPathTValue = 0.5;
 
-    public AutonomousPeriodActionSample(Follower follower, Alliance alliance, LimelightYoloReader reader) {
-        this.alliance = alliance;
+    public AutonomousPeriodActionSample(Follower follower, LimelightYoloReader reader) {
         this.reader = reader;
 
         addCommands(

@@ -22,6 +22,11 @@ public class VLRSpecimenAuto extends VLRAutoTestOpMode {
 
     @Override
     public Command autoCommand(Follower f, LimelightYoloReader reader){
-        return new AutonomousPeriodActionSpecimen(f, Alliance.BLUE, reader);
+        return new AutonomousPeriodActionSpecimen(f, reader);
+    }
+
+    @Override
+    public boolean SpecimenOnly(){
+        return true;
     }
 }

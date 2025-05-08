@@ -9,17 +9,17 @@ public class PointsSpecimen {
 
     public static Pose START_POSE = new Pose(10, 57 + OFFSET, Math.toRadians(0)); //63.5
 
-    public static Pose SCORE_PRELOAD_AND_SUB_PICKUP = new Pose(35.85, 54.5 + OFFSET, Math.toRadians(0));
+    public static Pose SCORE_PRELOAD_AND_SUB_PICKUP = new Pose(37.5, 54.5 + OFFSET, Math.toRadians(0));
 
-    public static Pose PICK_UP_SAMPLE_1 = new Pose(29, 15.5 + OFFSET, Math.toRadians(0));
+    public static Pose PICK_UP_SAMPLE_1 = new Pose(29, 15.6 + OFFSET, Math.toRadians(0));
 
     public static Pose PICK_UP_SAMPLE_2 = new Pose(29, 5.1 + OFFSET, Math.toRadians(0));
 
-    public static Pose PICK_UP_SAMPLE_3 = new Pose(29, 3.9 + OFFSET, Math.toRadians(-22));
+    public static Pose PICK_UP_SAMPLE_3 = new Pose(29, 3.2 + OFFSET, Math.toRadians(-22));
 
     public static Pose DEPOSIT_SAMPLE_3_START = new Pose(29, 16 + OFFSET, Math.toRadians(0));
 
-    public static Pose DEPOSIT_SAMPLE_3_END = new Pose(25, 16 + OFFSET, Math.toRadians(0));
+    public static Pose DEPOSIT_SAMPLE_3_END = new Pose(24.5, 16 + OFFSET, Math.toRadians(0));
 
     public static Pose SCORE_SECOND_SPECIMEN = new Pose(34.25, 57.5 + OFFSET, Math.toRadians(0));
 
@@ -29,9 +29,7 @@ public class PointsSpecimen {
 
     public static Pose SCORE_SPECIMEN_BACK = new Pose(31, 61 + OFFSET, Math.toRadians(-180));
 
-    public static Pose SCORE_SPECIMEN_BACK_4 = new Pose(31, 65 + OFFSET, Math.toRadians(-180));
-
-    public static Pose SCORE_SPECIMEN_BACK_5 = new Pose(31, 70 + OFFSET, Math.toRadians(-180));
+    public static double DELTA = 2.75; //Y OFFSET FOR 4TH AND 5TH SPECIMEN
 
     public static Pose SUB_GRAB_SPEC = new Pose(64, 120 - 95.5, Math.toRadians(90));
     public static Pose SUB_GRAB_SPEC_CONTROL = new Pose(27, 20, Math.toRadians(0));

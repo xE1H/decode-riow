@@ -50,8 +50,6 @@ public class ArmSlideSubsystem {
     private OPERATION_MODE prevOperationMode = OPERATION_MODE.NORMAL;
 
     private ElapsedTime timer = new ElapsedTime();
-    private ElapsedTime measurementTimer = new ElapsedTime();
-
     private boolean disableThirdMotor = false;
 
     private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
@@ -92,7 +90,7 @@ public class ArmSlideSubsystem {
         motionProfile.enableTelemetry(true);
         timer.reset();
 
-        if  (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)){
+        if  (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)){
             extensionEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             motionProfile.setTargetPosition(getExtension());
         }
@@ -205,8 +203,12 @@ public class ArmSlideSubsystem {
     }
 
     public void updateCoefficientsForOperationMode(){
-        if (operationMode == OPERATION_MODE.HANG) {setHangCoefficients();}
-        else if (operationMode == OPERATION_MODE.NORMAL) {setDefaultCoefficients();}
+        if (operationMode == OPERATION_MODE.HANG) {
+            setHangCoefficients();
+        }
+        else if (operationMode == OPERATION_MODE.NORMAL || operationMode == OPERATION_MODE.NORMAL_SLOWER) {
+            setDefaultCoefficients();
+        }
     }
 
 
@@ -274,9 +276,10 @@ public class ArmSlideSubsystem {
             encoderReset = false;
 
             if (overridePowerState) {
-                extensionMotor0.setPower(clamp(overridePowerValue, -0.5, 0.5));
-                extensionMotor1.setPower(0);
-                extensionMotor2.setPower(0);
+                setMotorPower(overridePowerValue);
+//                extensionMotor0.setPower(clamp(overridePowerValue, -0.5, 0.5));
+//                extensionMotor1.setPower(0);
+//                extensionMotor2.setPower(0);
             }
 
             else if (reachedTargetPosition()) {

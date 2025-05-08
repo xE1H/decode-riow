@@ -30,7 +30,7 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
         rotator = new ArmRotatorSubsystem(hardwareMap);
         slides = new ArmSlideSubsystem(hardwareMap);
 
-        if (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)){
+        if (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)){
             targetPoint = new Point(slides.getTargetExtension(), rotator.getTargetPosition());
             prevTargetPoint = targetPoint;
         }
@@ -124,6 +124,15 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     public boolean isCurrentOperationMode(OPERATION_MODE operationMode){
         return this.operationMode == operationMode;
+    }
+
+    public boolean isCurrentOperationMode(OPERATION_MODE... operationModes){
+        for (OPERATION_MODE operation_mode : operationModes){
+            if (this.operationMode == operation_mode){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setSampleScoreHeight(SAMPLE_SCORE_HEIGHT sampleScoreHeight){

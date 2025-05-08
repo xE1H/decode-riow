@@ -24,6 +24,11 @@ public class VLRSampleAuto extends VLRAutoTestOpMode {
 
     @Override
     public Command autoCommand(Follower f, LimelightYoloReader reader) {
-        return new AutonomousPeriodActionSample(f, Alliance.BLUE, reader);
+        return new AutonomousPeriodActionSample(f, reader);
+    }
+
+    @Override
+    public boolean SpecimenOnly(){
+        return false;
     }
 }

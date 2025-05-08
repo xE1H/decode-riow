@@ -9,22 +9,13 @@ public class ArmRotatorConfiguration {
     public static String ENCODER_NAME = "MotorRightBack";
     public static String BEAM_BREAK_NAME = "BeamBreak";
 
-    //JERK PROFILE CONSTANTS:
-//    public static double ACCELERATION_JERK = 10000;
-//    public static double DECELERATION_JERK = 9000;
-//    public static double MAX_VELOCITY = 100;
-//
-//    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.04;
-//    public static double FEEDBACK_INTEGRAL_GAIN = 0.000;
-//    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0005;
-//    public static double VELOCITY_GAIN = 0.001;
-//    public static double ACCELERATION_GAIN = 0.00002;
-//    public static double FEEDFORWARD_GAIN = 0.05;
-
-    //VERY SLOW, LOGIC TUNING CONSTANTS
     public static double ACCELERATION_JERK = 36000;
     public static double DECELERATION_JERK = 28000;
     public static double MAX_VELOCITY = 900;
+
+    public static double ACCELERATION_JERK_SLOW = 10000;
+    public static double DECELERATION_JERK_SLOW = 9000;
+    public static double MAX_VELOCITY_SLOW = 500;
 
     public static double FEEDBACK_PROPORTIONAL_GAIN = 0.031;
     public static double FEEDBACK_INTEGRAL_GAIN = 0.00001;

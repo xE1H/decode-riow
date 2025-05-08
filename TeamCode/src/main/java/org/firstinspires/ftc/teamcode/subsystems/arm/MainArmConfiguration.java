@@ -30,6 +30,7 @@ public class MainArmConfiguration {
 
     public enum OPERATION_MODE {
         NORMAL,
+        NORMAL_SLOWER,
         HANG,
         HOLD_POINT
     }

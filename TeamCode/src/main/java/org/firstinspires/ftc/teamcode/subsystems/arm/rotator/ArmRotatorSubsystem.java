@@ -74,7 +74,7 @@ public class ArmRotatorSubsystem {
         motionProfile.enableTelemetry(true);
         timer.reset();
 
-        if  (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)){
+        if  (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)){
             thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             updateEncoderPosition();
             motionProfile.setTargetPosition(getAngleDegrees());
@@ -156,6 +156,18 @@ public class ArmRotatorSubsystem {
                 ACCELERATION_GAIN);
     }
 
+    public void setSlowCoefficients() {
+        motionProfile.updateCoefficients(
+                ACCELERATION_JERK_SLOW,
+                DECELERATION_JERK_SLOW,
+                MAX_VELOCITY_SLOW,
+                FEEDBACK_PROPORTIONAL_GAIN,
+                FEEDBACK_INTEGRAL_GAIN,
+                FEEDBACK_DERIVATIVE_GAIN,
+                VELOCITY_GAIN,
+                ACCELERATION_GAIN);
+    }
+
 
     public double getT(){
         return motionProfile.getT();
@@ -165,7 +177,12 @@ public class ArmRotatorSubsystem {
         if (operationMode == OPERATION_MODE.HANG) {
             setHangCoefficients();
         }
-        else if (operationMode == OPERATION_MODE.NORMAL) {setDefaultCoefficients();}
+        else if (operationMode == OPERATION_MODE.NORMAL) {
+            setDefaultCoefficients();
+        }
+        else if (operationMode == OPERATION_MODE.NORMAL_SLOWER) {
+            setSlowCoefficients();
+        }
     }
 
 
