@@ -75,8 +75,7 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         ac.review("Selected alliance: " + color.text);
         AllianceSaver.setAlliance(isBlue ? Alliance.BLUE : Alliance.RED);
 
-        telemetry.addLine("Selected alliance: " + color.text);
-        telemetry.update();
+
 
         f.setStartingPose(StartPose());
 

@@ -16,7 +16,7 @@ public class DriverControls {
     /**
      * The extended gamepad object.
      */
-    GamepadEx gamepad;
+    public GamepadEx gamepad;
 
     /**
      * List of control definitions.
