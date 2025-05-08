@@ -139,7 +139,7 @@ public class AutoConfigurator {
         // Accept - hold stick right for 1 second.
         long startTime = System.currentTimeMillis();
 
-        while (true) {
+        while (!stopRequested) {
             telemetry.addLine("Review:");
             Arrays.stream(lines).forEach(telemetry::addLine);
 
