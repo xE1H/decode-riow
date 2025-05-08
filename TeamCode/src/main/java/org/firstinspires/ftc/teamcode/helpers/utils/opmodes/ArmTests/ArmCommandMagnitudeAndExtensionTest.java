@@ -103,6 +103,9 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
             VLRSubsystem.getArm().disableRotatorPowerOverride();
         }
 
+        VLRSubsystem.getArm().enableSlidePowerOverride(gamepad1.left_stick_y);
+        VLRSubsystem.getArm().enableRotatorPowerOverride(gamepad1.right_stick_y);
+
 //        else if (gamepad1.cross && !prevCross){
 //            CommandScheduler.getInstance().schedule(new SetArmPosition().retract());
 //        }

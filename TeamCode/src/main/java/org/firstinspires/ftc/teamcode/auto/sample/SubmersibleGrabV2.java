@@ -4,12 +4,15 @@ import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_POSITION;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 
+import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
@@ -21,6 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.RequestLimelightFrame;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.WaitUntilNextLimelightFrame;
 
+import java.util.function.BooleanSupplier;
 import java.util.logging.Logger;
 
 @Config
@@ -30,15 +34,16 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
     private final SequentialCommandGroup submersibleGrabCommand = new SequentialCommandGroup();
     double sampleAngle = 90;
 
-    public SubmersibleGrabV2(Follower f, LimelightYoloReader reader, RumbleControls rc) {
+    public SubmersibleGrabV2(Follower f, LimelightYoloReader reader, RumbleControls rc, boolean skipWaiting) {
         addCommands(
-                new SetClawState(ClawConfiguration.GripperState.OPEN),
-                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+//                new SetClawState(ClawConfiguration.GripperState.OPEN),
+//                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+//                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 
-
-                new RequestLimelightFrame(reader),
-                new WaitUntilNextLimelightFrame(reader),
+                new CustomConditionalCommand(
+                        new RequestLimelightFrame(reader).andThen(new WaitUntilNextLimelightFrame(reader)),
+                        ()-> !skipWaiting
+                ),
 
 
                 new InstantCommand() {
@@ -99,10 +104,11 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
 
         submersibleGrabCommand.addCommands(
                 new ParallelCommandGroup(
+                        new WaitCommand(60).andThen(
                         new FollowPath(f, bezierPath(currentPose, strafePose)
                                 .setConstantHeadingInterpolation(robotHeading)
                                 .build())
-                                .withTimeout(1000),
+                                .withTimeout(1200)),
 
                         new SetArmPosition().intakeSampleAuto(
                                 (0.7742 * (forwardComponent + 1.5)) / MAX_POSITION,
@@ -112,7 +118,15 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
         );
     }
 
+    public SubmersibleGrabV2(Follower f, LimelightYoloReader reader, boolean skipWaiting) {
+        this(f, reader, null, skipWaiting);
+    }
+
+    public SubmersibleGrabV2(Follower f, LimelightYoloReader reader, RumbleControls rc) {
+        this(f, reader, rc, false);
+    }
+
     public SubmersibleGrabV2(Follower f, LimelightYoloReader reader) {
-        this(f, reader, null);
+        this(f, reader, null, false);
     }
 }

@@ -20,11 +20,14 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import pedroPathing.tuners.constants.FConstants;
 import pedroPathing.tuners.constants.LConstants;
@@ -39,6 +42,8 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
     boolean prevAutoFinished = false;
     double autoTime = 0;
 
+    private AutoConfigurator ac;
+
     @Override
     public void run() {
         cs = CommandScheduler.getInstance();
@@ -47,23 +52,25 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
         //noinspection unchecked
-        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class);
+        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, BlinkinSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         LimelightYoloReader reader = new LimelightYoloReader();
 
-        AutoConfigurator ac = new AutoConfigurator(telemetry, gamepad1);
+        ac = new AutoConfigurator(telemetry, gamepad1);
         AutoConfigurator.Choice color = ac.multipleChoice("Select alliance:", new AutoConfigurator.Choice("Blue"),
                 new AutoConfigurator.Choice("Red"));
 
         boolean isBlue = color.text.equals("Blue");
 
-        if (isBlue) {
-            reader.setAllowedColors(Arrays.asList(BLUE, YELLOW));
-        } else {
-            reader.setAllowedColors(Arrays.asList(RED, YELLOW));
-        }
+        List<LimelightYoloReader.Limelight.Sample.Color> allowedColors = new ArrayList<>();
+
+        if (isBlue) {allowedColors.add(BLUE);}
+        else {allowedColors.add(RED);}
+        if (!SpecimenOnly()) {allowedColors.add(YELLOW);}
+
+        reader.setAllowedColors(allowedColors);
 
         ac.review("Selected alliance: " + color.text);
         AllianceSaver.setAlliance(isBlue ? Alliance.BLUE : Alliance.RED);
@@ -84,6 +91,7 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         Init();
         while (opModeInInit()) {
             InitLoop();
+            if (isStopRequested()) {ac.setStopRequested(true);}
         }
 
         waitForStart();
@@ -126,4 +134,6 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
     public abstract Command autoCommand(Follower f, LimelightYoloReader reader);
 
     public abstract Pose StartPose();
+
+    public abstract boolean SpecimenOnly();
 }

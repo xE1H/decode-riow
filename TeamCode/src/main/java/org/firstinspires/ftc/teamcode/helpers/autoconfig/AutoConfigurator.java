@@ -12,6 +12,7 @@ public class AutoConfigurator {
     private final Telemetry telemetry;
     private final Gamepad gamepad;
     private static final Logger logger = Logger.getLogger("AutoConfigurator");
+    private boolean stopRequested = false;
 
     public static class Choice {
         public String text;
@@ -33,6 +34,10 @@ public class AutoConfigurator {
         this.gamepad = gamepad;
     }
 
+    public void setStopRequested(boolean stopRequested){
+        this.stopRequested = stopRequested;
+    }
+
     public Choice multipleChoice(String question, Choice... choices) {
         if (choices.length == 0) {
             throw new IllegalArgumentException("Must have at least one choice");
@@ -45,7 +50,7 @@ public class AutoConfigurator {
         long startTime = System.currentTimeMillis();
         boolean isAccepting = false;
 
-        while (!accepted) {
+        while (!accepted && !stopRequested) {
             telemetry.addLine(question);
 
             for (Choice choice : choices) {
