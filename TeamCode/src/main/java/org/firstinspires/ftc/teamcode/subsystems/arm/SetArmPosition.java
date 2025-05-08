@@ -715,7 +715,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new ParallelCommandGroup(
                                         new SequentialCommandGroup(
                                                 new SetArmPosition().extensionAndAngleDegrees(0.71, 95, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
-                                                new WaitCommand(100),
+                                                  new WaitCommand(100),
                                                 new SetArmPosition().extensionAndAngleDegrees(0, 52, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE)
                                         ),
                                         new WaitCommand(150).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
