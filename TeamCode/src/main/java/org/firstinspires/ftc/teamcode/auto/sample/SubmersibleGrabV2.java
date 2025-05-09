@@ -31,10 +31,13 @@ import java.util.logging.Logger;
 public class SubmersibleGrabV2 extends SequentialCommandGroup {
     private final Logger logger = Logger.getLogger("SubmersibleGrabV2");
 
+    private final LimelightYoloReader reader;
+
     private final SequentialCommandGroup submersibleGrabCommand = new SequentialCommandGroup();
     double sampleAngle = 90;
 
     public SubmersibleGrabV2(Follower f, LimelightYoloReader reader, RumbleControls rc, boolean skipWaiting) {
+        this.reader = reader;
         addCommands(
 //                new SetClawState(ClawConfiguration.GripperState.OPEN),
 //                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
@@ -77,11 +80,17 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
     private void generateSubmersibleGrabCommand(Follower f, LimelightYoloReader.Limelight.Sample sample) {
         logger.info("Current pose X: " + f.getPose().getX() + ", Y: " + f.getPose().getY() + ", heading: " + f.getPose().getHeading());
 
+        Pose framePose = reader.getFollowerFramePose();
         Pose currentPose = f.getPose();
-        double robotHeading = currentPose.getHeading();
 
-        double sampleFieldX = currentPose.getX() + sample.getX() * Math.cos(robotHeading) - sample.getY() * Math.sin(robotHeading);
-        double sampleFieldY = currentPose.getY() + sample.getX() * Math.sin(robotHeading) + sample.getY() * Math.cos(robotHeading);
+        if (framePose == null) framePose = currentPose.copy();
+
+        double frameRobotHeading = framePose.getHeading();
+        double currentRobotHeading = currentPose.getHeading();
+
+
+        double sampleFieldX = framePose.getX() + sample.getX() * Math.cos(frameRobotHeading) - sample.getY() * Math.sin(frameRobotHeading);
+        double sampleFieldY = framePose.getY() + sample.getX() * Math.sin(frameRobotHeading) + sample.getY() * Math.cos(frameRobotHeading);
         logger.info("Sample field position - X: " + sampleFieldX + ", Y: " + sampleFieldY);
 
         double dx = sampleFieldX - currentPose.getX();
@@ -89,24 +98,24 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
         logger.info("Vector to sample - dx: " + dx + ", dy: " + dy);
 
         // Calculate strafe and arm extension component
-        double strafeComponent = dx * Math.cos(robotHeading) + dy * Math.sin(robotHeading);
-        double forwardComponent = -dx * Math.sin(robotHeading) + dy * Math.cos(robotHeading);
+        double strafeComponent = dx * Math.cos(currentRobotHeading) + dy * Math.sin(currentRobotHeading);
+        double forwardComponent = -dx * Math.sin(currentRobotHeading) + dy * Math.cos(currentRobotHeading);
         logger.info("Strafe component: " + strafeComponent);
         logger.info("Forward component: " + forwardComponent);
 
         // Calculate the strafe destination
-        double strafeX = currentPose.getX() + strafeComponent * Math.sin(robotHeading);
-        double strafeY = currentPose.getY() - strafeComponent * Math.cos(robotHeading);
+        double strafeX = currentPose.getX() + strafeComponent * Math.sin(currentRobotHeading);
+        double strafeY = currentPose.getY() - strafeComponent * Math.cos(currentRobotHeading);
 
         logger.info("Strafe destination - X: " + strafeX + ", Y: " + strafeY);
 
-        Pose strafePose = new Pose(strafeX, strafeY, robotHeading);
+        Pose strafePose = new Pose(strafeX, strafeY, currentRobotHeading);
 
         submersibleGrabCommand.addCommands(
                 new ParallelCommandGroup(
                         new WaitCommand(60).andThen(
                         new FollowPath(f, bezierPath(currentPose, strafePose)
-                                .setConstantHeadingInterpolation(robotHeading)
+                                .setConstantHeadingInterpolation(currentRobotHeading)
                                 .build())
                                 .withTimeout(1200)),
 
