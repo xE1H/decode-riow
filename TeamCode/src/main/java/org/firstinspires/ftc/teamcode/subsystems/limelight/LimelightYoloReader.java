@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.limelight;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.localization.Pose;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,6 +30,7 @@ public class LimelightYoloReader {
     public static int RETRY_DELAY_MS = 100;
 
     public boolean ready = true;
+    public Pose followerFramePose = null;
 
     public LimelightYoloReader() {
     }
@@ -67,6 +69,14 @@ public class LimelightYoloReader {
         }
 
         return samples;
+    }
+
+    public void setFollowerFramePose(Pose followerFramePose) {
+        this.followerFramePose = followerFramePose;
+    }
+
+    public Pose getFollowerFramePose() {
+        return followerFramePose;
     }
 
     public int getFrameTimeDelta() {
