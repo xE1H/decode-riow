@@ -5,11 +5,11 @@ import com.pedropathing.localization.Pose;
 
 @Config
 public class PointsSpecimen {
-    private static double OFFSET = 8.5;
+    public static double OFFSET = 8.5;
 
     public static Pose START_POSE = new Pose(10, 57 + OFFSET, Math.toRadians(0)); //63.5
 
-    public static Pose SCORE_PRELOAD_AND_SUB_PICKUP = new Pose(37.5, 54.5 + OFFSET, Math.toRadians(0));
+    public static Pose SCORE_PRELOAD_AND_SUB_PICKUP = new Pose(38.4, 56 + OFFSET, Math.toRadians(0));
 
     public static Pose PICK_UP_SAMPLE_1 = new Pose(29, 15.6 + OFFSET, Math.toRadians(0));
 

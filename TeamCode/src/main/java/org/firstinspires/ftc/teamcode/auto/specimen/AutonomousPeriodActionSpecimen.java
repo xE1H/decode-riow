@@ -15,6 +15,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
@@ -43,24 +44,28 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
 
                 //DRIVE TO BAR AND EXTEND ARM
                 new ParallelCommandGroup(
+                        new SetArmPosition().scoreSpecimenFront(),
+                        new WaitCommand(130).andThen(new FollowPath(follower, bezierPath(START_POSE, SCORE_PRELOAD_AND_SUB_PICKUP)
+                                        .setConstantHeadingInterpolation(SCORE_PRELOAD_AND_SUB_PICKUP.getHeading()).build()))
+                ),
+
+                new WaitCommand(30),
+                new RequestLimelightFrame(reader),
+                new ParallelCommandGroup(
                         new SequentialCommandGroup(
-                                new SetArmPosition().scoreSpecimenFront(),
-                                new WaitUntilCommand(()-> follower.atPose(SCORE_PRELOAD_AND_SUB_PICKUP, 1.75, 1.75, Math.toRadians(5))),
                                 new SetArmPosition().extensionRelative(0.17),
-                                new SetPattern().green(),
-                                new WaitUntilCommand(()-> readyForSubPickup),
-                                new SubmersibleGrabV2(follower, reader, true)
+                                new InstantCommand(()-> readyForSubPickup = true),
+                                new SetPattern().green()
                         ),
 
                         new SequentialCommandGroup(
-                                new WaitCommand(150),
-                                new FollowPath(follower, bezierPath(START_POSE, SCORE_PRELOAD_AND_SUB_PICKUP)
-                                        .setConstantHeadingInterpolation(SCORE_PRELOAD_AND_SUB_PICKUP.getHeading()).build()),
-                                new RequestLimelightFrame(reader),
                                 new WaitUntilNextLimelightFrame(reader),
-                                new InstantCommand(()-> readyForSubPickup = true)
+                                new WaitUntilCommand(()-> readyForSubPickup),
+                                new SubmersibleGrabV2(follower, reader, true)
                         )
                 ),
+
+
 
                 //SCORING SPIKE MARK SAMPLE INTO HUMAN PLAYER AREA
                 new ParallelCommandGroup(
@@ -69,7 +74,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                                 new SetPattern().oceanPalette(),
                                 new InstantCommand(()-> VLRSubsystem.getArm().setOperationMode(MainArmConfiguration.OPERATION_MODE.NORMAL_SLOWER)),
                                 new SetArmPosition().angleDegrees(140),
-                                new WaitUntilCommand(()-> follower.getPose().getY() < 18.5),
+                                new WaitUntilCommand(()-> follower.getPose().getY() < PICK_UP_SAMPLE_1.getY() + 3),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new SetPattern().green(),
                                 new InstantCommand(()-> VLRSubsystem.getArm().setOperationMode(MainArmConfiguration.OPERATION_MODE.NORMAL)),
@@ -92,9 +97,15 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                                 )
                         ),
 
+
+
                         new SequentialCommandGroup(
-                                new WaitCommand(450).andThen(
-                                new FollowPath(follower, bezierPath(SCORE_PRELOAD_AND_SUB_PICKUP, PICK_UP_SAMPLE_1)
+                                new WaitCommand(100),
+                                new ScheduleRuntimeCommand(
+                                        ()-> new FollowPath(follower, bezierPath(follower.getPose(), new Pose(follower.getPose().getX() - 3, follower.getPose().getY(), follower.getPose().getHeading()))
+                                        .setConstantHeadingInterpolation(PICK_UP_SAMPLE_1.getHeading()).setPathEndTValueConstraint(pathTValueConstraint).build())),
+                                new ScheduleRuntimeCommand(
+                                        ()-> new FollowPath(follower, bezierPath(follower.getPose(), PICK_UP_SAMPLE_1)
                                         .setConstantHeadingInterpolation(PICK_UP_SAMPLE_1.getHeading()).setPathEndTValueConstraint(pathTValueConstraint).build()))
                         )
                 ),

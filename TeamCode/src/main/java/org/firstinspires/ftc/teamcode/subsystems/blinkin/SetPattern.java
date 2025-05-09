@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.blinkin;
 
+import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_FOREST_PALETTE;
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_OCEAN_PALETTE;
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_WHITE;
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
@@ -32,6 +33,8 @@ public class SetPattern extends InstantCommand {
     public Command oceanPalette(){
         return new SetPattern(BEATS_PER_MINUTE_OCEAN_PALETTE);
     }
+
+    public Command forestPalette() {return new SetPattern(BEATS_PER_MINUTE_FOREST_PALETTE);}
 
     public Command heartbeatWhite(){
         return new SetPattern(HEARTBEAT_WHITE);
