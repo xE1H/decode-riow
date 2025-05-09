@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.teleop.controlmaps.GlobalMap;
 import org.firstinspires.ftc.teamcode.teleop.controlmaps.SampleMap;
 import org.firstinspires.ftc.teamcode.teleop.controlmaps.SpecimenMap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -82,6 +83,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
         SampleMap sampleMap = new SampleMap(gp, cs, globalMap);
         sampleMap.initialize(); // initialize sample controls as default
+        globalMap.reader.setAllowedColors(Arrays.asList(BLUE, YELLOW));
 
         SpecimenMap specimenMap = new SpecimenMap(gp, cs, globalMap);
 

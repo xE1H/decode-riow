@@ -44,7 +44,7 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
 //                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 
                 new CustomConditionalCommand(
-                        new RequestLimelightFrame(reader).andThen(new WaitUntilNextLimelightFrame(reader)),
+                        new RequestLimelightFrame(reader, f).andThen(new WaitUntilNextLimelightFrame(reader)),
                         ()-> !skipWaiting
                 ),
 
