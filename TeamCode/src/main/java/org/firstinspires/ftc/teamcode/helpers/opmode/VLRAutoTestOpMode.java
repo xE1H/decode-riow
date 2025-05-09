@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.helpers.autoconfig.AutoConfigurator;
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
@@ -75,17 +77,21 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         ac.review("Selected alliance: " + color.text);
         AllianceSaver.setAlliance(isBlue ? Alliance.BLUE : Alliance.RED);
 
-
-
         f.setStartingPose(StartPose());
 
         autoCommand = autoCommand(f, reader);
         cs.schedule(autoCommand.andThen(new InstantCommand(() -> autoFinished = true)));
 
+
+        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.UP);
+        VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(ClawConfiguration.HorizontalRotation.NORMAL);
+        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.CLOSED_LOOSE);
+
         waitForStart();
         autoTimer.reset();
 
         GlobalConfig.DEBUG_MODE = false;
+        VLRSubsystem.getInstance(BlinkinSubsystem.class).setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
 
         Init();
         while (opModeInInit()) {

@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 public class SetArmStateOpMode extends VLRLinearOpMode {
     @Override
     public void run(){
-        ArmState.set(ArmState.State.SAMPLE_SCORE);
+        ArmState.set(ArmState.State.SPECIMEN_SCORE_BACK);
 
         waitForStart();
         if (opModeIsActive()) {

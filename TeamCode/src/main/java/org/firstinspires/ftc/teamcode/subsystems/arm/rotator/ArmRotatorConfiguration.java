@@ -22,7 +22,7 @@ public class ArmRotatorConfiguration {
     public static double FEEDBACK_DERIVATIVE_GAIN = 0.00048;
     public static double VELOCITY_GAIN = 0.0021;
     public static double ACCELERATION_GAIN = 0.00018;
-    public static double FEEDFORWARD_GAIN = 0.08;
+    public static double FEEDFORWARD_GAIN = 0.078;
 
     public static double EXTENDED_ACCELERATION_JERK = 9000;
     public static double EXTENDED_DECELERATION_JERK = 3000;
