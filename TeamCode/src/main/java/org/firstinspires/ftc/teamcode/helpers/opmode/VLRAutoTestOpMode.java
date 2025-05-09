@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
@@ -80,6 +81,11 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
 
         autoCommand = autoCommand(f, reader);
         cs.schedule(autoCommand.andThen(new InstantCommand(() -> autoFinished = true)));
+
+
+        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.UP);
+        VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(ClawConfiguration.HorizontalRotation.NORMAL);
+        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.CLOSED_LOOSE);
 
         waitForStart();
         autoTimer.reset();

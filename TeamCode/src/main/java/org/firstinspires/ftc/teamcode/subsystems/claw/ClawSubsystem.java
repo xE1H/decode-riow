@@ -28,10 +28,6 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         grabServos = hardwareMap.get(Servo.class, GRAB_SERVO);
 
         proximitySensor = hardwareMap.get(AnalogInput.class, ANALOG_PROXIMITY);
-
-        setTargetAngle(VerticalRotation.UP);
-        setHorizontalRotation(HorizontalRotation.NORMAL);
-        setTargetState(GripperState.CLOSED_LOOSE);
     }
 
 

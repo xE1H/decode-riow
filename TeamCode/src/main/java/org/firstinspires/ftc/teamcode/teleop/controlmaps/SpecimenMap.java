@@ -35,7 +35,7 @@ public class SpecimenMap extends ControlMap {
     Follower f;
     RumbleControls rc;
 
-    static Pose RELOCALIZATION_POSE = new Pose(0, 0, 0);
+    static Pose RELOCALIZATION_POSE = new Pose(56.488349, 46.358810, Math.toRadians(90));
 
     static volatile int hangCycleCount = 0;
 
@@ -215,6 +215,7 @@ public class SpecimenMap extends ControlMap {
     private void relocalize() {
         rc.rumbleBlips(1);
         Logger.getLogger("Relocalize").info("Relocalizing, current pose: " + f.getPose());
+        f.resetOffset();
         f.setCurrentPoseWithOffset(RELOCALIZATION_POSE);
     }
 
