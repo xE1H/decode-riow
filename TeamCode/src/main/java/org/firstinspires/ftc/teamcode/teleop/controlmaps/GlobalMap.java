@@ -54,7 +54,7 @@ public class GlobalMap extends ControlMap {
     }
 
     private void hang() {
-        CommandScheduler.getInstance().schedule(new SetArmPosition().level_2_hang(() -> gp.gamepad.gamepad.dpad_up));
+        CommandScheduler.getInstance().schedule(new SetArmPosition().level2Hang(() -> gp.gamepad.gamepad.dpad_up));
     }
 
     //

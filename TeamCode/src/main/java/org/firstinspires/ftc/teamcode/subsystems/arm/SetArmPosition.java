@@ -10,7 +10,6 @@ import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
-import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -25,8 +24,6 @@ import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
-import org.firstinspires.ftc.teamcode.subsystems.hang.HangConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.hang.commands.SetHangPosition;
 
 import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
@@ -585,7 +582,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
 
-    public Command level_2_hang(BooleanSupplier gamepadCondition){
+    public Command level2Hang(BooleanSupplier gamepadCondition){
         return new CustomConditionalCommand(
                 new SequentialCommandGroup(
                         new LogCommand("SECOND STAGE HANG", Level.SEVERE, "STARTING LEVEL 2 HANG COMMAND"),
@@ -598,13 +595,12 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new SetArmPosition().setArmOperationMode(OPERATION_MODE.HANG),
                         new ParallelCommandGroup(
                                 new SetArmPosition().extension(0.13),
-                                new WaitCommand(100).andThen(new SetArmPosition().angleDegrees(48)),
+                                new WaitCommand(100).andThen(new SetArmPosition().angleDegrees(48))
 //                                new SequentialCommandGroup(
 //                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.8)),
 //                                        new WaitCommand(450),
 //                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.3))
 //                                ),
-                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)
                         ),
 
                         new WaitCommand(250),
