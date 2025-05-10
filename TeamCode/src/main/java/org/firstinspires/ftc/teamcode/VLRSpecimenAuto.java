@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.Command;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.auto.specimen.AutonomousPeriodActionSpecimen;
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.teamcode.helpers.opmode.VLRAutoTestOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 
-@TeleOp(name = "VLR_SpecimenAuto", group = "!TELEOP")
+@Autonomous(name = "VLR_SpecimenAuto", group = "!TELEOP")
 @Photon
 public class VLRSpecimenAuto extends VLRAutoTestOpMode {
     @Override

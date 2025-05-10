@@ -229,13 +229,13 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                 new SetClawTwist(twist),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new SetArmPosition().extensionAndAngleDegrees(extension, 2).alongWith(
+                                new SetArmPosition().extensionAndAngleDegrees(extension, 4).alongWith(
                                         new SequentialCommandGroup(
                                                 new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.25, 0.08 ,1)),
                                                 new SetClawAngle(angle)
                                         ),
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.1),
+                                                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.05),
                                                 new SetArmPosition().angleDegrees(0)
                                         )
                                 ),

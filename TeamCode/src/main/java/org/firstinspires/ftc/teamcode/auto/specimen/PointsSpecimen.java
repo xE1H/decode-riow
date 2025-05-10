@@ -42,5 +42,5 @@ public class PointsSpecimen {
 
     public static Pose TELEOP_SPEC_HANG_TRANSITION_FINAL_FWD = new Pose(35, 60, 0);
 
-    public static Pose TELEOP_SPEC_HANG_FINAL_BACK = new Pose(31, 59.5, Math.toRadians(-180));
+    public static Pose TELEOP_SPEC_HANG_FINAL_BACK = new Pose(31, 62.5, Math.toRadians(-180));
 }

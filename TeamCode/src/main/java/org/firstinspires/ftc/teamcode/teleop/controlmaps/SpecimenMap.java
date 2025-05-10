@@ -57,9 +57,15 @@ public class SpecimenMap extends ControlMap {
         gp.add(new ButtonCtl(GamepadKeys.Button.LEFT_BUMPER, this::subGrabAndCycle));
         gp.add(new ButtonCtl(GamepadKeys.Button.RIGHT_BUMPER, this::hangCycle));
 
+        gp.add(new ButtonCtl(GamepadKeys.Button.DPAD_LEFT, this::grabPose));
+
         gp.add(new ButtonCtl(GamepadKeys.Button.B, this::retract));
         gp.add(new ButtonCtl(GamepadKeys.Button.RIGHT_STICK_BUTTON, this::relocalize));
 
+    }
+
+    private void grabPose() {
+        cs.schedule(new SetArmPosition().intakeSpecimen(0.44));
     }
 
     private void subGrabAndCycle() {

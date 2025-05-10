@@ -66,7 +66,7 @@ public class AutoConfigurator {
             telemetry.addLine("Hold left stick to the right to accept.");
             if (isAccepting) {
 
-                int acceptProgress = (int) Math.round((System.currentTimeMillis() - startTime) / 100.0);
+                int acceptProgress = (int) Math.round((System.currentTimeMillis() - startTime) / 50.0);
                 telemetry.addLine();
                 // some java bs to repeat a string n times...
                 telemetry.addLine("Accepting [" +
@@ -168,4 +168,5 @@ public class AutoConfigurator {
         Arrays.stream(lines).forEach(telemetry::addLine);
         telemetry.update();
     }
+
 }

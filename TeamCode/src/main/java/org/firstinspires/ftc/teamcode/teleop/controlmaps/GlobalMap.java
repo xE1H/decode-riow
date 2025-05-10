@@ -6,6 +6,7 @@ import com.pedropathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
+import org.firstinspires.ftc.teamcode.helpers.controls.trigger.TriggerCtl;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
@@ -42,6 +43,16 @@ public class GlobalMap extends ControlMap {
             if (!rotatorResetActive) startRotatorOverride();
             else endRotatorOverride();
         }));
+
+        gp.add(new TriggerCtl(GamepadKeys.Trigger.LEFT_TRIGGER, (Double a) -> {
+            VLRSubsystem.getInstance(Wiper.class).wipe(a);
+        }));
+
+        gp.add(new ButtonCtl(GamepadKeys.Button.DPAD_DOWN, this::hang));
+    }
+
+    private void hang() {
+        // todo
     }
 
     //
