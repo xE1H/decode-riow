@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop.controlmaps;
 
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
 
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.trigger.TriggerCtl;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 
@@ -52,7 +54,7 @@ public class GlobalMap extends ControlMap {
     }
 
     private void hang() {
-        // todo
+        CommandScheduler.getInstance().schedule(new SetArmPosition().level_2_hang(() -> gp.gamepad.gamepad.dpad_up));
     }
 
     //
