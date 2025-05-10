@@ -215,6 +215,11 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
 
+    public Command setArmOperationMode(OPERATION_MODE operationMode){
+        return new InstantCommand(()-> arm.setOperationMode(operationMode));
+    }
+
+
     private Command intake(double extension, double angle, double twist){
         return new SequentialCommandGroup(
                 new CustomConditionalCommand(
@@ -587,15 +592,24 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                         new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                         new SetArmPosition().angleDegrees(94).alongWith(
-                                new WaitUntilCommand(()-> arm.currentAngleDegrees() >= 50).andThen(new SetArmPosition().extension(0.314))
-                        ),
+                                new WaitUntilCommand(()-> arm.currentAngleDegrees() > 45).andThen(new SetArmPosition().extension(0.314))),
 
                         new WaitUntilCommand(gamepadCondition),
-                        new SetArmPosition().extension(0.1),
-                        new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HANG)),
+                        new SetArmPosition().setArmOperationMode(OPERATION_MODE.HANG),
+                        new ParallelCommandGroup(
+                                new SetArmPosition().extension(0.13),
+                                new WaitCommand(100).andThen(new SetArmPosition().angleDegrees(48)),
+//                                new SequentialCommandGroup(
+//                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.8)),
+//                                        new WaitCommand(450),
+//                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.3))
+//                                ),
+                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)
+                        ),
 
-                        new SetArmPosition().angleDegrees(48),
-                        new SetArmPosition().extension(0.03),
+                        new WaitCommand(250),
+                        new SetArmPosition().extension(0.0),
+
 
                         setArmState(ArmState.State.HANG_SECOND_STAGE)
                 ),
@@ -641,12 +655,12 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new InstantCommand(()-> VLRSubsystem.getInstance(ClawSubsystem.class).disable()),
                         new InstantCommand(()-> VLRSubsystem.getInstance(Chassis.class).stop()),
                         new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HANG)),
-                        new SetPattern().blank(),
+                        new SetPattern().blank()
 
 
                         //REMOVE LATER:
-                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
-                        new InstantCommand(()->VLRSubsystem.getArm().disableRotatorPowerOverride())
+//                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
+//                        new InstantCommand(()->VLRSubsystem.getArm().disableRotatorPowerOverride())
 
 
 //                        new WaitUntilCommand(gamepadCondition),
