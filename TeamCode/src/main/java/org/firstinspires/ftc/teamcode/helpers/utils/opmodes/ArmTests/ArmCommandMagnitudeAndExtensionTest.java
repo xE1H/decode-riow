@@ -48,6 +48,8 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
     boolean prevSquare = false;
     boolean prevCircle = false;
 
+    boolean overrideEnabled = false;
+
     Follower follower;
     GamepadEx gamepad;
     RumbleControls rc;
@@ -57,7 +59,6 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 
     @Override
     public void Start(){
-        CommandScheduler.getInstance().schedule(new SetArmPosition().retractAfterAuto());
     }
 
     @Override
@@ -73,6 +74,8 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 
         gamepad = new GamepadEx(gamepad1);
         rc = new RumbleControls(gamepad1);
+
+        ArmState.set(ArmState.State.IN_ROBOT);
     }
 
 
@@ -90,21 +93,28 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 
         if (gamepad1.triangle && !prevTriangle){
             follower.setMaxPower(0);
-            CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad1.right_bumper && gamepad1.left_bumper));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().level_2_hang(()-> gamepad1.right_bumper && gamepad1.left_bumper));
         }
 
-        if (gamepad1.cross && !prevCross){
-            VLRSubsystem.getArm().setThirdSlideMotorEnable(false);
-            VLRSubsystem.getArm().enableRotatorPowerOverride(0);
+//        if (gamepad1.cross && !prevCross){
+//            VLRSubsystem.getArm().setThirdSlideMotorEnable(false);
+//            VLRSubsystem.getArm().enableRotatorPowerOverride(0);
+//        }
+//
+//        if (!gamepad1.cross && prevCross){
+//            VLRSubsystem.getArm().setThirdSlideMotorEnable(true);
+//            VLRSubsystem.getArm().disableRotatorPowerOverride();
+//        }
+
+        if (gamepad1.circle && !prevCircle){
+            overrideEnabled = true;
         }
 
-        if (!gamepad1.cross && prevCross){
-            VLRSubsystem.getArm().setThirdSlideMotorEnable(true);
-            VLRSubsystem.getArm().disableRotatorPowerOverride();
+        if (overrideEnabled){
+            VLRSubsystem.getArm().enableSlidePowerOverride(gamepad1.left_stick_y);
+            VLRSubsystem.getArm().enableRotatorPowerOverride(gamepad1.right_stick_y);
         }
 
-        VLRSubsystem.getArm().enableSlidePowerOverride(gamepad1.left_stick_y);
-        VLRSubsystem.getArm().enableRotatorPowerOverride(gamepad1.right_stick_y);
 
 //        else if (gamepad1.cross && !prevCross){
 //            CommandScheduler.getInstance().schedule(new SetArmPosition().retract());
