@@ -4,19 +4,20 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig.DEBUG_MODE;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem.mapToRange;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.*;
+
+import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.LowPassFilter;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.roboctopi.cuttlefishftcbridge.devices.CuttleRevHub;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
@@ -52,6 +53,14 @@ public class ArmSlideSubsystem {
     private ElapsedTime timer = new ElapsedTime();
     private boolean disableThirdMotor = false;
 
+    private CuttleRevHub controlHub;
+    private double power = 0.4;
+    private double delta = 0.01;
+    private double maxPower = 0;
+    private int direction = 1;
+    private LowPassFilter lowPassFilter = new LowPassFilter(0.8);
+
+
     private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
 
 
@@ -71,6 +80,8 @@ public class ArmSlideSubsystem {
         extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         extensionEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
+
+        controlHub = new CuttleRevHub(hardwareMap, CuttleRevHub.HubTypes.CONTROL_HUB);
 
         motionProfile = new MotionProfile(
                 FtcDashboard.getInstance().getTelemetry(),
@@ -224,6 +235,28 @@ public class ArmSlideSubsystem {
 
     public void setThirdMotorEnable(boolean state){
         disableThirdMotor = state;
+    }
+
+
+    public double getCorrectedPowerForMaximumPower(){
+        //TANKS PERFORMANCE, EVERY VOLTAGE AND CURRENT READ TAKES 3MS
+        double voltage = controlHub.getBatteryVoltage();
+        double current = controlHub.getBatteryCurrent();
+        double outputPower = voltage * current;
+
+        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+        telemetry.addData("HUB VOLTAGE: ", voltage);
+        telemetry.addData("HUB CURRENT: ", current);
+
+        // Compare to last measurement
+        if (outputPower > maxPower) {maxPower = outputPower;}
+        else {direction *= -1;}
+
+        power += direction * delta;
+
+        power = lowPassFilter.estimate(power);
+        power = clamp(power, 0, 1);
+        return power;
     }
 
 
