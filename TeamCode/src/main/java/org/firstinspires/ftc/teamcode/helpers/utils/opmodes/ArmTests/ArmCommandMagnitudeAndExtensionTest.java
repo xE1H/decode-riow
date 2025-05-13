@@ -83,7 +83,7 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 
         if (gamepad1.triangle && !prevTriangle){
             follower.setMaxPower(0);
-            CommandScheduler.getInstance().schedule(new SetArmPosition().level2Hang(()-> gamepad1.right_bumper && gamepad1.left_bumper));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad1.right_bumper && gamepad1.left_bumper));
         }
 
 //        if (gamepad1.cross && !prevCross){

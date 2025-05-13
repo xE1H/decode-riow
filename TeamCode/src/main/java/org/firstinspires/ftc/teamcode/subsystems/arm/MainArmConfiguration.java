@@ -32,7 +32,8 @@ public class MainArmConfiguration {
         NORMAL,
         NORMAL_SLOWER,
         HANG,
-        HOLD_POINT
+        HOLD_POINT,
+        MAX_POWER_PULL
     }
 
     public enum SAMPLE_SCORE_HEIGHT {

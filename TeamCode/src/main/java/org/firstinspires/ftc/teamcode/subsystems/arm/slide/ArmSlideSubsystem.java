@@ -54,11 +54,12 @@ public class ArmSlideSubsystem {
     private boolean disableThirdMotor = false;
 
     private CuttleRevHub controlHub;
-    private double power = 0.4;
-    private double delta = 0.01;
+    private double power = 0.3;
+    private double delta = 0.05;
+    private double maxPowerDrop = 0.2; //WATTS
     private double maxPower = 0;
     private int direction = 1;
-    private LowPassFilter lowPassFilter = new LowPassFilter(0.8);
+    private LowPassFilter lowPassFilter = new LowPassFilter(0.7);
 
 
     private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
@@ -238,24 +239,20 @@ public class ArmSlideSubsystem {
     }
 
 
-    public double getCorrectedPowerForMaximumPower(){
-        //TANKS PERFORMANCE, EVERY VOLTAGE AND CURRENT READ TAKES 3MS
-        double voltage = controlHub.getBatteryVoltage();
-        double current = controlHub.getBatteryCurrent();
+    public double getCorrectedMaxPullPower(){
+        //TANKS PERFORMANCE, THESE READS TAKE 3ms EACH
+        double voltage = (double) controlHub.getBatteryVoltage() / 1000;
+        double current = (double) controlHub.getBatteryCurrent() / 1000;
         double outputPower = voltage * current;
-
-        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-        telemetry.addData("HUB VOLTAGE: ", voltage);
-        telemetry.addData("HUB CURRENT: ", current);
 
         // Compare to last measurement
         if (outputPower > maxPower) {maxPower = outputPower;}
         else {direction *= -1;}
 
         power += direction * delta;
+        power = clamp(power, -1, 1);
 
-        power = lowPassFilter.estimate(power);
-        power = clamp(power, 0, 1);
+        System.out.println("VOLTAGE: " + voltage + " CURRENT: " + current + " POWER: " + outputPower + " MOTOR POWER: " + power);
         return power;
     }
 
@@ -273,6 +270,13 @@ public class ArmSlideSubsystem {
         if (DEBUG_MODE){
             holdPointPID.setPID(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
         }
+
+
+        if (operationMode == OPERATION_MODE.MAX_POWER_PULL){
+            setMotorPower(-getCorrectedMaxPullPower());
+            return;
+        }
+
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;

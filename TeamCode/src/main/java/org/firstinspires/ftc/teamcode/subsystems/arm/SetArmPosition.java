@@ -650,21 +650,16 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                         new InstantCommand(()-> VLRSubsystem.getInstance(ClawSubsystem.class).disable()),
                         new InstantCommand(()-> VLRSubsystem.getInstance(Chassis.class).stop()),
-                        new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HANG)),
-                        new SetPattern().blank()
+                        new SetPattern().blank(),
 
 
-                        //REMOVE LATER:
-//                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
-//                        new InstantCommand(()->VLRSubsystem.getArm().disableRotatorPowerOverride())
+                        new WaitUntilCommand(gamepadCondition),
+                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
+                        new InstantCommand(()->VLRSubsystem.getArm().setRotatorPowerLimit(0.2)),
+                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.05)),
+                        new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.MAX_POWER_PULL))
 
-
-//                        new WaitUntilCommand(gamepadCondition),
-//                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
-//                        new InstantCommand(()->VLRSubsystem.getArm().disableRotatorPowerOverride()),
-//                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1)),
-//                        new InstantCommand(()-> VLRSubsystem.getArm().setSlidePowerLimit(0.9)),
-//
+                        //
 //                        new ParallelCommandGroup(
 //                                new SetArmPosition().extension(0),
 //

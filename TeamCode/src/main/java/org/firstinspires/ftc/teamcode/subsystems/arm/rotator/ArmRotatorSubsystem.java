@@ -177,7 +177,7 @@ public class ArmRotatorSubsystem {
         if (operationMode == OPERATION_MODE.HANG) {
             setHangCoefficients();
         }
-        else if (operationMode == OPERATION_MODE.NORMAL) {
+        else if (operationMode == OPERATION_MODE.NORMAL || operationMode == OPERATION_MODE.MAX_POWER_PULL) {
             setDefaultCoefficients();
         }
         else if (operationMode == OPERATION_MODE.NORMAL_SLOWER) {
