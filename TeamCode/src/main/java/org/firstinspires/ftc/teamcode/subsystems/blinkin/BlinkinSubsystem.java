@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 
 //TODO: CHECKOUT COOL PATTERNS -> BEATS_PER_MINUTE_OCEAN_PALETTE, HEARTBEAT_WHITE
 
-public class BlinkinSubsystem extends VLRSubsystem <BlinkinSubsystem> {
+public class BlinkinSubsystem extends VLRSubsystem <BlinkinSubsystem>{
     private RevBlinkinLedDriver blinkinLedDriver;
     private RevBlinkinLedDriver.BlinkinPattern currentPattern;
 

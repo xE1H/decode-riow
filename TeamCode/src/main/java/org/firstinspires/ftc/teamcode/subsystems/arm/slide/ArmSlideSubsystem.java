@@ -14,10 +14,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.roboctopi.cuttlefishftcbridge.devices.CuttleRevHub;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
@@ -53,14 +55,11 @@ public class ArmSlideSubsystem {
     private ElapsedTime timer = new ElapsedTime();
     private boolean disableThirdMotor = false;
 
-    private CuttleRevHub controlHub;
     private double power = 0.3;
-    private double delta = 0.05;
-    private double maxPowerDrop = 0.2; //WATTS
+    private double delta = 0.06;
+    private double direction = 1;
     private double maxPower = 0;
-    private int direction = 1;
-    private LowPassFilter lowPassFilter = new LowPassFilter(0.7);
-
+    VoltageSensor voltageSensor;
 
     private PIDController holdPointPID = new PIDController(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
 
@@ -81,8 +80,7 @@ public class ArmSlideSubsystem {
         extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         extensionEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
-
-        controlHub = new CuttleRevHub(hardwareMap, CuttleRevHub.HubTypes.CONTROL_HUB);
+        this.voltageSensor = (VoltageSensor) hardwareMap.voltageSensor.iterator().next();
 
         motionProfile = new MotionProfile(
                 FtcDashboard.getInstance().getTelemetry(),
@@ -241,15 +239,16 @@ public class ArmSlideSubsystem {
 
     public double getCorrectedMaxPullPower(){
         //TANKS PERFORMANCE, THESE READS TAKE 3ms EACH
-        double voltage = (double) controlHub.getBatteryVoltage() / 1000;
-        double current = (double) controlHub.getBatteryCurrent() / 1000;
+        double voltage = voltageSensor.getVoltage();
+        double current = extensionMotor0.getCurrent(CurrentUnit.AMPS) + extensionMotor1.getCurrent(CurrentUnit.AMPS) + extensionMotor2.getCurrent(CurrentUnit.AMPS);
         double outputPower = voltage * current;
 
         // Compare to last measurement
         if (outputPower > maxPower) {maxPower = outputPower;}
-        else {direction *= -1;}
-
-        power += direction * delta;
+        else{
+            direction *= -1;
+        }
+        power += delta * direction;
         power = clamp(power, -1, 1);
 
         System.out.println("VOLTAGE: " + voltage + " CURRENT: " + current + " POWER: " + outputPower + " MOTOR POWER: " + power);
@@ -261,6 +260,31 @@ public class ArmSlideSubsystem {
         limitSwitchPressed = limitSwitch.isPressed();
         updateEncoderPosition();
 
+//        if (operationMode == OPERATION_MODE.MAX_POWER_PULL && prevOperationMode != OPERATION_MODE.MAX_POWER_PULL){
+//            bomboTimer.reset();
+//            prevOperationMode = OPERATION_MODE.MAX_POWER_PULL;
+//            //setMotorPower(-getCorrectedMaxPullPower());
+//            //return;
+//        }
+//
+//        if (operationMode == OPERATION_MODE.MAX_POWER_PULL){
+//            setMotorPower(-bomboTimer.seconds() * 0.02);
+//            double voltage = (double) controlHub.getBatteryVoltage() / 1000;
+//            double current = extensionMotor0.getCurrent(CurrentUnit.AMPS) + extensionMotor1.getCurrent(CurrentUnit.AMPS) + extensionMotor2.getCurrent(CurrentUnit.AMPS);
+//            double outputPower = voltage * current;
+//
+//            if (outputPower > maxPower) {
+//                maxPower = outputPower;
+//            }
+//            System.out.println("VOLTAGE: " + voltage + " CURRENT: " + current + " POWER: " + outputPower + " MOTOR POWER: " + -bomboTimer.seconds() * 0.02);
+//            return;
+//        }
+        if (operationMode == OPERATION_MODE.MAX_POWER_PULL){
+            setMotorPower(-getCorrectedMaxPullPower());
+            return;
+        }
+
+
         this.operationMode = operationMode;
         if (operationMode == OPERATION_MODE.HOLD_POINT && prevOperationMode != OPERATION_MODE.HOLD_POINT){
             VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "SLIDES HOLDING POINT");
@@ -269,12 +293,6 @@ public class ArmSlideSubsystem {
 
         if (DEBUG_MODE){
             holdPointPID.setPID(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
-        }
-
-
-        if (operationMode == OPERATION_MODE.MAX_POWER_PULL){
-            setMotorPower(-getCorrectedMaxPullPower());
-            return;
         }
 
 
