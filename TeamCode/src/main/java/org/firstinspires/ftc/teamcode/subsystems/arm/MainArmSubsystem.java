@@ -7,6 +7,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorCo
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_EXTENSION_CM;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.roboctopi.cuttlefishftcbridge.devices.CuttleRevHub;
+
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.Point;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
@@ -24,7 +26,6 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     private OPERATION_MODE operationMode = OPERATION_MODE.NORMAL;
 
     private SAMPLE_SCORE_HEIGHT sampleScoreHeight = SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
-
 
     protected void initialize(HardwareMap hardwareMap){
         rotator = new ArmRotatorSubsystem(hardwareMap);

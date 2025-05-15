@@ -26,6 +26,8 @@ public class CommandRunner implements Runnable {
     public static boolean debugCommandScheduler = false;
     private static final Logger logger = Logger.getLogger("CommandRunner");
 
+    private LoopTimeMonitor loopTimeMonitor = new LoopTimeMonitor();
+
     public CommandRunner(OpModeRunningInterface runningInterface, HardwareMap hardwareMap) {
         this.runningInterface = runningInterface;
         this.hardwareMap = hardwareMap;
@@ -59,14 +61,15 @@ public class CommandRunner implements Runnable {
         }
 
         while (runningInterface.isOpModeRunning()) {
-            while (runningInterface.isOpModeRunning()) {
+            loopTimeMonitor.loopStart();
 
-                for (LynxModule hub : allHubs) {
-                    hub.clearBulkCache();
-                }
-
-                CommandScheduler.getInstance().run();
+            for (LynxModule hub : allHubs) {
+                hub.clearBulkCache();
             }
+
+            CommandScheduler.getInstance().run();
+            loopTimeMonitor.loopEnd();
+            //System.out.println("COMMAND THREAD LOOP TIME HZ: " + loopTimeMonitor.getAverageTime(5) / Math.pow(10, -9));
         }
     }
 }

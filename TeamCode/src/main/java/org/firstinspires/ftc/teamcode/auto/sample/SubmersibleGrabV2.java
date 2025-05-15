@@ -4,8 +4,8 @@ import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_POSITION;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.ProxyScheduleCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.pedropathing.commands.FollowPath;
@@ -14,17 +14,19 @@ import com.pedropathing.localization.Pose;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
+import org.firstinspires.ftc.teamcode.subsystems.blinkin.SetPattern;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.RequestLimelightFrame;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.WaitUntilNextLimelightFrame;
 
-import java.util.function.BooleanSupplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Config
@@ -32,6 +34,7 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
     private final Logger logger = Logger.getLogger("SubmersibleGrabV2");
 
     private final LimelightYoloReader reader;
+    private LimelightYoloReader.Limelight.Sample.Color sampleColour;
 
     private final SequentialCommandGroup submersibleGrabCommand = new SequentialCommandGroup();
     double sampleAngle = 90;
@@ -39,9 +42,10 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
     public SubmersibleGrabV2(Follower f, LimelightYoloReader reader, RumbleControls rc, boolean skipWaiting) {
         this.reader = reader;
         addCommands(
-//                new SetClawState(ClawConfiguration.GripperState.OPEN),
-//                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-//                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+                new CustomConditionalCommand(
+                        new SetClawState(ClawConfiguration.GripperState.OPEN),
+                        ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
+                ),
 
                 new CustomConditionalCommand(
                         new RequestLimelightFrame(reader, f).andThen(new WaitUntilNextLimelightFrame(reader)),
@@ -66,12 +70,15 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
                             }
                             if (sampleAngle < 0) sampleAngle += 180;
 
-                            logger.info("Going for sample: " + sample.getColor() + " in X: " + sample.getX() + ", Y: " + sample.getY() + ", angle: " + sampleAngle);
+                            sampleColour = sample.getColor();
+                            logger.info("Going for sample: " + sampleColour + " in X: " + sample.getX() + ", Y: " + sample.getY() + ", angle: " + sampleAngle);
 
                             generateSubmersibleGrabCommand(f, sample);
                         }
                     }
                 },
+
+                new ScheduleRuntimeCommand(()-> new SetPattern().blinkSampleColour(sampleColour)),
                 submersibleGrabCommand
         );
 
@@ -110,6 +117,7 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
         logger.info("Strafe destination - X: " + strafeX + ", Y: " + strafeY);
 
         Pose strafePose = new Pose(strafeX, strafeY, currentRobotHeading);
+        logger.info("CLAW TWIST: " + (sampleAngle / -180.0) + 1);
 
         submersibleGrabCommand.addCommands(
                 new ParallelCommandGroup(

@@ -237,6 +237,7 @@ public class LimelightYoloReader {
         return setAllowedColors(List.of(Limelight.Sample.Color.YELLOW));
     }
 
+
     /**
      * Allow all colors (default behavior)
      */
