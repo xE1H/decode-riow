@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -24,13 +25,15 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
     MotorEx MotorLeftBack;
     MotorEx MotorRightBack;
 
+    AnalogInput leftAngledSensor;
+    AnalogInput rightAngledSensor;
+
     public static double motorPower = 1;
     public static double acceleration_a = 0.9;
     public static double deceleration_a = 0.6;
 
     public static double forwardsMultiplier = 0.95;
     public static double strafeMultiplier = 0.7;
-
 
     public static double staticFrictionBar = 0.05;
 
@@ -57,6 +60,9 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         MotorRightBack.setRunMode(Motor.RunMode.RawPower);
         MotorRightFront.setRunMode(Motor.RunMode.RawPower);
         MotorLeftFront.setRunMode(Motor.RunMode.RawPower);
+
+        leftAngledSensor = hardwareMap.get(AnalogInput.class, LEFT_ANGLED_SENSOR);
+        rightAngledSensor = hardwareMap.get(AnalogInput.class, RIGHT_ANGLED_SENSOR);
 
 //        MotorRightBack.setInverted(true);
 //        MotorRightFront.setInverted(true);
@@ -124,10 +130,15 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
     }
 
 
+    private double getDistanceMM(double voltage){
+        return voltage / 3.3 * 1500;
+    }
+
+
     public Pose calculateRobotPoseFromDistanceSensors(Follower follower){
         double robotAngle = follower.getPose().getHeading();
-        double X_offset = 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.sin(robotAngle);
-        double Y_offset = 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.cos(robotAngle);
+        double X_offset = getDistanceMM(leftAngledSensor.getVoltage()) + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.sin(robotAngle);
+        double Y_offset = getDistanceMM(rightAngledSensor.getVoltage()) + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.cos(robotAngle);
 
         Pose midpointBetweenSensors = new Pose(BUCKET_CORNER.getX() + X_offset, BUCKET_CORNER.getY() - Y_offset, robotAngle);
         Vector2d rotatedOffset = OFFSET_FROM_SENSOR_MIDPOINT_TO_PEDRO_CENTER.rotateBy(Math.toDegrees(robotAngle));
