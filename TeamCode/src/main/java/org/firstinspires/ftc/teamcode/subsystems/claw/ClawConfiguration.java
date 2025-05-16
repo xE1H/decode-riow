@@ -12,7 +12,7 @@ public interface ClawConfiguration {
     double HORIZONTAL_ROTATION_MIN = 0;
     double HORIZONTAL_ROTATION_MAX = 1;
 
-    double CLAW_ANALOG_PROXIMITY_THRESHOLD = 1.065;
+    double CLAW_ANALOG_PROXIMITY_THRESHOLD = 0.92;//1.065;
 
     enum VerticalRotation {
         DOWN(1),
@@ -36,9 +36,9 @@ public interface ClawConfiguration {
     }
 
     enum GripperState {
-        CLOSED(0.08),
+        CLOSED(0.095),
         CLOSED_LOOSE(0.13),
-        OPEN(0.81);
+        OPEN(0.92);
 
         public final double pos;
 

@@ -3,15 +3,15 @@ package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.rad;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
+import org.firstinspires.ftc.teamcode.helpers.commands.RepeatUntilCommand;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
@@ -30,7 +30,6 @@ public class LimelightAimerTest extends VLRLinearOpMode {
 
     @Override
     public void run() {
-
         VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, BlinkinSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
@@ -47,13 +46,19 @@ public class LimelightAimerTest extends VLRLinearOpMode {
 //            sleep(10);
 //        }
 
-        cs.schedule(new SequentialCommandGroup(
-                new SubmersibleGrabV2(f, reader),
-                new SetArmPosition().retract()
-        ));
+        cs.schedule(new SubmersibleGrabV2(f, reader).andThen(new SetArmPosition().retract()));
 
         while (opModeIsActive()) {
             f.update();
         }
+    }
+
+
+    private Command SubGrabWithFailsafe(Follower f, LimelightYoloReader reader){
+        return new RepeatUntilCommand(
+                ()-> VLRSubsystem.getInstance(ClawSubsystem.class).isSamplePresent(),
+                new SubmersibleGrabV2(f, reader),
+                new SetArmPosition().retract()
+        );
     }
 }

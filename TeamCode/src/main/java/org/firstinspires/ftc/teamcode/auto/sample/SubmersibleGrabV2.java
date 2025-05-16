@@ -121,11 +121,10 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
 
         submersibleGrabCommand.addCommands(
                 new ParallelCommandGroup(
-                        new WaitCommand(60).andThen(
                         new FollowPath(f, bezierPath(currentPose, strafePose)
                                 .setConstantHeadingInterpolation(currentRobotHeading)
                                 .build())
-                                .withTimeout(1200)),
+                                .withTimeout(1200),
 
                         new SetArmPosition().intakeSampleAuto(
                                 (0.7742 * (forwardComponent + 1.5)) / MAX_POSITION,
