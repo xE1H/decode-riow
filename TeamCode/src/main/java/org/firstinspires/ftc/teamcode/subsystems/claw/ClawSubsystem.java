@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.claw;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 
+import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.LowPassFilter;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawConfiguration {
     private Servo angleServo, twistServo, grabServos;
     private AnalogInput proximitySensor;
-
+    private LowPassFilter analogFilter = new LowPassFilter(0.7);
 
     private VerticalRotation targetAngle = VerticalRotation.UP;
     private GripperState clawState = GripperState.CLOSED;
@@ -62,8 +63,11 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         grabServos.setPosition(state.pos);
     }
 
+
     public boolean isSamplePresent(){
-        return proximitySensor.getVoltage() < CLAW_ANALOG_PROXIMITY_THRESHOLD;
+        boolean state = analogFilter.estimate(proximitySensor.getVoltage()) > CLAW_ANALOG_PROXIMITY_THRESHOLD;
+        logger.info("SAMPLE PRESENT SATE: " + state);
+        return state;
     }
 
     public void disable() {

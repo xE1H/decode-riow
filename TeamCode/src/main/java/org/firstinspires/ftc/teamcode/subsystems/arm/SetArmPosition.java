@@ -233,15 +233,16 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new ParallelCommandGroup(
                                         new SetArmPosition().extensionAndAngleDegrees(extension, 4),
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.5, 0.02 ,1)),
-                                                new SetClawAngle(angle),
                                                 new WaitCommand(100),
+                                                new SetClawAngle(angle),
+                                                new WaitCommand(180),
                                                 new SetClawTwist(twist),
-                                                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.125),
+                                                new WaitCommand(100),
+                                                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.150),
                                                 new SetArmPosition().angleDegrees(0)
                                         )
                                 ),
-                                new ScheduleRuntimeCommand(()-> new WaitCommand((long) (Math.abs(0.5 - twist) * 150)))
+                                 new WaitCommand((long) ((Math.abs(0.5 - twist) * 60) + 40))
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
                 ),
@@ -434,7 +435,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                         new SetArmPosition().extension(0),
                                         new SequentialCommandGroup(
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                                new WaitCommand(50),
+                                                new WaitCommand(150),
                                                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)
                                         )
                                 ),

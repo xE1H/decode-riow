@@ -18,6 +18,7 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.RepeatNTimesCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
@@ -61,15 +62,8 @@ public class SetPattern extends InstantCommand {
 
     public InstantCommand blinkSampleColour(RevBlinkinLedDriver.BlinkinPattern sampleColour){
         return new InstantCommand(()-> CommandScheduler.getInstance().schedule(
-                new SequentialCommandGroup(
-                        new SetPattern().blank(),
-                        new WaitCommand(waitBetweenBlinksMS),
-                        new SetPattern(sampleColour),
-                        new WaitCommand(waitBetweenBlinksMS),
-                        new SetPattern().blank(),
-                        new WaitCommand(waitBetweenBlinksMS),
-                        new SetPattern(sampleColour),
-                        new WaitCommand(waitBetweenBlinksMS),
+                new RepeatNTimesCommand(
+                        3,
                         new SetPattern().blank(),
                         new WaitCommand(waitBetweenBlinksMS),
                         new SetPattern(sampleColour),
