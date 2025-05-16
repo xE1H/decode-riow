@@ -6,6 +6,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -119,5 +121,17 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
     public void setPower(double power) {
         motorPower = Math.min(power, 1.0);
+    }
+
+
+    public Pose calculateRobotPoseFromDistanceSensors(Follower follower){
+        double robotAngle = follower.getPose().getHeading();
+        double X_offset = 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.sin(robotAngle);
+        double Y_offset = 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.cos(robotAngle);
+
+        Pose midpointBetweenSensors = new Pose(BUCKET_CORNER.getX() + X_offset, BUCKET_CORNER.getY() - Y_offset, robotAngle);
+        Vector2d rotatedOffset = OFFSET_FROM_SENSOR_MIDPOINT_TO_PEDRO_CENTER.rotateBy(Math.toDegrees(robotAngle));
+
+        return new Pose(midpointBetweenSensors.getX() + rotatedOffset.getX(), midpointBetweenSensors.getY() + rotatedOffset.getY(), robotAngle);
     }
 }
