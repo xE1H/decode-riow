@@ -1,8 +1,20 @@
 package org.firstinspires.ftc.teamcode.auto.specimen;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.*;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DELTA;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DEPOSIT_SAMPLE_3_END;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DEPOSIT_SAMPLE_3_START;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DRIVE_BACK;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SAMPLE_1;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SAMPLE_2;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SAMPLE_3;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SCORE_PRELOAD_AND_SUB_PICKUP;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SCORE_SECOND_SPECIMEN;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SCORE_SPECIMEN_BACK;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.START_POSE;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
+
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -13,6 +25,7 @@ import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;

@@ -5,6 +5,21 @@ import java.text.SimpleDateFormat
 //
 apply plugin: 'com.android.library'
 
+repositories {
+    maven {
+        url "https://repo.dairy.foundation/snapshots"
+    }
+    maven {
+        url "https://repo.dairy.foundation/releases"
+    }
+    maven {
+        url = 'https://www.matthewo.tech/maven/'
+    }
+    maven{
+        url = 'https://maven.brott.dev/'
+    }
+}
+
 android {
 
     defaultConfig {
@@ -25,6 +40,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     namespace = 'com.qualcomm.ftcrobotcontroller'
+}
+
+dependencies {
+    implementation "dev.frozenmilk.sinister:Sloth:0.0.1"
 }
 
 apply from: '../build.dependencies.gradle'
