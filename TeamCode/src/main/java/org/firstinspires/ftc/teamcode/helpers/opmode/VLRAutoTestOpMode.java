@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.helpers.opmode;
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.BLUE;
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.RED;
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.YELLOW;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.Command;
@@ -13,7 +12,6 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.helpers.autoconfig.AutoConfigurator;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.persistence.AllianceSaver;
@@ -22,17 +20,14 @@ import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
-import pedroPathing.tuners.constants.FConstants;
-import pedroPathing.tuners.constants.LConstants;
 
 public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
     CommandScheduler cs;

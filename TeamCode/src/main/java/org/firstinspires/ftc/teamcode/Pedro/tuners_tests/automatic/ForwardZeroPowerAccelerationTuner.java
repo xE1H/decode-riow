@@ -1,4 +1,4 @@
-package pedroPathing.tuners.tuners_tests.automatic;
+package org.firstinspires.ftc.teamcode.Pedro.tuners_tests.automatic;
 import static com.pedropathing.follower.FollowerConstants.*;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import pedroPathing.tuners.constants.FConstants;
-import pedroPathing.tuners.constants.LConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
 /**
  * This is the ForwardZeroPowerAccelerationTuner autonomous follower OpMode. This runs the robot

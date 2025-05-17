@@ -20,6 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
+import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
 @TeleOp(name = "LimelightAimer", group = "Utils")
 @Photon
@@ -33,7 +35,7 @@ public class LimelightAimerTest extends VLRLinearOpMode {
         VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, BlinkinSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
-        Follower f = new Follower(hardwareMap, pedroPathing.tuners.constants.FConstants.class, pedroPathing.tuners.constants.LConstants.class);
+        Follower f = new Follower(hardwareMap, FConstants.class, LConstants.class);
         f.setStartingPose(new Pose(0, 0, rad(0)));
         CommandScheduler cs = CommandScheduler.getInstance();
         LimelightYoloReader reader = new LimelightYoloReader();

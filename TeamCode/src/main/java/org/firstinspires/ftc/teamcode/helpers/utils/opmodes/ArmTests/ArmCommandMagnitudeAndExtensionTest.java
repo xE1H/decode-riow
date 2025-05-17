@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 
-import pedroPathing.tuners.constants.FConstants;
-import pedroPathing.tuners.constants.LConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
 @Config
 @Photon

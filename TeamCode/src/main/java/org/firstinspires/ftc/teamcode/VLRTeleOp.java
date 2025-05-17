@@ -29,12 +29,11 @@ import org.firstinspires.ftc.teamcode.teleop.controlmaps.GlobalMap;
 import org.firstinspires.ftc.teamcode.teleop.controlmaps.SampleMap;
 import org.firstinspires.ftc.teamcode.teleop.controlmaps.SpecimenMap;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import pedroPathing.tuners.constants.FConstants;
-import pedroPathing.tuners.constants.LConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
 @TeleOp(name = "VLRTeleOp", group = "!TELEOP")
 @Photon

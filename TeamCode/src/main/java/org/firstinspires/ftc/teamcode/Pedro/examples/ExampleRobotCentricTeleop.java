@@ -1,12 +1,12 @@
-package pedroPathing.tuners.examples;
+package org.firstinspires.ftc.teamcode.Pedro.examples;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import pedroPathing.tuners.constants.FConstants;
-import pedroPathing.tuners.constants.LConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
 /**
  * This is an example teleop that showcases movement and robot-centric driving.
