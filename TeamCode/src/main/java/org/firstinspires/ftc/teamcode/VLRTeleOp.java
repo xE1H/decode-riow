@@ -12,8 +12,8 @@ import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
-import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
+import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
 import org.firstinspires.ftc.teamcode.controlmaps.GlobalMap;
 import org.firstinspires.ftc.teamcode.controlmaps.SampleMap;
 import org.firstinspires.ftc.teamcode.controlmaps.SpecimenMap;
