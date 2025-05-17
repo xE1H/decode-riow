@@ -1,13 +1,21 @@
 package org.firstinspires.ftc.teamcode.subsystems.arm;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.*;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.ARM_PIVOT_POINT_OFFSET_FROM_ROBOT_CENTER;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.EXCLUSION_ZONE_MAX_ANGLE;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.EXCLUSION_ZONE_MIN_ANGLE;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.EXCLUSION_ZONE_MIN_EXTENSION;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OFFSET_REFERENCE_PLANE;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERATION_MODE;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.RETRACTED_END_EFFECTOR_OFFSET_FROM_PIVOT_POINT;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.ROBOT_LENGTH_CM;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.SAMPLE_SCORE_HEIGHT;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.MAX_ANGLE;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.MIN_ANGLE;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_EXTENSION_CM;
+
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.roboctopi.cuttlefishftcbridge.devices.CuttleRevHub;
 
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.Point;

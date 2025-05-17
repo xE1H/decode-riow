@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode.helpers.monitoring;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.TreeSet;
 import java.util.Iterator;
+import java.util.TreeSet;
 
 
 public class LoopTimeMonitor {
