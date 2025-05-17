@@ -7,10 +7,8 @@ import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.auto.specimen.AutonomousPeriodActionSpecimen;
-import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRAutoTestOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 

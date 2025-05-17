@@ -12,28 +12,28 @@ import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
+import org.firstinspires.ftc.teamcode.controlmaps.GlobalMap;
+import org.firstinspires.ftc.teamcode.controlmaps.SampleMap;
+import org.firstinspires.ftc.teamcode.controlmaps.SpecimenMap;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.persistence.AllianceSaver;
-import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
+import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
-import org.firstinspires.ftc.teamcode.teleop.controlmaps.GlobalMap;
-import org.firstinspires.ftc.teamcode.teleop.controlmaps.SampleMap;
-import org.firstinspires.ftc.teamcode.teleop.controlmaps.SpecimenMap;
+
 
 import java.util.Arrays;
 import java.util.Collections;
-
-import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
-import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
 @TeleOp(name = "VLRTeleOp", group = "!TELEOP")
 @Photon

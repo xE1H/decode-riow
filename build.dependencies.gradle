@@ -17,7 +17,7 @@ dependencies {
     implementation 'org.firstinspires.ftc:Hardware:10.2.0'
     implementation 'org.firstinspires.ftc:FtcCommon:10.2.0'
     implementation 'org.firstinspires.ftc:Vision:10.2.0'
-    implementation 'androidx.appcompat:appcompat:1.2.0' // keep at 1.2.0, else it breaks
+    implementation 'androidx.appcompat:appcompat:1.2.0'
 
 
     implementation("com.pedropathing:pedro:1.0.9") {
@@ -32,3 +32,4 @@ dependencies {
     implementation 'com.roboctopi:CuttlefishFTCBridge:1.0.0'
     implementation 'com.github.Thermal-Equilibrium:homeostasis-FTC:1.0.8'
 }
+

@@ -1,7 +1,16 @@
 package org.firstinspires.ftc.teamcode.auto.sample;
 
-import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.*;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.BUCKET_HIGH_SCORE_POSE;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.BUCKET_HIGH_SCORE_POSE_SUB;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.FIRST_MARK_GRAB;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.GRAB_POSES;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.START_POSE;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB_0;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB_CONTROL_1;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB_CONTROL_2;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
+
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -13,10 +22,10 @@ import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
-import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;

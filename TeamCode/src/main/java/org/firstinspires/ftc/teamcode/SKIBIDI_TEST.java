@@ -12,6 +12,6 @@ public class SKIBIDI_TEST extends OpMode {
 
     @Override
     public void loop() {
-        System.out.println("SKIBIDI 6");
+        System.out.println("SKIBIDI 12");
     }
 }

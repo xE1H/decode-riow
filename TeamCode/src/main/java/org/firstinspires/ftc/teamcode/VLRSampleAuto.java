@@ -9,7 +9,6 @@ import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.auto.sample.AutonomousPeriodActionSample;
-import org.firstinspires.ftc.teamcode.helpers.enums.Alliance;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRAutoTestOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 

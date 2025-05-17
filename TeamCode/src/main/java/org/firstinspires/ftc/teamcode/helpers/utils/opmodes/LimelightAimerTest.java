@@ -10,6 +10,8 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.commands.RepeatUntilCommand;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
@@ -20,8 +22,6 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
-import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
-import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
 @TeleOp(name = "LimelightAimer", group = "Utils")
 @Photon

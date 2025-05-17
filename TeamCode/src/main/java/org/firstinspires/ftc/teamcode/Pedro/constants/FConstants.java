@@ -5,8 +5,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfigura
 import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration.MOTOR_RIGHT_BACK;
 import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration.MOTOR_RIGHT_FRONT;
 
-import com.pedropathing.localization.Localizers;
 import com.pedropathing.follower.FollowerConstants;
+import com.pedropathing.localization.Localizers;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class FConstants {

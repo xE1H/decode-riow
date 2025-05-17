@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.Pedro.tuners_tests.automatic;
 
-import static com.pedropathing.follower.FollowerConstants.*;
+import static com.pedropathing.follower.FollowerConstants.leftFrontMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.leftRearMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.rightFrontMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
 import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration.MOTOR_LEFT_BACK;
 import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration.MOTOR_LEFT_FRONT;
 import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration.MOTOR_RIGHT_BACK;
@@ -9,6 +12,9 @@ import static org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfigura
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.pedropathing.localization.PoseUpdater;
+import com.pedropathing.pathgen.MathFunctions;
+import com.pedropathing.pathgen.Vector;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,16 +22,12 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import com.pedropathing.localization.PoseUpdater;
-import com.pedropathing.pathgen.MathFunctions;
-import com.pedropathing.pathgen.Vector;
+import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.firstinspires.ftc.teamcode.Pedro.constants.FConstants;
-import org.firstinspires.ftc.teamcode.Pedro.constants.LConstants;
 
 /**
  * This is the ForwardVelocityTuner autonomous follower OpMode. This runs the robot forwards at max
