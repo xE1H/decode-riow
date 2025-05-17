@@ -216,6 +216,19 @@ public class SetArmPosition extends SequentialCommandGroup{
         return new InstantCommand(()-> arm.setOperationMode(operationMode));
     }
 
+    private Command grabSequence(double extension, double angle, double twist){
+        return new SequentialCommandGroup(
+                new WaitCommand(100),
+                new SetClawAngle(angle),
+                new WaitCommand(180),
+                new SetClawTwist(twist),
+                new WaitCommand(100),
+                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.150),
+                new SetArmPosition().angleDegrees(0),
+                new WaitCommand((long) ((Math.abs(0.5 - twist) * 60) + 40))
+        );
+    }
+
 
     private Command intake(double extension, double angle, double twist){
         return new SequentialCommandGroup(
@@ -232,17 +245,8 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new ParallelCommandGroup(
                                         new SetArmPosition().extensionAndAngleDegrees(extension, 4),
-                                        new SequentialCommandGroup(
-                                                new WaitCommand(100),
-                                                new SetClawAngle(angle),
-                                                new WaitCommand(180),
-                                                new SetClawTwist(twist),
-                                                new WaitCommand(100),
-                                                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.150),
-                                                new SetArmPosition().angleDegrees(0)
-                                        )
-                                ),
-                                 new WaitCommand((long) ((Math.abs(0.5 - twist) * 60) + 40))
+                                        grabSequence(extension, angle, twist)
+                                )
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
                 ),
@@ -273,15 +277,7 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                                                 new ParallelCommandGroup(
                                                         new SetArmPosition().extension(extension),
-                                                        new SequentialCommandGroup(
-                                                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                                                new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.25, 0.08 ,1)),
-                                                                new SetClawAngle(angle),
-                                                                new WaitCommand(50),
-                                                                new SetClawTwist(twist),
-                                                                new WaitCommand(140),
-                                                                new SetArmPosition().angleDegrees(0)
-                                                        )
+                                                        grabSequence(extension, angle, twist)
                                                 )
                                         )
                                 )
@@ -313,16 +309,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                                 new ParallelCommandGroup(
                                                         new SetClawAngle(0.68),
                                                         new SetArmPosition().extension(extension),
-                                                        new SequentialCommandGroup(
-                                                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                                                new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.25, 0.08 ,1)),
-                                                                new SetClawAngle(angle),
-                                                                new WaitCommand(50),
-                                                                new SetClawTwist(twist),
-                                                                new WaitCommand(150),
-                                                                new SetArmPosition().angleDegrees(0),
-                                                                new WaitCommand(10)
-                                                        )
+                                                        grabSequence(extension, angle, twist)
                                                 )
                                         )
                                 )
