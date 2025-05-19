@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.helpers.controls;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.List;
 import java.util.function.BiConsumer;

@@ -2,10 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.arm;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem.getArm;
-import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
-import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OFFSET_REFERENCE_PLANE;
-import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERATION_MODE;
-import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.SAMPLE_SCORE_HEIGHT;
+
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -13,10 +10,15 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
+
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.Point;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OFFSET_REFERENCE_PLANE;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERATION_MODE;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.SAMPLE_SCORE_HEIGHT;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.SetPattern;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
@@ -58,7 +60,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new WaitUntilCommand(arm::motionProfilePathsAtParametricEnd),
 
                                 new CustomConditionalCommand(
-                                        new InstantCommand(()-> arm.setOperationMode(MainArmConfiguration.OPERATION_MODE.HOLD_POINT)),
+                                        new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HOLD_POINT)),
                                         ()-> !arm.isCurrentOperationMode(OPERATION_MODE.HANG)
                                 ),
 
@@ -216,6 +218,19 @@ public class SetArmPosition extends SequentialCommandGroup{
         return new InstantCommand(()-> arm.setOperationMode(operationMode));
     }
 
+    private Command grabSequence(double extension, double angle, double twist){
+        return new SequentialCommandGroup(
+                new WaitCommand(100),
+                new SetClawAngle(angle),
+                new WaitCommand(180),
+                new SetClawTwist(twist),
+                new WaitCommand(100),
+                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.150),
+                new SetArmPosition().angleDegrees(0),
+                new WaitCommand((long) ((Math.abs(0.5 - twist) * 60) + 40))
+        );
+    }
+
 
     private Command intake(double extension, double angle, double twist){
         return new SequentialCommandGroup(
@@ -232,17 +247,8 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new ParallelCommandGroup(
                                         new SetArmPosition().extensionAndAngleDegrees(extension, 4),
-                                        new SequentialCommandGroup(
-                                                new WaitCommand(100),
-                                                new SetClawAngle(angle),
-                                                new WaitCommand(180),
-                                                new SetClawTwist(twist),
-                                                new WaitCommand(100),
-                                                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.150),
-                                                new SetArmPosition().angleDegrees(0)
-                                        )
-                                ),
-                                 new WaitCommand((long) ((Math.abs(0.5 - twist) * 60) + 40))
+                                        grabSequence(extension, angle, twist)
+                                )
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
                 ),
@@ -273,15 +279,7 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                                                 new ParallelCommandGroup(
                                                         new SetArmPosition().extension(extension),
-                                                        new SequentialCommandGroup(
-                                                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                                                new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.25, 0.08 ,1)),
-                                                                new SetClawAngle(angle),
-                                                                new WaitCommand(50),
-                                                                new SetClawTwist(twist),
-                                                                new WaitCommand(140),
-                                                                new SetArmPosition().angleDegrees(0)
-                                                        )
+                                                        grabSequence(extension, angle, twist)
                                                 )
                                         )
                                 )
@@ -313,16 +311,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                                 new ParallelCommandGroup(
                                                         new SetClawAngle(0.68),
                                                         new SetArmPosition().extension(extension),
-                                                        new SequentialCommandGroup(
-                                                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                                                new WaitUntilCommand(()-> arm.currentExtension() > clamp(extension - 0.25, 0.08 ,1)),
-                                                                new SetClawAngle(angle),
-                                                                new WaitCommand(50),
-                                                                new SetClawTwist(twist),
-                                                                new WaitCommand(150),
-                                                                new SetArmPosition().angleDegrees(0),
-                                                                new WaitCommand(10)
-                                                        )
+                                                        grabSequence(extension, angle, twist)
                                                 )
                                         )
                                 )

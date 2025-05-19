@@ -9,6 +9,8 @@ import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRTestOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
@@ -19,9 +21,6 @@ import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
-
-import pedroPathing.tuners.constants.FConstants;
-import pedroPathing.tuners.constants.LConstants;
 
 @Config
 @Photon
