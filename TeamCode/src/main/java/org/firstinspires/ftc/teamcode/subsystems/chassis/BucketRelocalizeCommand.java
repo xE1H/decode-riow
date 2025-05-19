@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 
 public class BucketRelocalizeCommand extends SequentialCommandGroup {
-    private final double velocityThreshold = 0;
-    private final double maxAllowedDistanceDelta = 0;
+    private final double velocityThreshold = 0.5; //idk units
+    private final double maxAllowedDistanceDelta = 2; //inches
 
     public BucketRelocalizeCommand(Follower follower){
         addCommands(
@@ -22,7 +22,7 @@ public class BucketRelocalizeCommand extends SequentialCommandGroup {
                         Pose currentPose = follower.getPose();
 
                         System.out.println("CALCULATED POSITION FROM DISTANCE SENSORS IS: " + calculatedPose.getX() + "; " + calculatedPose.getY() + "; " + Math.toDegrees(calculatedPose.getHeading()));
-                        System.out.println("PEDRO ODOMETRY POSE IS: " + currentPose.getX() + "; " + currentPose.getY() + "; " + currentPose.getHeading());
+                        System.out.println("PEDRO ODOMETRY POSE IS: " + currentPose.getX() + "; " + currentPose.getY() + "; " + Math.toDegrees(currentPose.getHeading()));
 
                         double poseDeviation = Math.hypot(calculatedPose.getX() - currentPose.getX(), calculatedPose.getY() - currentPose.getY());
 
@@ -30,11 +30,13 @@ public class BucketRelocalizeCommand extends SequentialCommandGroup {
                             System.out.println("POSE DEVIATION IS ACCEPTABLE, RELOCALIZING");
                             follower.resetOffset();
                             follower.setCurrentPoseWithOffset(calculatedPose);
+
+                            currentPose = follower.getPose();
+                            System.out.println("CURRENT POSE IS: " + currentPose.getX() + "; " + currentPose.getY() + "; " + Math.toDegrees(currentPose.getHeading()));
                         }
 
                         else{
                             System.out.println("POSE DEVIATION IS UNACCEPTABLE, SKIPPING RELOCALIZATION");
-
                         }
                     }
                 }

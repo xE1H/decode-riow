@@ -12,10 +12,10 @@ public interface ChassisConfiguration {
     String MOTOR_LEFT_BACK = "MotorLeftBack";
     String MOTOR_RIGHT_BACK = "MotorRightBack";
 
-    String LEFT_ANGLED_SENSOR = "";
-    String RIGHT_ANGLED_SENSOR = "";
+    String LEFT_ANGLED_SENSOR = "CHanalog0";
+    String RIGHT_ANGLED_SENSOR = "CHanalog1";
 
-    double DISTANCE_BETWEEN_ANGLED_SENSORS_MM = 0;
-    Pose BUCKET_CORNER = new Pose(0, 0, 0);
-    Vector2d OFFSET_FROM_SENSOR_MIDPOINT_TO_PEDRO_CENTER = new Vector2d();
+    double DISTANCE_BETWEEN_ANGLED_SENSORS_MM = 303.9089; //mm
+    Pose BUCKET_CORNER = new Pose(0, 144, 0); //inches
+    Vector2d OFFSET_FROM_SENSOR_MIDPOINT_TO_PEDRO_CENTER = new Vector2d(13.3883, 0); //mm
 }

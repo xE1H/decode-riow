@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.helpers.utils.opmodes.ArmTests;
+package org.firstinspires.ftc.teamcode.helpers.testOpmodes.ArmTests;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;

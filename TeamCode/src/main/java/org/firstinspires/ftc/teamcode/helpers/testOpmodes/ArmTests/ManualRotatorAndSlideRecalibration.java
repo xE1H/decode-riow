@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.helpers.utils.opmodes.ArmTests;
+package org.firstinspires.ftc.teamcode.helpers.testOpmodes.ArmTests;
 
 import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.MOTOR_NAME;
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MOTOR_NAME_0;

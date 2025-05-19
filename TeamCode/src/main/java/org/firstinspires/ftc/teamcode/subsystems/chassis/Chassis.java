@@ -126,7 +126,7 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
 
     private double getDistanceMM(double voltage){
-        return voltage / 3.3 * 1500;
+        return voltage / 3.3 * 1300;
     }
 
 
@@ -135,8 +135,9 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         double X_offset = getDistanceMM(leftAngledSensor.getVoltage()) + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.sin(robotAngle);
         double Y_offset = getDistanceMM(rightAngledSensor.getVoltage()) + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.cos(robotAngle);
 
-        Pose midpointBetweenSensors = new Pose(BUCKET_CORNER.getX() + X_offset, BUCKET_CORNER.getY() - Y_offset, robotAngle);
+        Pose midpointBetweenSensors = new Pose(BUCKET_CORNER.getX() + X_offset / 25.4, BUCKET_CORNER.getY() - Y_offset / 25.4, robotAngle);
         Vector2d rotatedOffset = OFFSET_FROM_SENSOR_MIDPOINT_TO_PEDRO_CENTER.rotateBy(Math.toDegrees(robotAngle));
+        rotatedOffset = rotatedOffset.div(25.4); //convert to inches
 
         return new Pose(midpointBetweenSensors.getX() + rotatedOffset.getX(), midpointBetweenSensors.getY() + rotatedOffset.getY(), robotAngle);
     }

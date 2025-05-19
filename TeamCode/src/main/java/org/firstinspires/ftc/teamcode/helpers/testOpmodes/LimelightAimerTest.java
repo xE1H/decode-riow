@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
+package org.firstinspires.ftc.teamcode.helpers.testOpmodes;
 
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.rad;
 

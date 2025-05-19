@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.helpers.utils.opmodes;
+package org.firstinspires.ftc.teamcode.helpers.testOpmodes;
 
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
