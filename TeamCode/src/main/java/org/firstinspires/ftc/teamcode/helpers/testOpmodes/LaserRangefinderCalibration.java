@@ -23,13 +23,21 @@ public class LaserRangefinderCalibration extends LinearOpMode {
         waitForStart();
         /* <configuration code> */
 
-        //SET TO DIGITAL
-        lrf.setTiming(45, 0);
+//        //SET TO DIGITAL
+//        lrf.setTiming(38, 0);
+//        lrf.setDistanceMode(LaserRangefinder.DistanceMode.SHORT);
+//        lrf.setROI(0, 15, 15, 0);
+//
+//        lrf.setPin0Digital(42, 2000);
+//        lrf.setPin1Digital(42, 2000);
+
+//        SET TO ANALOG
+        lrf.setTiming(100, 0);
         lrf.setDistanceMode(LaserRangefinder.DistanceMode.SHORT);
         lrf.setROI(0, 15, 15, 0);
 
-        lrf.setPin0Digital(0, 35);
-        lrf.setPin1Digital(0, 35);
+        lrf.setPin0Analog(0, 800);
+        lrf.setPin1Analog(0, 800);
     }
 }
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.chassis;
 
+import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.LowPassFilter;
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -9,12 +11,16 @@ import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.helpers.AsymmetricLowPassFilter;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.helpers.MecanumDriveController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Config
 public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfiguration {
+    private static final Logger log = LoggerFactory.getLogger(Chassis.class);
     MotorEx MotorLeftFront;
     MotorEx MotorRightFront;
     MotorEx MotorLeftBack;
@@ -36,6 +42,14 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
     AsymmetricLowPassFilter x_filter = new AsymmetricLowPassFilter(acceleration_a, deceleration_a);
     AsymmetricLowPassFilter y_filter = new AsymmetricLowPassFilter(acceleration_a, deceleration_a);
+
+    LowPassFilter rightSensorFilter = new LowPassFilter(0.97);
+    LowPassFilter leftSensorFilter = new LowPassFilter(0.97);
+
+    private double leftDistance = 0;
+    private double rightDistance = 0;
+
+    public static double sensorScalar = 1105;
 
 
     @Override
@@ -125,19 +139,46 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
     }
 
 
-    private double getDistanceMM(double voltage){
-        return voltage / 3.3 * 1300;
+    private void updateLeftDistanceMM(){
+        leftDistance = leftSensorFilter.estimate(leftAngledSensor.getVoltage() / 3.3 * sensorScalar);
+    }
+
+    private void updateRightDistanceMM(){
+        rightDistance =  rightSensorFilter.estimate(rightAngledSensor.getVoltage() / 3.3 * sensorScalar);
+    }
+
+    @Override
+    public void periodic(){
+        updateLeftDistanceMM();
+        updateRightDistanceMM();
+
+        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+        telemetry.addData("LEFT DISTANCE: ", leftDistance);
+        telemetry.addData("RIGHT DISTANCE: ", rightDistance);
+    }
+
+
+    public double getLeftDistance(){
+        return leftDistance;
+    }
+
+    public double getRightDistance(){
+        return rightDistance;
     }
 
 
     public Pose calculateRobotPoseFromDistanceSensors(Follower follower){
         double robotAngle = follower.getPose().getHeading();
-        double X_offset = getDistanceMM(leftAngledSensor.getVoltage()) + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.sin(robotAngle);
-        double Y_offset = getDistanceMM(rightAngledSensor.getVoltage()) + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.cos(robotAngle);
+
+        logger.info("left distance: " + leftDistance);
+        logger.info("right distance: " + rightDistance);
+
+        double X_offset = rightDistance + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.sin(robotAngle);
+        double Y_offset = leftDistance + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.cos(robotAngle);
 
         Pose midpointBetweenSensors = new Pose(BUCKET_CORNER.getX() + X_offset / 25.4, BUCKET_CORNER.getY() - Y_offset / 25.4, robotAngle);
-        Vector2d rotatedOffset = OFFSET_FROM_SENSOR_MIDPOINT_TO_PEDRO_CENTER.rotateBy(Math.toDegrees(robotAngle));
-        rotatedOffset = rotatedOffset.div(25.4); //convert to inches
+        Vector2d rotatedOffset = OFFSET_FROM_SENSOR_MIDPOINT_TO_PEDRO_CENTER.rotateBy(Math.toDegrees(robotAngle)).div(25.4);
+        logger.info("rotated offset: " + rotatedOffset.getX() + "; " + rotatedOffset.getY());
 
         return new Pose(midpointBetweenSensors.getX() + rotatedOffset.getX(), midpointBetweenSensors.getY() + rotatedOffset.getY(), robotAngle);
     }
