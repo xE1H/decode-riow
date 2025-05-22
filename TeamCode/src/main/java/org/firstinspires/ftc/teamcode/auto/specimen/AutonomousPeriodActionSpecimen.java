@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DELTA;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DEPOSIT_SAMPLE_3_END;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DEPOSIT_SAMPLE_3_START;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.DRIVE_BACK;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.MIDPOINT_BEFORE_PICKUP;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SAMPLE_1;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SAMPLE_2;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SAMPLE_3;
@@ -23,17 +24,20 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.pedropathing.commands.FollowPath;
+import com.pedropathing.commands.HoldPoint;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.SetPattern;
+import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
@@ -42,10 +46,11 @@ import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.RequestLimelightFrame;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.commands.WaitUntilNextLimelightFrame;
 
+import java.util.logging.Level;
+
 public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
     private volatile boolean readyForSubPickup = false;
     private final double pathTValueConstraint = 0.92;
-
 
     public AutonomousPeriodActionSpecimen(Follower follower, LimelightYoloReader reader) {
         addCommands(
@@ -67,7 +72,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new WaitCommand(150),
-                                new SetArmPosition().extensionRelative(0.17),
+                                new SetArmPosition().extensionRelative(0.21),
                                 new InstantCommand(()-> readyForSubPickup = true),
                                 new SetPattern().green()
                         ),
@@ -86,7 +91,10 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                                 new SetArmPosition().retract(),
                                 new SetPattern().oceanPalette(),
                                 new InstantCommand(()-> VLRSubsystem.getArm().setOperationMode(MainArmConfiguration.OPERATION_MODE.NORMAL_SLOWER)),
-                                new SetArmPosition().angleDegrees(140),
+                                new ParallelCommandGroup(
+                                        new SetArmPosition().angleDegrees(140),
+                                        new WaitCommand(500).andThen(new SetClawAngle(0.5))
+                                ),
                                 new WaitUntilCommand(()-> follower.getPose().getY() < PICK_UP_SAMPLE_1.getY() + 3),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new SetPattern().green(),
@@ -144,6 +152,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                 ),
 
                 //THIRD SPIKE MARK SAMPLE
+                new WaitCommand(60),
                 new SetPattern().green(),
                 new ParallelCommandGroup(
                         new WaitCommand(500).andThen(new SetPattern().red()),
@@ -160,7 +169,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
 
                 new SetPattern().green(),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                new WaitCommand(100),
+                new WaitCommand(80),
                 scoreSecondSample(follower),
 
 
@@ -168,10 +177,11 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                         new SequentialCommandGroup(
                                 new WaitCommand(30),
                                 new FollowPath(follower, bezierPath(SCORE_SECOND_SPECIMEN, DRIVE_BACK)
-                                        .setConstantHeadingInterpolation(DRIVE_BACK.getHeading()).build(), false).setCompletionThreshold(0.9),
-                                new SetPattern().red(),
-                                new FollowPath(follower, bezierPath(DRIVE_BACK, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER)
-                                        .setLinearHeadingInterpolation(DRIVE_BACK.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build())
+                                        .setConstantHeadingInterpolation(DRIVE_BACK.getHeading()).build(), false),
+                                new FollowPath(follower, bezierPath(DRIVE_BACK, MIDPOINT_BEFORE_PICKUP)
+                                        .setLinearHeadingInterpolation(DRIVE_BACK.getHeading(), MIDPOINT_BEFORE_PICKUP.getHeading()).setPathEndTValueConstraint(pathTValueConstraint).build(), false),
+                                new FollowPath(follower, bezierPath(MIDPOINT_BEFORE_PICKUP, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER)
+                                        .setLinearHeadingInterpolation(MIDPOINT_BEFORE_PICKUP.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build())
                         ),
                         new SetArmPosition().retract().andThen(new SetArmPosition().intakeSpecimen(0.44))
                 ),
@@ -185,34 +195,51 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
 
 
     private Command cycle(Follower follower, int sample){
-        Pose targetScore = new Pose(SCORE_SPECIMEN_BACK.getX(), SCORE_SPECIMEN_BACK.getY() + (sample - 3) * DELTA, SCORE_SPECIMEN_BACK.getHeading());
+        Pose targetStart = new Pose(SCORE_SPECIMEN_BACK.getX(), SCORE_SPECIMEN_BACK.getY() + (sample - 3) * DELTA, SCORE_SPECIMEN_BACK.getHeading());
+        Pose targetEnd = new Pose(targetStart.getX() + 15, targetStart.getY(), targetStart.getHeading());
+
         return new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                        new WaitCommand(200).andThen(
-                                new FollowPath(follower, bezierPath(PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER, targetScore)
-                                        .setLinearHeadingInterpolation(PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading(), targetScore.getHeading()).build())
+                        new SequentialCommandGroup(
+                                new WaitCommand(200),
+                                new FollowPath(follower, bezierPath(PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER, targetStart)
+                                        .setLinearHeadingInterpolation(PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading(), targetStart.getHeading()).setPathEndTValueConstraint(pathTValueConstraint).build()),
+                                new LogCommand("SPECIMEN PERIOD ACTIONS", Level.SEVERE, "SKIBIDI FIRST FOLLOW PATH PASSED"),
+                                new FollowPath(follower, bezierPath(targetStart, targetEnd)
+                                        .setConstantHeadingInterpolation(targetStart.getHeading()).build())
+                                        .interruptOn(()-> VLRSubsystem.getInstance(Chassis.class).getBackDistance() < 362),
+
+                                new InstantCommand(follower::breakFollowing),
+                                new LogCommand("BACK DISTANCE LOGGER", Level.INFO, ()-> "BACK SENSOR DISTANCE: " + VLRSubsystem.getInstance(Chassis.class).getBackDistance()),
+                                new ScheduleRuntimeCommand(()-> new HoldPoint(follower, follower.getPose())).withTimeout(70)
                         ),
                         new SetArmPosition().scoreSpecimenBack()
                 ),
 
-                new WaitCommand(80),
-
+                new WaitCommand(60),
                 new ConditionalCommand(
                         new ParallelCommandGroup(
-                                new SetArmPosition().extensionRelative(0.205).andThen(new SetPattern().green()),
-                                new WaitCommand(170).andThen(
-                                        new ParallelCommandGroup(
-                                                new WaitCommand(200).andThen(new FollowPath(follower, bezierPath(SCORE_SPECIMEN_BACK, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER)
-                                                        .setLinearHeadingInterpolation(SCORE_SPECIMEN_BACK.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build())
-                                                ),
-                                                new SetPattern().red(),
-                                                new SetArmPosition().intakeSpecimen(0.46)
-                                        ),
-                                        new WaitCommand(150)
+                                new SequentialCommandGroup(
+                                        new SetArmPosition().extensionRelative(0.215),
+                                        new SetPattern().green(),
+                                        new SetArmPosition().intakeSpecimen(0.485)
+                                ),
+
+
+                                new SequentialCommandGroup(
+                                        new WaitCommand(400),
+                                        new InstantCommand(follower::resumePathFollowing),
+
+                                        new ScheduleRuntimeCommand(()-> new FollowPath(follower, bezierPath(follower.getPose(), MIDPOINT_BEFORE_PICKUP)
+                                                .setLinearHeadingInterpolation(follower.getPose().getHeading(), MIDPOINT_BEFORE_PICKUP.getHeading()).build(), false)),
+
+                                        new FollowPath(follower, bezierPath(MIDPOINT_BEFORE_PICKUP, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER)
+                                                .setLinearHeadingInterpolation(MIDPOINT_BEFORE_PICKUP.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build()
+                                        )
                                 )
                         ),
                         new SequentialCommandGroup(
-                                new SetArmPosition().extensionRelative(0.205).andThen(new SetPattern().green()),
+                                new SetArmPosition().extensionRelative(0.215).andThen(new SetPattern().green()),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new WaitCommand(100),
                                 new SetArmPosition().extensionAndAngleDegrees(0, 96)
@@ -228,8 +255,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
         return new ParallelCommandGroup(
                 new WaitCommand(50).andThen(
                         new FollowPath(follower, bezierPath(DEPOSIT_SAMPLE_3_END, DRIVE_BACK)
-                                .setConstantHeadingInterpolation(DRIVE_BACK.getHeading()).build(), false).setCompletionThreshold(0.9),
-                        new SetPattern().red(),
+                                .setConstantHeadingInterpolation(DRIVE_BACK.getHeading()).setPathEndTValueConstraint(pathTValueConstraint).build(), false),
                         new FollowPath(follower, bezierPath(DRIVE_BACK, SCORE_SECOND_SPECIMEN)
                                 .setConstantHeadingInterpolation(SCORE_SECOND_SPECIMEN.getHeading()).build())
                 ),
@@ -238,7 +264,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                         new WaitCommand(200).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN))
                 ),
                 new SequentialCommandGroup(
-                        new WaitUntilCommand(()-> follower.atPose(SCORE_SECOND_SPECIMEN, 1.75, 1.75, Math.toRadians(4))),
+                        new WaitUntilCommand(()-> follower.atPose(SCORE_SECOND_SPECIMEN, 1.6, 1.6, Math.toRadians(4))),
                         new SetArmPosition().extensionRelative(0.23),
                         new SetPattern().green(),
                         new SetArmPosition().setArmState(ArmState.State.SPECIMEN_SCORE_FRONT)
@@ -255,7 +281,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
         return new ParallelCommandGroup(
                 new SequentialCommandGroup(
                         new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                        new WaitCommand(110),
+                        new WaitCommand(150),
                         new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                         new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                         new SetArmPosition().extension(0),

@@ -14,6 +14,7 @@ public interface ChassisConfiguration {
 
     String LEFT_ANGLED_SENSOR = "CHanalog2";
     String RIGHT_ANGLED_SENSOR = "CHanalog1";
+    String BACK_SENSOR = "backAnalog";
 
     double DISTANCE_BETWEEN_ANGLED_SENSORS_MM = 303.9089; //mm
     Pose BUCKET_CORNER = new Pose(8.45, 144, 0); //inches
