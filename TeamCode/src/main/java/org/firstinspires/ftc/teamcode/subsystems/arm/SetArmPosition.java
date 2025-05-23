@@ -32,8 +32,6 @@ import java.util.logging.Level;
 
 public class SetArmPosition extends SequentialCommandGroup{
     private final MainArmSubsystem arm;
-    private static BooleanSupplier interruptCondition = ()-> true;
-
     {
         // This needs to be here, since addRequirements needs to be called BEFORE the command is
         // able to run. The running may happen instantly (on super() being called), or at any point
@@ -106,7 +104,7 @@ public class SetArmPosition extends SequentialCommandGroup{
         return new ScheduleRuntimeCommand(
                 ()-> new ConditionalCommand(
                         new LogCommand("SET ARM POSITION.XY", Level.SEVERE, "ARM ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH")
-                                .andThen(new WaitUntilCommand(arm::motionProfilePathsAtParametricEnd).interruptOn(interruptCondition)
+                                .andThen(new WaitUntilCommand(arm::motionProfilePathsAtParametricEnd)
                         ),
                         safeSetTargetPoint(arm.calculateTargetPointFromRealWordCoordinates(x_cm, y_cm, reference), gamePieceType),
                         ()-> !arm.motionProfilePathsAtParametricEnd()
@@ -197,18 +195,6 @@ public class SetArmPosition extends SequentialCommandGroup{
         });
     }
 
-    public Command MANUALLY_INTERRUPT_CURRENT_COMMAND(){
-        return new SequentialCommandGroup(
-                new InstantCommand(()-> interruptCondition = ()-> true),
-                new WaitCommand(20),
-                new InstantCommand(()-> interruptCondition = ()-> false)
-        );
-    }
-
-    public Command SET_INTERRUPT_CONDITION(BooleanSupplier state){
-        return new InstantCommand(()-> interruptCondition = state);
-    }
-
     public Command setArmState(ArmState.State state){
         return new InstantCommand(()-> ArmState.set(state));
     }
@@ -259,17 +245,18 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("INTAKE SAMPLE COMMAND", "INTAKING SAMPLE FROM IN SAMPLE SCORE STATE"),
 
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new WaitCommand(70),
-                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
-                                new WaitCommand(100),
+                                new WaitCommand(80),
+                                new CustomConditionalCommand(
+                                        new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN).andThen(new WaitCommand(100),new WaitCommand(100)),
+                                        ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)
+                                ),
 
                                 new ParallelCommandGroup(
-                                        new SetArmPosition().extensionAndAngleDegrees(0, 52, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
+                                        new SetArmPosition().extensionAndAngleDegrees(0, 56, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
                                         new WaitCommand(350).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
                                 ),
 
-                                new WaitUntilCommand(()-> arm.currentExtension() < 0.1),
-                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                                new WaitUntilCommand(()-> arm.currentExtension() < 0.09),
                                 new ParallelCommandGroup(
                                         new SetArmPosition().angleDegrees(2),
                                         new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
@@ -369,16 +356,13 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SAMPLE SCORE STATE"),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new WaitCommand(70),
-                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
-                                new WaitCommand(60),
 
                                 new ParallelCommandGroup(
                                         new SetArmPosition().extensionAndAngleDegrees(0, 52, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
                                         new WaitCommand(250).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
                                 ),
 
-                                new WaitUntilCommand(()-> arm.currentExtension() < 0.2),
-                                new WaitUntilCommand(()-> arm.currentExtension() < 0.1).withTimeout(1000),
+                                new WaitUntilCommand(()-> arm.currentExtension() < 0.13),
                                 new SetArmPosition().angleDegrees(0),
                                 setArmState(ArmState.State.IN_ROBOT)
                         ),
@@ -538,7 +522,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
                                 new LogCommand("SCORE SPECIMEN BACK", Level.SEVERE, "SCORING SPECIMEN BACK FROM IN ROBOT STATE"),
-                                new SetArmPosition().extensionAndAngleDegrees(0.28, 102, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE).alongWith(
+                                new SetArmPosition().extensionAndAngleDegrees(0.27, 102, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE).alongWith(
                                         new WaitUntilCommand(()-> arm.currentAngleDegrees() > 80).andThen(new SetClawAngle(0.24))
                                 ),
                                 setArmState(ArmState.State.SPECIMEN_SCORE_BACK)
@@ -564,7 +548,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                                         new SetArmPosition().angleDegrees(102),
                                                         new SequentialCommandGroup(
                                                                 new WaitUntilCommand(()-> (arm.currentAngleDegrees() > 18 && !arm.areSlidesMoving())),
-                                                                new SetArmPosition().extension(0.3)
+                                                                new SetArmPosition().extension(0.27)
                                                         ),
                                                         new WaitUntilCommand(()-> arm.currentAngleDegrees() > 80).andThen(new SetClawAngle(0.265))
                                                 )
@@ -601,7 +585,6 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                         new WaitCommand(250),
                         new SetArmPosition().extension(0.0),
-
 
                         setArmState(ArmState.State.HANG_SECOND_STAGE)
                 ),
@@ -648,63 +631,11 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new InstantCommand(()-> VLRSubsystem.getInstance(Chassis.class).stop()),
                         new SetPattern().blank(),
 
-
                         new WaitUntilCommand(gamepadCondition),
                         new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
                         new InstantCommand(()->VLRSubsystem.getArm().setRotatorPowerLimit(0.2)),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.05)),
                         new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.MAX_POWER_PULL))
-                        //
-//                        new ParallelCommandGroup(
-//                                new SetArmPosition().extension(0),
-//
-//                                new SequentialCommandGroup(
-//                                        new WaitUntilCommand(()-> arm.currentExtension() < 0.3),
-//                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(-0.1)),
-//                                        new WaitCommand(600),
-//                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
-//                                        new InstantCommand(()-> VLRSubsystem.getHang().disable())
-//                                ),
-//
-//                                new SequentialCommandGroup(
-//                                        new WaitCommand(300),
-//                                        new SetArmPosition().angleDegrees(105),
-//                                        new WaitUntilCommand(()-> arm.currentExtension() < 0.36),
-//                                        new SetArmPosition().angleDegrees(50),
-//                                        new WaitCommand(120),
-//                                        new SetArmPosition().angleDegrees(30)
-//                                )
-//                                new SequentialCommandGroup(
-//                                        new PerpetualCommand(
-//                                                new SequentialCommandGroup(
-//                                                        new InstantCommand(()->VLRSubsystem.getArm().enableSlidePowerOverride(0)),
-//                                                        new WaitCommand(1000),
-//                                                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
-//                                                        new InstantCommand(()-> arm.setRotatorPowerLimit(0.75)),
-//                                                        new WaitCommand(1000)
-//                                                )
-//                                        ).withTimeout(3000),
-//                                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
-//                                        new LogCommand("SKIBIDI", Level.SEVERE, "SKIBIDI ROTATOR SKIBIDI DISABLED"),
-//                                        new InstantCommand(()-> VLRSubsystem.getArm().setRotatorPowerLimit(0.8))
-//                                ),
-//
-//                                new SequentialCommandGroup(
-//                                        new WaitCommand(500),
-//                                        new PerpetualCommand(
-//                                                new SequentialCommandGroup(
-//                                                        new InstantCommand(()-> arm.setThirdSlideMotorEnable(false)),
-//                                                        new WaitCommand(1000),
-//                                                        new InstantCommand(()-> arm.setThirdSlideMotorEnable(true)),
-//                                                        new WaitCommand(1000)
-//                                                )
-//                                        ).withTimeout(3000),
-//                                        new LogCommand("SKIBIDI", Level.SEVERE, "SKIBIDI SLIDE SKIBIDI DISABLED"),
-//                                        new InstantCommand(()-> arm.setThirdSlideMotorEnable(true)),
-//                                        new WaitCommand(400),
-//                                        new InstantCommand(()-> arm.setThirdSlideMotorEnable(false))
-//                                )
-                        //)
                 ),
                 ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
         );

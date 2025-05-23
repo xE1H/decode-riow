@@ -28,6 +28,7 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
     AnalogInput leftAngledSensor;
     AnalogInput rightAngledSensor;
+    AnalogInput backSensor;
 
     public static double motorPower = 1;
     public static double acceleration_a = 0.9;
@@ -45,9 +46,11 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
     LowPassFilter rightSensorFilter = new LowPassFilter(0.97);
     LowPassFilter leftSensorFilter = new LowPassFilter(0.97);
+    LowPassFilter backSensorFilter = new LowPassFilter(0.4);
 
     private double leftDistance = 0;
     private double rightDistance = 0;
+    private double backDistance = 0;
 
     public static double sensorScalar = 1105;
 
@@ -72,6 +75,7 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
         leftAngledSensor = hardwareMap.get(AnalogInput.class, LEFT_ANGLED_SENSOR);
         rightAngledSensor = hardwareMap.get(AnalogInput.class, RIGHT_ANGLED_SENSOR);
+        backSensor = hardwareMap.get(AnalogInput.class, BACK_SENSOR);
 
 //        MotorRightBack.setInverted(true);
 //        MotorRightFront.setInverted(true);
@@ -147,14 +151,20 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         rightDistance =  rightSensorFilter.estimate(rightAngledSensor.getVoltage() / 3.3 * sensorScalar);
     }
 
+    private void updateBackSensor(){
+        backDistance = backSensorFilter.estimate(backSensor.getVoltage() / 3.3 * 800);
+    }
+
     @Override
     public void periodic(){
         updateLeftDistanceMM();
         updateRightDistanceMM();
+        updateBackSensor();
 
         Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
         telemetry.addData("LEFT DISTANCE: ", leftDistance);
         telemetry.addData("RIGHT DISTANCE: ", rightDistance);
+        telemetry.addData("BACK DISTANCE: ", backDistance);
     }
 
 
@@ -166,6 +176,9 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         return rightDistance;
     }
 
+    public double getBackDistance(){
+        return backDistance;
+    }
 
     public Pose calculateRobotPoseFromDistanceSensors(Follower follower){
         double robotAngle = follower.getPose().getHeading();

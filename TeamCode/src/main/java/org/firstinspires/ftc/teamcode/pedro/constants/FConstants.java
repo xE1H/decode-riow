@@ -43,7 +43,7 @@ public class FConstants {
 
         FollowerConstants.turnHeadingErrorThreshold = 0.0125; // default is 0.01
 
-        FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.15,0,0.016,0);
+        FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.14,0,0.016,0);
         FollowerConstants.useSecondaryTranslationalPID = false;
         FollowerConstants.secondaryTranslationalPIDFCoefficients.setCoefficients(0.1,0,0.01,0); // Not being used, @see useSecondaryTranslationalPID
 
@@ -51,7 +51,7 @@ public class FConstants {
         FollowerConstants.useSecondaryHeadingPID = true;
         FollowerConstants.secondaryHeadingPIDFCoefficients.setCoefficients(3.25,0,0.17,0); // Not being used, @see useSecondaryHeadingPID
 
-        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.0084 ,0,0.00019,0.6,0.00004);
+        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.0079 ,0,0.00019,0.6,0.00004);
         FollowerConstants.useSecondaryDrivePID = false;
         FollowerConstants.secondaryDrivePIDFCoefficients.setCoefficients(0.1,0,0,0.6,0); // Not being used, @see useSecondaryDrivePID
 
