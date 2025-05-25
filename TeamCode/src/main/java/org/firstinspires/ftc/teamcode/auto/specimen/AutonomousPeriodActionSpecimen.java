@@ -13,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_U
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SCORE_PRELOAD_AND_SUB_PICKUP;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SCORE_SECOND_SPECIMEN;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SCORE_SPECIMEN_BACK;
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SECOND_SPECIMEN_CONTROL;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.START_POSE;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
 
@@ -262,10 +263,8 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
     private Command scoreSecondSample(Follower follower){
         return new ParallelCommandGroup(
                 new WaitCommand(50).andThen(
-                        new FollowPath(follower, bezierPath(DEPOSIT_SAMPLE_3_END, DRIVE_BACK)
-                                .setConstantHeadingInterpolation(DRIVE_BACK.getHeading()).setZeroPowerAccelerationMultiplier(2).setPathEndTValueConstraint(0.85).build(), false),
-                        new FollowPath(follower, bezierPath(DRIVE_BACK, SCORE_SECOND_SPECIMEN)
-                                .setConstantHeadingInterpolation(SCORE_SECOND_SPECIMEN.getHeading()).build())
+                        new FollowPath(follower, bezierPath(DEPOSIT_SAMPLE_3_END, SECOND_SPECIMEN_CONTROL, SCORE_SECOND_SPECIMEN)
+                                .setConstantHeadingInterpolation(DRIVE_BACK.getHeading()).build())
                 ),
                 new ParallelCommandGroup(
                         new SetArmPosition().angleDegrees(100).andThen(new SetArmPosition().extensionAndAngleDegrees(0.53 , 50)),

@@ -26,6 +26,8 @@ public class PointsSpecimen {
 
     public static Pose SCORE_SECOND_SPECIMEN = new Pose(34.25, 54.5 + OFFSET, Math.toRadians(0));
 
+    public static Pose SECOND_SPECIMEN_CONTROL = new Pose(23.9, 54.66, Math.toRadians(0));
+
     public static Pose DRIVE_BACK = new Pose(28, SCORE_SECOND_SPECIMEN.getY(), Math.toRadians(0));
 
     public static Pose PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER = new Pose(22, 40 + OFFSET, Math.toRadians(-120));
