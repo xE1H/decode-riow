@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.auto.sample;
 
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.BUCKET_HIGH_SCORE_POSE;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.BUCKET_HIGH_SCORE_POSE_SUB;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.DELTA;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.FIRST_MARK_GRAB;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.GRAB_POSES;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.START_POSE;
@@ -42,7 +43,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private final LimelightYoloReader reader;
     private final ElapsedTime autoTimer = new ElapsedTime();
     private double elapsedTime = 0;
-    private final double jointPathTValue = 0.5;
+    private final double jointPathTValue = 0.94;
 
     public AutonomousPeriodActionSample(Follower follower, LimelightYoloReader reader) {
         this.reader = reader;
@@ -101,6 +102,10 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
 
     private Command subCycle(Follower follower, int sample) {
+        double dx_first = (sample - 5) * DELTA;
+        double dx_second = (sample - 4) * DELTA;
+
+
         return new SequentialCommandGroup(
                 new WaitCommand(50),
                 new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
@@ -128,7 +133,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                                                 new WaitCommand(130),
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                                                 new WaitCommand(50),
-                                                new SetArmPosition().extensionAndAngleDegrees(0.82, 111)
+                                                new SetArmPosition().extensionAndAngleDegrees(0.8, 111)
                                         ),
                                         ()-> sample <= 6
                                 )
@@ -136,10 +141,10 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
                         new SequentialCommandGroup(
                                 new WaitCommand(100),
-                                new FollowPath(follower, bezierPath(SUB_GRAB, SUB_GRAB_CONTROL_2, SUB_GRAB_CONTROL_1, SUB_GRAB_0)
-                                        .setTangentHeadingInterpolation().setReversed(true).build(), false).setCompletionThreshold(jointPathTValue),
+                                new FollowPath(follower, bezierPath(offsetX(dx_first, SUB_GRAB, SUB_GRAB_CONTROL_2, SUB_GRAB_CONTROL_1, SUB_GRAB_0))
+                                        .setTangentHeadingInterpolation().setReversed(true).setPathEndTValueConstraint(jointPathTValue).build(), false),
                                 new LogCommand("Auto bombo", "Passed 1st path"),
-                                new FollowPath(follower, bezierPath(SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE_SUB).setZeroPowerAccelerationMultiplier(1.75)
+                                new FollowPath(follower, bezierPath(offsetX(dx_first, SUB_GRAB_0), BUCKET_HIGH_SCORE_POSE_SUB).setZeroPowerAccelerationMultiplier(1.75)
                                         .setConstantHeadingInterpolation(BUCKET_HIGH_SCORE_POSE.getHeading()).build()),
                                 new LogCommand("Auto bombo", "Passed 2nd path"),
 
@@ -149,9 +154,9 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
                                 new CustomConditionalCommand(
                                         new SequentialCommandGroup(
-                                                new FollowPath(follower, bezierPath(BUCKET_HIGH_SCORE_POSE_SUB, SUB_GRAB_0)
-                                                        .setConstantHeadingInterpolation(SUB_GRAB_0.getHeading()).build(), false).setCompletionThreshold(jointPathTValue),
-                                                new FollowPath(follower, bezierPath(SUB_GRAB_0, SUB_GRAB_CONTROL_1, SUB_GRAB_CONTROL_2, SUB_GRAB)
+                                                new FollowPath(follower, bezierPath(BUCKET_HIGH_SCORE_POSE_SUB, offsetX(dx_second, SUB_GRAB_0))
+                                                        .setConstantHeadingInterpolation(SUB_GRAB_0.getHeading()).setPathEndTValueConstraint(jointPathTValue).build(), false),
+                                                new FollowPath(follower, bezierPath(offsetX(dx_second, SUB_GRAB_0, SUB_GRAB_CONTROL_1, SUB_GRAB_CONTROL_2, SUB_GRAB))
                                                         .setTangentHeadingInterpolation().build())
                                         ),
 
@@ -160,6 +165,17 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                         )
                 )
         );
+    }
+
+    private Pose offsetX(double xOffset, Pose pose){
+        return new Pose(pose.getX() + xOffset, pose.getY(), pose.getHeading());
+    }
+
+    private Pose[] offsetX(double xOffset, Pose... poses){
+        for (int i = 0; i < poses.length; i++){
+            poses[i] = offsetX(xOffset, poses[i]);
+        }
+        return poses;
     }
 
 
@@ -195,7 +211,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
                                 new SequentialCommandGroup(
                                         new FollowPath(follower, bezierPath(BUCKET_HIGH_SCORE_POSE, SUB_GRAB_0)
-                                                .setConstantHeadingInterpolation(SUB_GRAB_0.getHeading()).build(), false).setCompletionThreshold(jointPathTValue),
+                                                .setConstantHeadingInterpolation(SUB_GRAB_0.getHeading()).setPathEndTValueConstraint(jointPathTValue).build(), false),
                                         new FollowPath(follower, bezierPath(SUB_GRAB_0, SUB_GRAB_CONTROL_1, SUB_GRAB_CONTROL_2, SUB_GRAB)
                                                 .setTangentHeadingInterpolation().build())
                                 ),
