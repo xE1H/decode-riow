@@ -218,7 +218,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
 
-    private Command intake(double extension, double angle, double twist){
+    private Command intake(double extension, double angle, double twist, boolean specimenGrab){
         return new SequentialCommandGroup(
                 new CustomConditionalCommand(
                         retract(),
@@ -266,7 +266,16 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                                                 new ParallelCommandGroup(
                                                         new SetArmPosition().extension(extension),
-                                                        grabSequence(extension, angle, twist)
+                                                        new ConditionalCommand(
+                                                                new SequentialCommandGroup(
+                                                                        new WaitCommand(50),
+                                                                        new SetClawAngle(angle),
+                                                                        new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.15),
+                                                                        new SetArmPosition().angleDegrees(0)
+                                                                ),
+                                                                grabSequence(extension, angle, twist),
+                                                                ()-> specimenGrab
+                                                        )
                                                 )
                                         )
                                 )
@@ -279,7 +288,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new SequentialCommandGroup(
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SPECIMEN SCORE STATE"),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new WaitCommand(100),
+                                new WaitCommand(90),
 
                                 new ParallelCommandGroup(
                                         new SetArmPosition().extension(0),
@@ -298,7 +307,16 @@ public class SetArmPosition extends SequentialCommandGroup{
                                                 new ParallelCommandGroup(
                                                         new SetClawAngle(0.68),
                                                         new SetArmPosition().extension(extension),
-                                                        grabSequence(extension, angle, twist)
+                                                        new ConditionalCommand(
+                                                                new SequentialCommandGroup(
+                                                                        new WaitCommand(50),
+                                                                        new SetClawAngle(angle),
+                                                                        new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.15),
+                                                                        new SetArmPosition().angleDegrees(0)
+                                                                ),
+                                                                grabSequence(extension, angle, twist),
+                                                                ()-> specimenGrab
+                                                        )
                                                 )
                                         )
                                 )
@@ -309,17 +327,17 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
     public Command intakeSample(double extension) {
-        return intake(extension, ClawConfiguration.VerticalRotation.DOWN.pos, ClawConfiguration.HorizontalRotation.NORMAL.pos)
+        return intake(extension, ClawConfiguration.VerticalRotation.DOWN.pos, ClawConfiguration.HorizontalRotation.NORMAL.pos, false)
                 .andThen(setArmState(ArmState.State.SAMPLE_INTAKE));
     }
 
     public Command intakeSampleAuto(double extension, double twist) {
-        return intake(extension, ClawConfiguration.VerticalRotation.DOWN.pos, twist)
+        return intake(extension, ClawConfiguration.VerticalRotation.DOWN.pos, twist, false)
                 .andThen(setArmState(ArmState.State.SAMPLE_INTAKE));
     }
 
     public Command intakeSpecimen(double extension) {
-        return intake(extension, 0.88, ClawConfiguration.HorizontalRotation.NORMAL.pos)
+        return intake(extension, 0.88, ClawConfiguration.HorizontalRotation.NORMAL.pos, true)
                 .andThen(setArmState(ArmState.State.SPECIMEN_INTAKE));
     }
 
