@@ -373,7 +373,15 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new SequentialCommandGroup(
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SAMPLE SCORE STATE"),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new WaitCommand(70),
+                                new ConditionalCommand(
+                                        new WaitCommand(80),
+                                        new SequentialCommandGroup(
+                                                new WaitCommand(100),
+                                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
+                                                new WaitCommand(30)
+                                        ),
+                                        ()-> ArmState.isCurrentState(ArmState.State.SPECIMEN_SCORE_BACK)
+                                ),
 
                                 new ParallelCommandGroup(
                                         new SetArmPosition().extensionAndAngleDegrees(0, 52, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
@@ -452,10 +460,11 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                                 new ParallelCommandGroup(
                                         new WaitCommand(300).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)),
-                                        new SetArmPosition().angleDegrees(101),
+                                        new SetClawTwist(1),
+                                        new SetArmPosition().angleDegrees(101).andThen(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)),
                                         new WaitUntilCommand(()-> arm.currentAngleDegrees() > 17).andThen(new SetArmPosition().extension(sampleScoreHeight.extension)),
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentExtension() > sampleScoreHeight.extension - 0.27),
+                                                new WaitUntilCommand(()-> arm.currentExtension() > sampleScoreHeight.extension - 0.24),
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT)
                                         )
                                 ),
@@ -479,8 +488,9 @@ public class SetArmPosition extends SequentialCommandGroup{
                                         new SequentialCommandGroup(
                                                 new WaitUntilCommand(()-> arm.currentExtension() < 0.2),
                                                 new ParallelCommandGroup(
+                                                        new SetClawTwist(1),
                                                         new WaitCommand(300).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)),
-                                                        new SetArmPosition().angleDegrees(101),
+                                                        new SetArmPosition().angleDegrees(101).andThen(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)),
                                                         new WaitUntilCommand(()-> arm.currentAngleDegrees() > 17).andThen(new SetArmPosition().extension(sampleScoreHeight.extension)),
                                                         new SequentialCommandGroup(
                                                                 new WaitUntilCommand(()-> arm.currentExtension() > sampleScoreHeight.extension - 0.27),

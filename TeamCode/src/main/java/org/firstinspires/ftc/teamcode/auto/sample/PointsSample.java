@@ -25,6 +25,8 @@ public class PointsSample {
 
     public static Pose SUB_GRAB = new Pose(64, 95.5, Math.toRadians(-90));
 
+    public static double DELTA = 1;
+
     public static Pose[] GRAB_POSES = {FIRST_MARK_GRAB, SECOND_MARK_GRAB, THIRD_MARK_GRAB};
 
     public static double rad(double deg) {
