@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.START_POSE;
-import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.pickupAngle;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.outoftheboxrobotics.photoncore.Photon;
@@ -12,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.auto.specimen.AutonomousPeriodActionSpecimen;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRAutoTestOpMode;
-import org.firstinspires.ftc.teamcode.helpers.utils.CommandTimer;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 

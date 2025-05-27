@@ -2,15 +2,13 @@ package org.firstinspires.ftc.teamcode.helpers.utils;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
-import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 
 import java.util.logging.Level;
 
-public class CommandTimer {
+public class GlobalTimer {
     private static double elapsedTime = 0;
     private static boolean stopped = false;
     private static double startTime = System.nanoTime();

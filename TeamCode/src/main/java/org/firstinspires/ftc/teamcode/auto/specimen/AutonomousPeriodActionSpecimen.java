@@ -25,7 +25,6 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.pedropathing.commands.FollowPath;
-import com.pedropathing.commands.HoldPoint;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -35,7 +34,7 @@ import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
-import org.firstinspires.ftc.teamcode.helpers.utils.CommandTimer;
+import org.firstinspires.ftc.teamcode.helpers.utils.GlobalTimer;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
@@ -199,7 +198,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                 new ConditionalCommand(
                         cycle(follower, 6),
                         new SetArmPosition().retract(),
-                        ()-> CommandTimer.time() < 27.5
+                        ()-> GlobalTimer.time() < 27.5
                 )
         );
     }
@@ -264,7 +263,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                         ),
                         ()-> sample <= 5
                 ),
-                CommandTimer.logTime("TIME AFTER SCORING SAMPLE NUMBER: " + sample + ": ")
+                GlobalTimer.logTime("TIME AFTER SCORING " + sample + "th SPECIMEN: ")
         );
     }
 

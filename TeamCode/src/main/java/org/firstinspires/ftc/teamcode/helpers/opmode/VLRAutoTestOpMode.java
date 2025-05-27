@@ -13,10 +13,9 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
-import org.firstinspires.ftc.teamcode.helpers.utils.CommandTimer;
+import org.firstinspires.ftc.teamcode.helpers.utils.GlobalTimer;
 import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
 import org.firstinspires.ftc.teamcode.helpers.autoconfig.AutoConfigurator;
@@ -81,7 +80,7 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         cs.schedule(new SequentialCommandGroup(
                 autoCommand,
                 new ScheduleRuntimeCommand(()-> new InstantCommand(()-> PoseSaver.setPedroPose(f.getPose()))),
-                CommandTimer.logAuto()
+                GlobalTimer.logAuto()
         ));
 
         VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.UP);
@@ -89,7 +88,7 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.CLOSED_LOOSE);
 
         waitForStart();
-        CommandTimer.resetTimer();
+        GlobalTimer.resetTimer();
 
         GlobalConfig.DEBUG_MODE = false;
         VLRSubsystem.getInstance(BlinkinSubsystem.class).setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
