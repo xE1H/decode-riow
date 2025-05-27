@@ -9,11 +9,14 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
+import org.firstinspires.ftc.teamcode.helpers.utils.CommandTimer;
 import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
 import org.firstinspires.ftc.teamcode.helpers.autoconfig.AutoConfigurator;
@@ -36,14 +39,8 @@ import java.util.List;
 public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
     CommandScheduler cs;
     Follower f;
-    ElapsedTime autoTimer = new ElapsedTime();
-
     Command autoCommand;
-    boolean autoFinished = false;
-    boolean prevAutoFinished = false;
-    double autoTime = 0;
-
-    private AutoConfigurator ac;
+    AutoConfigurator ac;
 
     @Override
     public void run() {
@@ -79,15 +76,20 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         f.setStartingPose(StartPose());
 
         autoCommand = autoCommand(f, reader);
-        cs.schedule(autoCommand.andThen(new InstantCommand(() -> autoFinished = true)));
 
+        ///SCHEDULE AUTO COMMAND, THEN SAVE PEDRO POSE AND LOG TOTAL AUTO TIME
+        cs.schedule(new SequentialCommandGroup(
+                autoCommand,
+                new ScheduleRuntimeCommand(()-> new InstantCommand(()-> PoseSaver.setPedroPose(f.getPose()))),
+                CommandTimer.logAuto()
+        ));
 
         VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.UP);
         VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(ClawConfiguration.HorizontalRotation.NORMAL);
         VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.CLOSED_LOOSE);
 
         waitForStart();
-        autoTimer.reset();
+        CommandTimer.resetTimer();
 
         GlobalConfig.DEBUG_MODE = false;
         VLRSubsystem.getInstance(BlinkinSubsystem.class).setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
@@ -99,23 +101,11 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         }
 
         waitForStart();
-        boolean poseSaved = false;
+
         Start();
         while (opModeIsActive()) {
             Loop();
             f.update();
-
-            if (autoFinished) {
-                if (!prevAutoFinished) {
-                    prevAutoFinished = true;
-                    autoTime = autoTimer.seconds();
-                }
-                if (!poseSaved) {
-                    PoseSaver.setPedroPose(f.getPose());
-                    poseSaved = true;
-                }
-                System.out.println("TOTAL AUTO TIME: " + autoTime);
-            }
         }
         Stop();
     }

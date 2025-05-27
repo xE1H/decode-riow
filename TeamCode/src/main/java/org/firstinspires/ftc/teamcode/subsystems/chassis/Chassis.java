@@ -46,7 +46,7 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
     LowPassFilter rightSensorFilter = new LowPassFilter(0.97);
     LowPassFilter leftSensorFilter = new LowPassFilter(0.97);
-    LowPassFilter backSensorFilter = new LowPassFilter(0.4);
+    LowPassFilter backSensorFilter = new LowPassFilter(0.3);
 
     private double leftDistance = 0;
     private double rightDistance = 0;

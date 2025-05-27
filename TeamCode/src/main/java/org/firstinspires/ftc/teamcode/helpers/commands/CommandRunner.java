@@ -54,22 +54,22 @@ public class CommandRunner implements Runnable {
 
         while (!runningInterface.isOpModeRunning()) {
             try {
-                sleep(10); // Wait for the opmode to start to start running commands
+                sleep(0); // Wait for the opmode to start to start running commands
             } catch (InterruptedException e) {
                 throw new RuntimeException(e); // some stupid shit so it compiles
             }
         }
 
         while (runningInterface.isOpModeRunning()) {
-            loopTimeMonitor.loopStart();
+            //loopTimeMonitor.loopStart();
 
             for (LynxModule hub : allHubs) {
                 hub.clearBulkCache();
             }
 
             CommandScheduler.getInstance().run();
-            loopTimeMonitor.loopEnd();
-            //System.out.println("COMMAND THREAD LOOP TIME HZ: " + loopTimeMonitor.getAverageTime(5) / Math.pow(10, -9));
+            //loopTimeMonitor.loopEnd();
+            //System.out.println("COMMAND THREAD LOOP TIME HZ: " + loopTimeMonitor.getAverageTime(10) / Math.pow(10, -9));
         }
     }
 }

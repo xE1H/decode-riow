@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.auto.specimen.AutonomousPeriodActionSpecimen;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRAutoTestOpMode;
+import org.firstinspires.ftc.teamcode.helpers.utils.CommandTimer;
 import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 
@@ -30,4 +31,9 @@ public class VLRSpecimenAuto extends VLRAutoTestOpMode {
     public boolean SpecimenOnly(){
         return true;
     }
+
+//    @Override
+//    public void Loop(){
+//        System.out.println(CommandTimer.time());
+//    }
 }

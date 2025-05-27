@@ -35,6 +35,7 @@ import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.helpers.utils.CommandTimer;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
@@ -56,6 +57,8 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
 
     public AutonomousPeriodActionSpecimen(Follower follower, LimelightYoloReader reader) {
         addCommands(
+                //TIMER RESETS IN THE MAIN LOOP, NO NEED TO RESET HERE
+
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
@@ -191,7 +194,13 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                 cycle(follower, 3),
                 cycle(follower, 4),
                 cycle(follower, 5),
-                cycle(follower, 6)
+
+                //SKIP 6TH IF NO TIME
+                new ConditionalCommand(
+                        cycle(follower, 6),
+                        new SetArmPosition().retract(),
+                        ()-> CommandTimer.time() < 27.5
+                )
         );
     }
 
@@ -209,7 +218,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                                 new LogCommand("SPECIMEN PERIOD ACTIONS", Level.INFO, "SKIBIDI FIRST FOLLOW PATH PASSED"),
                                 new FollowPath(follower, bezierPath(targetStart, targetEnd)
                                         .setConstantHeadingInterpolation(targetStart.getHeading()).build())
-                                        .interruptOn(() -> VLRSubsystem.getInstance(Chassis.class).getBackDistance() < 382),
+                                        .interruptOn(() -> VLRSubsystem.getInstance(Chassis.class).getBackDistance() < 386),
                                 new LogCommand("SPECIMEN PERIOD ACTIONS", Level.INFO, "SKIBIDI SECOND FOLLOW PATH PASSED"),
                                 new InstantCommand(follower::breakFollowing),
                                 new LogCommand("BACK DISTANCE LOGGER", Level.INFO, () -> "BACK SENSOR DISTANCE: " + VLRSubsystem.getInstance(Chassis.class).getBackDistance()),
@@ -254,7 +263,8 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                                 new SetArmPosition().extensionAndAngleDegrees(0, 96)
                         ),
                         ()-> sample <= 5
-                )
+                ),
+                CommandTimer.logTime("TIME AFTER SCORING SAMPLE NUMBER: " + sample + ": ")
         );
     }
 
