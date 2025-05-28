@@ -14,7 +14,9 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
+import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
+import org.firstinspires.ftc.teamcode.helpers.monitoring.SimpleLoopTimeMonitor;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalTimer;
 import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
@@ -33,6 +35,7 @@ import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 
 public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
@@ -43,68 +46,80 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
 
     @Override
     public void run() {
-        cs = CommandScheduler.getInstance();
-        FConstants.initialize();
-
-        f = new Follower(hardwareMap, FConstants.class, LConstants.class);
-
-        //noinspection unchecked
-        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, BlinkinSubsystem.class, Chassis.class);
-        VLRSubsystem.initializeAll(hardwareMap);
-
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        LimelightYoloReader reader = new LimelightYoloReader();
-
-        ac = new AutoConfigurator(telemetry, gamepad1);
+        ac = new AutoConfigurator(telemetry, gamepad1, ()-> isStopRequested() || opModeIsActive());
         AutoConfigurator.Choice color = ac.multipleChoice("Select alliance:", new AutoConfigurator.Choice("Blue"),
                 new AutoConfigurator.Choice("Red"));
 
-        boolean isBlue = color.text.equals("Blue");
-
-        List<LimelightYoloReader.Limelight.Sample.Color> allowedColors = new ArrayList<>();
-
-        if (isBlue) {allowedColors.add(BLUE);}
-        else {allowedColors.add(RED);}
-        if (!SpecimenOnly()) {allowedColors.add(YELLOW);}
-
-        reader.setAllowedColors(allowedColors);
-
         ac.review("Selected alliance: " + color.text);
-        AllianceSaver.setAlliance(isBlue ? Alliance.BLUE : Alliance.RED);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry.clearAll();
 
-        f.setStartingPose(StartPose());
 
-        autoCommand = autoCommand(f, reader);
+        if (!isStopRequested()) {
+            cs = CommandScheduler.getInstance();
+            FConstants.initialize();
 
-        ///SCHEDULE AUTO COMMAND, THEN SAVE PEDRO POSE AND LOG TOTAL AUTO TIME
-        cs.schedule(new SequentialCommandGroup(
-                autoCommand,
-                new ScheduleRuntimeCommand(()-> new InstantCommand(()-> PoseSaver.setPedroPose(f.getPose()))),
-                GlobalTimer.logAuto()
-        ));
+            f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
-        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.UP);
-        VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(ClawConfiguration.HorizontalRotation.NORMAL);
-        VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.CLOSED_LOOSE);
+            //noinspection unchecked
+            VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, BlinkinSubsystem.class, Chassis.class);
+            VLRSubsystem.initializeAll(hardwareMap);
 
-        waitForStart();
-        GlobalTimer.resetTimer();
+            LimelightYoloReader reader = new LimelightYoloReader();
 
-        GlobalConfig.DEBUG_MODE = false;
-        VLRSubsystem.getInstance(BlinkinSubsystem.class).setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
+            boolean isBlue = color.text.equals("Blue");
 
-        Init();
-        while (opModeInInit()) {
-            InitLoop();
-            if (isStopRequested()) {ac.setStopRequested(true);}
+            List<LimelightYoloReader.Limelight.Sample.Color> allowedColors = new ArrayList<>();
+
+            if (isBlue) {allowedColors.add(BLUE);}
+            else {allowedColors.add(RED);}
+            if (!SpecimenOnly()) {allowedColors.add(YELLOW);}
+
+            reader.setAllowedColors(allowedColors);
+            AllianceSaver.setAlliance(isBlue ? Alliance.BLUE : Alliance.RED);
+
+            f.setStartingPose(StartPose());
+
+            autoCommand = autoCommand(f, reader);
+
+            ///SCHEDULE AUTO COMMAND, THEN SAVE PEDRO POSE AND LOG TOTAL AUTO TIME
+            cs.schedule(new SequentialCommandGroup(
+                    autoCommand,
+                    new ScheduleRuntimeCommand(() -> new InstantCommand(() -> PoseSaver.setPedroPose(f.getPose()))),
+                    GlobalTimer.logAutoTime()
+            ));
+
+            VLRSubsystem.getInstance(ClawSubsystem.class).setTargetAngle(ClawConfiguration.VerticalRotation.UP);
+            VLRSubsystem.getInstance(ClawSubsystem.class).setHorizontalRotation(ClawConfiguration.HorizontalRotation.NORMAL);
+            VLRSubsystem.getInstance(ClawSubsystem.class).setTargetState(ClawConfiguration.GripperState.CLOSED_LOOSE);
+
+            waitForStart();
+            GlobalTimer.resetTimer();
+
+            GlobalConfig.DEBUG_MODE = false;
+            VLRSubsystem.getInstance(BlinkinSubsystem.class).setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
+            Init();
+            System.out.println("AUTO INITIALIZED, READY TO RUMBLE");
+
+            while (opModeInInit()) {
+                InitLoop();
+                super.idle();
+            }
+            Start();
+
+            System.out.println("AUTO STARTED");
         }
 
-        waitForStart();
 
-        Start();
         while (opModeIsActive()) {
+            SimpleLoopTimeMonitor.mainLoopStart();
+
             Loop();
             f.update();
+
+            SimpleLoopTimeMonitor.mainLoopEnd();
+            SimpleLoopTimeMonitor.logLoopTimes(telemetry);
+            telemetry.update();
         }
         Stop();
     }

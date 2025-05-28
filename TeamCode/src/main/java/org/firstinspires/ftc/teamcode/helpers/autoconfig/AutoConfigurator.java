@@ -6,13 +6,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.function.BooleanSupplier;
 import java.util.logging.Logger;
 
 public class AutoConfigurator {
     private final Telemetry telemetry;
     private final Gamepad gamepad;
     private static final Logger logger = Logger.getLogger("AutoConfigurator");
-    private boolean stopRequested = false;
+    private final BooleanSupplier isStopRequested;
 
     public static class Choice {
         public String text;
@@ -29,13 +30,10 @@ public class AutoConfigurator {
         }
     }
 
-    public AutoConfigurator(Telemetry telemetry, Gamepad gamepad) {
+    public AutoConfigurator(Telemetry telemetry, Gamepad gamepad, BooleanSupplier isStopRequested) {
         this.telemetry = telemetry;
         this.gamepad = gamepad;
-    }
-
-    public void setStopRequested(boolean stopRequested){
-        this.stopRequested = stopRequested;
+        this.isStopRequested = isStopRequested;
     }
 
     public Choice multipleChoice(String question, Choice... choices) {
@@ -44,13 +42,12 @@ public class AutoConfigurator {
         }
         Choice currentChoice = choices[0];
         boolean accepted = false;
-        double lastStickY = 0;
         boolean latched = false;
 
         long startTime = System.currentTimeMillis();
         boolean isAccepting = false;
 
-        while (!accepted && !stopRequested) {
+        while (!accepted && !isStopRequested.getAsBoolean()) {
             telemetry.addLine(question);
 
             for (Choice choice : choices) {
@@ -139,7 +136,7 @@ public class AutoConfigurator {
         // Accept - hold stick right for 1 second.
         long startTime = System.currentTimeMillis();
 
-        while (!stopRequested) {
+        while (!isStopRequested.getAsBoolean()) {
             telemetry.addLine("Review:");
             Arrays.stream(lines).forEach(telemetry::addLine);
 
@@ -168,5 +165,4 @@ public class AutoConfigurator {
         Arrays.stream(lines).forEach(telemetry::addLine);
         telemetry.update();
     }
-
 }

@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloR
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.RED;
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.YELLOW;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -12,6 +14,7 @@ import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.helpers.monitoring.SimpleLoopTimeMonitor;
 import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
 import org.firstinspires.ftc.teamcode.controlmaps.GlobalMap;
@@ -91,8 +94,10 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
         waitForStart();
         cs.schedule(new SetArmPosition().retractAfterAuto());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         while (opModeIsActive()) {
+            SimpleLoopTimeMonitor.mainLoopStart();
             gp.update();
 
             if (globalMap.followerActive) f.update();
@@ -101,6 +106,10 @@ public class VLRTeleOp extends VLRLinearOpMode {
                 VLRSubsystem.getInstance(Chassis.class).drive(gpEx.getLeftY(), -gpEx.getLeftX(), -0.3 * gpEx.getRightX());
                 f.updatePose();
             }
+
+            SimpleLoopTimeMonitor.mainLoopEnd();
+            SimpleLoopTimeMonitor.logLoopTimes(telemetry);
+            telemetry.update();
         }
     }
 

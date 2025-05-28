@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CommandRunner;
+import org.firstinspires.ftc.teamcode.helpers.monitoring.SimpleLoopTimeMonitor;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
@@ -35,6 +36,7 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
         executorService.submit(commandRunner);
 
         this.run();
+        SimpleLoopTimeMonitor.shutDown();
 
         CommandScheduler.getInstance().reset(); // reset command scheduler -- clear all previous commands
         if (beforeEndRunnable != null) beforeEndRunnable.run();

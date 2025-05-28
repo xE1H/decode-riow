@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.helpers.utils;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandBase;
-
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 
@@ -46,7 +45,7 @@ public class GlobalTimer {
     }
 
     public static Command stopTimer(){
-        return new org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand() {
+        return new InstantCommand() {
             @Override
             public void run() {
                 elapsedTime = time();
@@ -66,14 +65,14 @@ public class GlobalTimer {
     }
 
     public static Command logTime(){
-        return new LogCommand("COMMAND TIMER", Level.INFO, ()-> "COMMAND TIMER TIME: " + time());
+        return new LogCommand("GLOBAL TIMER", Level.INFO, ()-> "GLOBAL TIMER TIME: " + time());
     }
 
     public static Command logTime(String message){
-        return new LogCommand("COMMAND TIMER", Level.INFO, ()-> message + time());
+        return new LogCommand("GLOBAL TIMER", Level.INFO, ()-> message + time());
     }
 
-    public static Command logAuto(){
-        return new LogCommand("COMMAND TIMER", Level.INFO, ()-> "FINAL AUTO TIME: " + time());
+    public static Command logAutoTime(){
+        return new LogCommand("GLOBAL TIMER", Level.INFO, ()-> "FINAL AUTO TIME: " + time());
     }
 }
