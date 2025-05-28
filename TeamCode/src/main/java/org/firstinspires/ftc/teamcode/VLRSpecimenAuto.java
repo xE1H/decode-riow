@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.START_POSE;
-import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.pickupAngle;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.outoftheboxrobotics.photoncore.Photon;
@@ -30,4 +28,9 @@ public class VLRSpecimenAuto extends VLRAutoTestOpMode {
     public boolean SpecimenOnly(){
         return true;
     }
+
+//    @Override
+//    public void Loop(){
+//        System.out.println(CommandTimer.time());
+//    }
 }

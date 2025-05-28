@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
+import org.firstinspires.ftc.teamcode.helpers.utils.GlobalTimer;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
@@ -41,8 +42,6 @@ import java.util.logging.Level;
 public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private boolean sampleScored = false;
     private final LimelightYoloReader reader;
-    private final ElapsedTime autoTimer = new ElapsedTime();
-    private double elapsedTime = 0;
     private final double jointPathTValue = 0.94;
 
     public AutonomousPeriodActionSample(Follower follower, LimelightYoloReader reader) {
@@ -50,8 +49,6 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
         addCommands(
                 new SetArmPosition().setArmState(ArmState.State.IN_ROBOT),
-                new InstantCommand(autoTimer::reset),
-
                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
@@ -70,9 +67,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
                 subCycle(follower, 5),
                 subCycle(follower, 6),
-                subCycle(follower, 7),
-
-                new ScheduleRuntimeCommand(() -> new LogCommand("SKIBIDI AUTO TIME SECONDS: ", Level.SEVERE, "SKIBIDI AUTO TIME SECONDS: " + elapsedTime))
+                subCycle(follower, 7)
         );
     }
 
@@ -114,11 +109,6 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new SetArmPosition().retract(),
-
-                                new CustomConditionalCommand(
-                                        new InstantCommand(()-> elapsedTime = autoTimer.seconds()),
-                                        ()-> sample == 7
-                                ),
 
                                 new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
                                 new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE_SUB, 3, 3, Math.toRadians(2))),
@@ -163,7 +153,8 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                                         () -> sample <= 6
                                 )
                         )
-                )
+                ),
+                GlobalTimer.logTime("TIME AFTER SCORING " + sample + "th SAMPLE: ")
         );
     }
 

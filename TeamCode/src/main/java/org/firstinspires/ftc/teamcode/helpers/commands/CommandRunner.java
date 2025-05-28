@@ -9,6 +9,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.helpers.monitoring.LoopTimeMonitor;
+import org.firstinspires.ftc.teamcode.helpers.monitoring.SimpleLoopTimeMonitor;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -25,8 +26,6 @@ public class CommandRunner implements Runnable {
 
     public static boolean debugCommandScheduler = false;
     private static final Logger logger = Logger.getLogger("CommandRunner");
-
-    private LoopTimeMonitor loopTimeMonitor = new LoopTimeMonitor();
 
     public CommandRunner(OpModeRunningInterface runningInterface, HardwareMap hardwareMap) {
         this.runningInterface = runningInterface;
@@ -54,22 +53,19 @@ public class CommandRunner implements Runnable {
 
         while (!runningInterface.isOpModeRunning()) {
             try {
-                sleep(10); // Wait for the opmode to start to start running commands
+                sleep(0); // Wait for the opmode to start to start running commands
             } catch (InterruptedException e) {
                 throw new RuntimeException(e); // some stupid shit so it compiles
             }
         }
 
         while (runningInterface.isOpModeRunning()) {
-            loopTimeMonitor.loopStart();
+            SimpleLoopTimeMonitor.commandLoopStart();
 
-            for (LynxModule hub : allHubs) {
-                hub.clearBulkCache();
-            }
+            for (LynxModule hub : allHubs) {hub.clearBulkCache();}
 
             CommandScheduler.getInstance().run();
-            loopTimeMonitor.loopEnd();
-            //System.out.println("COMMAND THREAD LOOP TIME HZ: " + loopTimeMonitor.getAverageTime(5) / Math.pow(10, -9));
+            SimpleLoopTimeMonitor.commandLoopEnd();
         }
     }
 }
