@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.helpers.opmode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CommandRunner;
-import org.firstinspires.ftc.teamcode.helpers.monitoring.SimpleLoopTimeMonitor;
+import org.firstinspires.ftc.teamcode.helpers.monitoring.GlobalLoopTimeMonitor;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
@@ -29,14 +31,15 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
     public void runOpMode() {
         VLRSubsystem.clearSubsystems(); // Clear all subsystems
         executorService = Executors.newCachedThreadPool();
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         ArmState.initialize();
 
-        commandRunner = new CommandRunner(this::opModeIsActive, hardwareMap);
+        commandRunner = new CommandRunner(this::opModeIsActive, hardwareMap, telemetry);
         executorService.submit(commandRunner);
 
         this.run();
-        SimpleLoopTimeMonitor.shutDown();
+        GlobalLoopTimeMonitor.shutDown();
 
         CommandScheduler.getInstance().reset(); // reset command scheduler -- clear all previous commands
         if (beforeEndRunnable != null) beforeEndRunnable.run();

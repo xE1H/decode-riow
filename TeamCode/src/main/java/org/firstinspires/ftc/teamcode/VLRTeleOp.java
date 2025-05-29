@@ -14,7 +14,7 @@ import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.helpers.monitoring.SimpleLoopTimeMonitor;
+import org.firstinspires.ftc.teamcode.helpers.monitoring.GlobalLoopTimeMonitor;
 import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
 import org.firstinspires.ftc.teamcode.controlmaps.GlobalMap;
@@ -97,7 +97,6 @@ public class VLRTeleOp extends VLRLinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         while (opModeIsActive()) {
-            SimpleLoopTimeMonitor.mainLoopStart();
             gp.update();
 
             if (globalMap.followerActive) f.update();
@@ -107,8 +106,6 @@ public class VLRTeleOp extends VLRLinearOpMode {
                 f.updatePose();
             }
 
-            SimpleLoopTimeMonitor.mainLoopEnd();
-            SimpleLoopTimeMonitor.logLoopTimes(telemetry);
             telemetry.update();
         }
     }
