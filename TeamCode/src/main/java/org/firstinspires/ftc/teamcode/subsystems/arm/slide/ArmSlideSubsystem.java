@@ -124,7 +124,7 @@ public class ArmSlideSubsystem {
                 ACCELERATION_GAIN);
 
 
-        motionProfile.enableTelemetry(true);
+        motionProfile.enableTelemetry(DEBUG_MODE);
         timer.reset();
 
         if  (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)){
@@ -383,10 +383,12 @@ public class ArmSlideSubsystem {
 
         prevLimitSwitchPressed = limitSwitchPressed;
 
-        Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
-        telemetry.addData("ARM SLIDE SUBSYSTEM POWER TIMER: ", timer.seconds());
-        telemetry.addData("ARM SLIDE SUBSYSTEM ENCODER RESET: ", encoderReset ? 1 : 0);
-        telemetry.addData("ARM SLIDE SUBSYSTEM LIMIT SWITCH STATE: ", limitSwitchPressed);
-        telemetry.addData("ARM SLIDE SUBSYSTEM PREV LIMIT SWITCH STATE: ", prevLimitSwitchPressed);
+        if (DEBUG_MODE) {
+            Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+            telemetry.addData("ARM SLIDE SUBSYSTEM POWER TIMER: ", timer.seconds());
+            telemetry.addData("ARM SLIDE SUBSYSTEM ENCODER RESET: ", encoderReset ? 1 : 0);
+            telemetry.addData("ARM SLIDE SUBSYSTEM LIMIT SWITCH STATE: ", limitSwitchPressed);
+            telemetry.addData("ARM SLIDE SUBSYSTEM PREV LIMIT SWITCH STATE: ", prevLimitSwitchPressed);
+        }
     }
 }

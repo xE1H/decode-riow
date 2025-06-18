@@ -76,8 +76,8 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         grabServos.getController().pwmDisable();
     }
 
-    @Override
-    public void periodic(){
-        FtcDashboard.getInstance().getTelemetry().addData("CLAW ANALOG SENSOR: ", proximitySensor.getVoltage());
-    }
+//    @Override
+//    public void periodic(){
+//        FtcDashboard.getInstance().getTelemetry().addData("CLAW ANALOG SENSOR: ", proximitySensor.getVoltage());
+//    }
 }

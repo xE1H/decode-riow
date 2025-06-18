@@ -21,6 +21,7 @@ public class GlobalMap extends ControlMap {
     boolean rotatorResetActive = false;
 
     public boolean followerActive = false;
+    GamepadKeys.Button triangle = GamepadKeys.Button.A;
 
     public LimelightYoloReader reader = new LimelightYoloReader();
 
@@ -35,7 +36,7 @@ public class GlobalMap extends ControlMap {
 
     @Override
     public void initialize() {
-        gp.add(new ButtonCtl(GamepadKeys.Button.A, this::toggleFollower));
+        gp.add(new ButtonCtl(triangle, this::toggleFollower));
 
         gp.add(new ButtonCtl(GamepadKeys.Button.X, ButtonCtl.Trigger.STATE_JUST_CHANGED, () -> {
             if (!slideResetActive) startSlideOverride();

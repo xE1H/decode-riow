@@ -52,9 +52,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
@@ -65,8 +67,8 @@ import java.util.logging.Level;
 
 
 public class ArmRotatorSubsystem {
-    private DcMotorSimple motor;
-    private DcMotorEx thoughBoreEncoder;
+    private final DcMotorEx motor;
+    private final DcMotorEx thoughBoreEncoder;
 
     private MotionProfile motionProfile;
 
@@ -87,14 +89,19 @@ public class ArmRotatorSubsystem {
     private double powerOverride_value = 0;
 
     private double powerLimit = 1;
+    VoltageSensor voltageSensor;
+    double prevTime = 0;
+    double energy = 0;
 
 
     public ArmRotatorSubsystem (HardwareMap hardwareMap) {
-        motor = hardwareMap.get(DcMotorSimple.class, MOTOR_NAME);
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor = hardwareMap.get(DcMotorEx.class, MOTOR_NAME);
+        motor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         thoughBoreEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
         breamBreak = hardwareMap.get(RevTouchSensor.class, BEAM_BREAK_NAME);
+
+        this.voltageSensor = (VoltageSensor) hardwareMap.voltageSensor.iterator().next();
 
         motionProfile = new MotionProfile(
                 FtcDashboard.getInstance().getTelemetry(),
@@ -110,7 +117,7 @@ public class ArmRotatorSubsystem {
                 VELOCITY_GAIN,
                 ACCELERATION_GAIN);
 
-        motionProfile.enableTelemetry(true);
+        motionProfile.enableTelemetry(DEBUG_MODE);
         timer.reset();
 
         if  (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)){
@@ -126,8 +133,6 @@ public class ArmRotatorSubsystem {
             motionProfile.setTargetPosition(0);
             updateEncoderPosition();
         }
-
-
     }
 
 
@@ -254,6 +259,7 @@ public class ArmRotatorSubsystem {
 
 
     public void periodic(double slideExtension, OPERATION_MODE operationMode) {
+
         updateEncoderPosition();
         double currentAngle = getAngleDegrees();
         boolean currentBeamBreakState = breamBreak.isPressed();
@@ -299,17 +305,30 @@ public class ArmRotatorSubsystem {
         }
         else {
             encoderReset = false;
-            if (motionProfile.getTargetPosition() == 0 && currentAngle <= 10){
+            if (motionProfile.getTargetPosition() == 0 && currentAngle <= 10 && currentAngle >= 2){
                 power = -0.08;
             }
         }
 
         prevBreamBreakState = currentBeamBreakState;
 
+        if (DEBUG_MODE) {
+            Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+            telemetry.addData("ROTATOR POWER: ", power);
+        }
+
         Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
-        telemetry.addData("ROTATOR POWER: ", power);
+        double motorPowerWatts = motor.getCurrent(CurrentUnit.AMPS) * voltageSensor.getVoltage();
+
+        if (prevTime != 0){
+            double dt = (System.nanoTime() - prevTime) / 10e9;
+            energy += motorPowerWatts * dt;
+        }
+
+        prevTime = System.nanoTime();
+        telemetry.addData("ROTATOR CONSUMED ENERGY SINCE INIT (Ws): ",  energy);
 
         if (powerOverride_state) {motor.setPower(powerOverride_value);}
-        else {motor.setPower(power);}
+        else {motor.setPower(clamp(power, -0.5, 0.5));}
     }
 }

@@ -80,10 +80,10 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 //            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(angle));
 //        }
 
-        if (gamepad1.triangle && !prevTriangle){
-            follower.setMaxPower(0);
-            CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad1.right_bumper && gamepad1.left_bumper));
-        }
+//        if (gamepad1.triangle && !prevTriangle){
+//            follower.setMaxPower(0);
+//            CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad1.right_bumper && gamepad1.left_bumper));
+//        }
 
 //        if (gamepad1.cross && !prevCross){
 //            VLRSubsystem.getArm().setThirdSlideMotorEnable(false);
@@ -95,14 +95,14 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 //            VLRSubsystem.getArm().disableRotatorPowerOverride();
 //        }
 
-        if (gamepad1.circle && !prevCircle){
-            overrideEnabled = true;
-        }
-
-        if (overrideEnabled){
-            VLRSubsystem.getArm().enableSlidePowerOverride(gamepad1.left_stick_y);
-            VLRSubsystem.getArm().enableRotatorPowerOverride(gamepad1.right_stick_y);
-        }
+//        if (gamepad1.circle && !prevCircle){
+//            overrideEnabled = true;
+//        }
+//
+//        if (overrideEnabled){
+//            VLRSubsystem.getArm().enableSlidePowerOverride(gamepad1.left_stick_y);
+//            VLRSubsystem.getArm().enableRotatorPowerOverride(gamepad1.right_stick_y);
+//        }
 
 
 //        else if (gamepad1.cross && !prevCross){
@@ -120,14 +120,14 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 //        else if (gamepad1.cross && !prevCross){
 //            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(0));
 //        }
-//
-//        else if (gamepad1.square && !prevSquare){
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(90));
-//        }
-//
-//        else if (gamepad1.circle && !prevCircle){
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(0));
-//        }
+
+        if (gamepad1.square && !prevSquare){
+            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(101));
+        }
+
+        else if (gamepad1.circle && !prevCircle){
+            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(0));
+        }
 
 
 //        if (gamepad1.triangle && !prevTriangle){
