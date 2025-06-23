@@ -250,7 +250,7 @@ public class ArmSlideSubsystem {
 
 
     private void updateEncoderPosition(){
-        encoderPosition = -(extensionEncoder.getCurrentPosition() - encoderOffset) / 8192d;
+        encoderPosition = (extensionEncoder.getCurrentPosition() - encoderOffset) / 8192d;
     }
 
 
@@ -332,22 +332,23 @@ public class ArmSlideSubsystem {
         power = clamp(power, -powerLimit, powerLimit);
 
 
-        if (limitSwitchPressed && motionProfile.getTargetPosition() == 0) {
-            extensionMotor1.setPower(0);
-            extensionMotor2.setPower(0);
+        if (overridePowerState) {
+            setMotorPower(overridePowerValue);
+        }
 
+        else if (limitSwitchPressed && motionProfile.getTargetPosition() == 0) {
             if (!prevLimitSwitchPressed) {
                 timer.reset();
             }
 
-            else if (timer.seconds() < 0.4){
-                extensionMotor0.setPower(-0.3);
+            else if (timer.seconds() < 0.5){
+                setMotorPower(-0.2);
             }
 
-            else if (timer.seconds() > 0.4) {
+            else if (timer.seconds() > 0.5) {
                 setMotorPower(0);
 
-                if (timer.seconds() > 0.7 && !encoderReset) {
+                if (timer.seconds() > 1 && !encoderReset) {
                     resetEncoder();
                     encoderReset = true;
                 }
@@ -357,15 +358,8 @@ public class ArmSlideSubsystem {
         else {
             encoderReset = false;
 
-            if (overridePowerState) {
-                setMotorPower(overridePowerValue);
-//                extensionMotor0.setPower(clamp(overridePowerValue, -0.5, 0.5));
-//                extensionMotor1.setPower(0);
-//                extensionMotor2.setPower(0);
-            }
-
-            else if (reachedTargetPosition()) {
-                extensionMotor0.setPower(0);
+            if (reachedTargetPosition()) {
+                extensionMotor0.setPower(power);
                 extensionMotor1.setPower(power);
                 extensionMotor2.setPower(power);
             }

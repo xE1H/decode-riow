@@ -9,6 +9,10 @@ public class SquIDController {
      * The proportional gain. This gain multiplies the signed square root of error.
      */
     private double p;
+    private double targetPosition = 0;
+    private double prevTargetPosition = 0;
+    private double t = 1;
+    private double startPosition = 0;
 
     public SquIDController(double p) {
         this.p = p;
@@ -17,12 +21,32 @@ public class SquIDController {
     /**
      * The function that computes the intended system response.
      * @param currentPosition The current state of the system.
-     * @param targetPosition The target state of the system.
      * @return The system response.
      */
-    public double calculate(double currentPosition, double targetPosition) {
+    public double getPower(double currentPosition) {
         double error = targetPosition - currentPosition;
+
+        if (targetPosition != prevTargetPosition){
+            startPosition = currentPosition;
+            prevTargetPosition = targetPosition;
+        }
+
+        if (targetPosition == startPosition){t = 1;}
+        else {t = (currentPosition - startPosition) / (targetPosition - startPosition);}
+
         return signedSqrt(error) * p;
+    }
+
+    public double getT(){
+        return t;
+    }
+
+    public void setTargetPosition(double targetPosition){
+        this.targetPosition = targetPosition;
+    }
+
+    public double getTargetPosition(){
+        return targetPosition;
     }
 
     public void setP(double p) {
@@ -36,5 +60,4 @@ public class SquIDController {
     private static double signedSqrt(double val) {
         return Math.signum(val) * Math.sqrt(Math.abs(val));
     }
-
 }

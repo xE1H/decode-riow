@@ -19,7 +19,11 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
+import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 
 @Config
@@ -47,10 +51,6 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
 
 
     @Override
-    public void Start(){
-    }
-
-    @Override
     public void Init(){
         FConstants.initialize();
 
@@ -67,83 +67,39 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
         ArmState.set(ArmState.State.IN_ROBOT);
     }
 
+    @Override
+    public void Start(){
+        CommandScheduler.getInstance().schedule(new SetClawState(ClawConfiguration.GripperState.CLOSED));
+        CommandScheduler.getInstance().schedule(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL));
+        CommandScheduler.getInstance().schedule(new SetClawAngle(0.15));
+    }
+
 
     @Override
     public void Loop() {
-//        if (extension != prevExtension){
-//            prevExtension = extension;
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(extension));
-//        }
-//
-//        if (angle != prevAngle){
-//            prevAngle = angle;
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(angle));
-//        }
-
-//        if (gamepad1.triangle && !prevTriangle){
-//            follower.setMaxPower(0);
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad1.right_bumper && gamepad1.left_bumper));
-//        }
-
-//        if (gamepad1.cross && !prevCross){
-//            VLRSubsystem.getArm().setThirdSlideMotorEnable(false);
-//            VLRSubsystem.getArm().enableRotatorPowerOverride(0);
-//        }
-//
-//        if (!gamepad1.cross && prevCross){
-//            VLRSubsystem.getArm().setThirdSlideMotorEnable(true);
-//            VLRSubsystem.getArm().disableRotatorPowerOverride();
-//        }
-
-//        if (gamepad1.circle && !prevCircle){
-//            overrideEnabled = true;
-//        }
-//
-//        if (overrideEnabled){
-//            VLRSubsystem.getArm().enableSlidePowerOverride(gamepad1.left_stick_y);
-//            VLRSubsystem.getArm().enableRotatorPowerOverride(gamepad1.right_stick_y);
-//        }
-
-
-//        else if (gamepad1.cross && !prevCross){
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().retract());
-//        }
-//
-//        else if (gamepad1.square && !prevSquare){
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().intakeSample(0.34));
-//        }
-
-//        if (gamepad1.triangle && !prevTriangle){
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(1));
-//        }
-//
-//        else if (gamepad1.cross && !prevCross){
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(0));
-//        }
+        VLRSubsystem.getArm().setSlidePowerLimit(1);
+        VLRSubsystem.getArm().setRotatorPowerLimit(1);
 
         if (gamepad1.square && !prevSquare){
             CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(101));
         }
 
         else if (gamepad1.circle && !prevCircle){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(0));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(70));
         }
 
+        if (gamepad1.triangle && !prevTriangle){
+            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(0.8));
+        }
 
-//        if (gamepad1.triangle && !prevTriangle){
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().XY(40, 30, MainArmConfiguration.OFFSET_REFERENCE_PLANE.FRONT));
-//        }
-//
-//        else if (gamepad1.cross && !prevCross){
-//            CommandScheduler.getInstance().schedule(new SetArmPosition().XY(10, 0, MainArmConfiguration.OFFSET_REFERENCE_PLANE.FRONT));
-//        }
-
+        else if (gamepad1.cross && !prevCross){
+            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(0));
+        }
 
         prevTriangle = gamepad1.triangle;
         prevCross = gamepad1.cross;
         prevSquare = gamepad1.square;
         prevCircle = gamepad1.circle;
-
 
         follower.update();
         VLRSubsystem.getInstance(Chassis.class).drive(0, 0, 0);

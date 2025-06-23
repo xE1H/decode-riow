@@ -65,15 +65,6 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new ConditionalCommand(
                                         new LogCommand("SET ARM POS COMMAND", Level.WARNING, "TARGET REACHED SUCCESSFULLY"),
                                         new LogCommand("SET ARM POS COMMAND", Level.WARNING, "TARGET NOT REACHED"),
-//                                        new SequentialCommandGroup(
-//                                                new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "ARM TIMEOUT TRIGGERED, WAITING INDEFINITELY FOR MANUAL OVERRIDE"),
-//                                                new WaitUntilCommand(arm::reachedTargetPosition).interruptOn(interruptCondition),
-//                                                new ConditionalCommand(
-//                                                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "WAIT INTERRUPTED, HOPE THE DRIVER KNOWS WHAT HES DOING"),
-//                                                        new LogCommand("SET ARM POS COMMAND", Level.SEVERE, "ARM MAGICALLY REACHED TARGET POSITION WITH NO OVERRIDE"),
-//                                                        interruptCondition
-//                                                )
-//                                        ),
                                         arm::reachedTargetPosition
                                 )
                         ),
@@ -384,12 +375,16 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 ),
 
                                 new ParallelCommandGroup(
+                                        new SetArmPosition().extension(0),
+                                        new SequentialCommandGroup(
+                                                new SetArmPosition().angleDegrees(52),
+                                                new WaitUntilCommand(()-> arm.currentExtension() < 0.06),
+                                                new SetArmPosition().angleDegrees(0)
+                                        ),
                                         new SetArmPosition().extensionAndAngleDegrees(0, 52, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
                                         new WaitCommand(250).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
                                 ),
 
-                                new WaitUntilCommand(()-> arm.currentExtension() < 0.13),
-                                new SetArmPosition().angleDegrees(0),
                                 setArmState(ArmState.State.IN_ROBOT)
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)
