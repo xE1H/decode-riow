@@ -56,6 +56,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new InstantCommand(()-> arm.setTargetPoint(targetPoint)),
                                 new WaitCommand(5),
                                 new WaitUntilCommand(arm::motionProfilePathsAtParametricEnd),
+                                new WaitCommand(50),
 
                                 new CustomConditionalCommand(
                                         new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HOLD_POINT)),
@@ -164,7 +165,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     public Command angleDegrees(double angleDegrees){
         return new SequentialCommandGroup(
                 new CustomConditionalCommand(
-                        new LogCommand("SET ARM POSITION.ANGLE_DEGREES", Level.SEVERE, "ROTATOR ALREADY MOVING, WAITING PREVIOUS COMMAND TO FINISH"),
+                        new LogCommand("SET ARM POSITION.ANGLE_DEGREES", Level.SEVERE, "ROTATOR ALREADY MOVING"),
                         ()-> (arm.isRotatorMoving() && arm.getTargetAngleDegrees() != angleDegrees)
                 ),
 
@@ -197,14 +198,13 @@ public class SetArmPosition extends SequentialCommandGroup{
 
     private Command grabSequence(double extension, double angle, double twist){
         return new SequentialCommandGroup(
-                new WaitCommand(100),
                 new SetClawAngle(angle),
-                new WaitCommand(180),
+                new WaitCommand(140),
                 new SetClawTwist(twist),
-                new WaitCommand(100),
-                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.150),
+                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.265),
                 new SetArmPosition().angleDegrees(0),
-                new WaitCommand((long) ((Math.abs(0.5 - twist) * 60) + 40))
+                new WaitCommand((long) ((Math.abs(0.5 - twist) * 60))),
+                new WaitCommand(30)
         );
     }
 
@@ -223,8 +223,8 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new ParallelCommandGroup(
-                                        new SetArmPosition().extensionAndAngleDegrees(extension, 4),
-                                        grabSequence(extension, angle, twist)
+                                        new SetArmPosition().extensionAndAngleDegrees(extension, 3),
+                                        new WaitCommand(150).andThen(grabSequence(extension, angle, twist))
                                 )
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
@@ -238,34 +238,30 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                 new WaitCommand(80),
                                 new CustomConditionalCommand(
-                                        new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN).andThen(new WaitCommand(100),new WaitCommand(100)),
+                                        new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN).andThen(new WaitCommand(90)),
                                         ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)
                                 ),
 
                                 new ParallelCommandGroup(
-                                        new SetArmPosition().extensionAndAngleDegrees(0, 56, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
-                                        new WaitCommand(350).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
-                                ),
-
-                                new WaitUntilCommand(()-> arm.currentExtension() < 0.09),
-                                new ParallelCommandGroup(
-                                        new SetArmPosition().angleDegrees(2),
-                                        new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+                                        new SetArmPosition().extensionAndAngleDegrees(0, 60, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
+                                        new WaitCommand(250).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP)),
 
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentAngleDegrees() < 40),
-
+                                                new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.19),
                                                 new ParallelCommandGroup(
-                                                        new SetArmPosition().extension(extension),
-                                                        new ConditionalCommand(
-                                                                new SequentialCommandGroup(
-                                                                        new WaitCommand(50),
-                                                                        new SetClawAngle(angle),
-                                                                        new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.15),
-                                                                        new SetArmPosition().angleDegrees(0)
-                                                                ),
-                                                                grabSequence(extension, angle, twist),
-                                                                ()-> specimenGrab
+                                                        new SetArmPosition().angleDegrees(4),
+                                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() < 39).andThen(new SetArmPosition().extension(extension)),
+
+                                                        new WaitCommand(240).andThen(
+                                                                new ConditionalCommand(
+                                                                        new SequentialCommandGroup(
+                                                                                new SetClawAngle(angle),
+                                                                                new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.2),
+                                                                                new SetArmPosition().angleDegrees(0)
+                                                                        ),
+                                                                        grabSequence(extension, angle, twist),
+                                                                        ()-> specimenGrab
+                                                                )
                                                         )
                                                 )
                                         )
@@ -279,7 +275,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new SequentialCommandGroup(
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SPECIMEN SCORE STATE"),
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new WaitCommand(90),
+                                new WaitCommand(80),
 
                                 new ParallelCommandGroup(
                                         new SetArmPosition().extension(0),
@@ -294,7 +290,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                                 new SetArmPosition().angleDegrees(1.5)
                                         ),
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentAngleDegrees() < 15),
+                                                new WaitUntilCommand(()-> arm.currentAngleDegrees() < 20),
                                                 new ParallelCommandGroup(
                                                         new SetClawAngle(0.68),
                                                         new SetArmPosition().extension(extension),
@@ -375,13 +371,9 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 ),
 
                                 new ParallelCommandGroup(
-                                        new SetArmPosition().extension(0),
-                                        new SequentialCommandGroup(
-                                                new SetArmPosition().angleDegrees(52),
-                                                new WaitUntilCommand(()-> arm.currentExtension() < 0.06),
-                                                new SetArmPosition().angleDegrees(0)
-                                        ),
-                                        new SetArmPosition().extensionAndAngleDegrees(0, 52, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
+                                        new SetArmPosition().extensionAndAngleDegrees(0, 61, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
+                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.185).andThen(new SetArmPosition().angleDegrees(0)),
+
                                         new WaitCommand(250).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
                                 ),
 
@@ -424,7 +416,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("RETRACT ARM", Level.SEVERE, "RETRACTING ARM FROM SPECIMEN OR SAMPLE INTAKE STATE"),
 
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                                new WaitCommand(150),
+                                new WaitCommand(80),
                                 new ParallelCommandGroup(
                                         new SetArmPosition().extension(0),
                                         new SequentialCommandGroup(
@@ -456,10 +448,10 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new ParallelCommandGroup(
                                         new WaitCommand(300).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)),
                                         new SetClawTwist(1),
-                                        new SetArmPosition().angleDegrees(101).andThen(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)),
-                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 17).andThen(new SetArmPosition().extension(sampleScoreHeight.extension)),
+                                        new SetArmPosition().angleDegrees(108).andThen(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)),
+                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 19.5).andThen(new SetArmPosition().extension(sampleScoreHeight.extension)),
                                         new SequentialCommandGroup(
-                                                new WaitUntilCommand(()-> arm.currentExtension() > sampleScoreHeight.extension - 0.24),
+                                                new WaitUntilCommand(()-> arm.currentExtension() > sampleScoreHeight.extension - 0.26),
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DEPOSIT)
                                         )
                                 ),
@@ -485,7 +477,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                                 new ParallelCommandGroup(
                                                         new SetClawTwist(1),
                                                         new WaitCommand(300).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)),
-                                                        new SetArmPosition().angleDegrees(101).andThen(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)),
+                                                        new SetArmPosition().angleDegrees(108).andThen(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)),
                                                         new WaitUntilCommand(()-> arm.currentAngleDegrees() > 17).andThen(new SetArmPosition().extension(sampleScoreHeight.extension)),
                                                         new SequentialCommandGroup(
                                                                 new WaitUntilCommand(()-> arm.currentExtension() > sampleScoreHeight.extension - 0.27),

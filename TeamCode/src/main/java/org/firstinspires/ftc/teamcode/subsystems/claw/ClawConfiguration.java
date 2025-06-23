@@ -12,12 +12,12 @@ public interface ClawConfiguration {
     double HORIZONTAL_ROTATION_MIN = 0;
     double HORIZONTAL_ROTATION_MAX = 1;
 
-    double CLAW_PROXIMITY_THRESHOLD = 0.85;
+    double CLAW_PROXIMITY_THRESHOLD = 0.81;
 
     enum VerticalRotation {
         DOWN(1),
         UP(0.1),
-        DEPOSIT(0.4);
+        DEPOSIT(0.35);
 
         public final double pos;
         VerticalRotation(double pos) {

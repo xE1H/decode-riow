@@ -66,7 +66,7 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
 
     public boolean isSamplePresent(){
         boolean state = proximityFilter.estimate(proximitySensor.isPressed() ? 1 : 0) > CLAW_PROXIMITY_THRESHOLD;
-        logger.info("SAMPLE PRESENT SATE: " + state);
+        //logger.info("SAMPLE PRESENT SATE: " + state);
         return state;
     }
 

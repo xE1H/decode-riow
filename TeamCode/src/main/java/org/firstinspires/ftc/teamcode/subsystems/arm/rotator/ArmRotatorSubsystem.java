@@ -2,21 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.arm.rotator;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig.DEBUG_MODE;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.BEAM_BREAK_NAME;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.DERIVATIVE;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.ENCODER_NAME;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.ENCODER_TICKS_PER_ROTATION;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.ERROR_MARGIN;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.HOLD_POINT_DERIVATIVE;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.HOLD_POINT_PROPORTIONAL;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.INTEGRAL;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.PROPORTIONAL;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.PROPORTIONAL_HANG;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.FEEDFORWARD_GAIN;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.FEEDFORWARD_GAIN_HANG;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.MAX_ANGLE;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.MIN_ANGLE;
-import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.MOTOR_NAME;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem.mapToRange;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevTouchSensor;
@@ -28,8 +15,8 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.helpers.utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.helpers.utils.PidController;
-import org.firstinspires.ftc.teamcode.helpers.utils.SquIDController;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration.OPERATION_MODE;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
@@ -44,8 +31,7 @@ public class ArmRotatorSubsystem {
     private static volatile double encoderPosition;
     private static volatile double encoderOffset;
 
-    private static final PidController controller = new PidController(PROPORTIONAL, INTEGRAL, DERIVATIVE);
-    private static final PidController holdPointController = new PidController(HOLD_POINT_PROPORTIONAL, 0, HOLD_POINT_DERIVATIVE);
+    private final PidController holdPointController = new PidController(HOLD_POINT_PROPORTIONAL, 0, HOLD_POINT_DERIVATIVE);
 
     private final ElapsedTime timer = new ElapsedTime();
     private boolean encoderReset = false;
@@ -54,14 +40,11 @@ public class ArmRotatorSubsystem {
     private boolean prevBreamBreakState = false;
 
     private OPERATION_MODE operationMode = OPERATION_MODE.NORMAL;
+    private MotionProfile motionProfile;
 
     private boolean powerOverride_state = false;
     private double powerOverride_value = 0;
-
     private double powerLimit = 1;
-    private final VoltageSensor voltageSensor;
-    private double prevTime = 0;
-    private double energy = 0;
 
 
     public ArmRotatorSubsystem (HardwareMap hardwareMap) {
@@ -71,37 +54,51 @@ public class ArmRotatorSubsystem {
         thoughBoreEncoder = hardwareMap.get(DcMotorEx.class, ENCODER_NAME);
         breamBreak = hardwareMap.get(RevTouchSensor.class, BEAM_BREAK_NAME);
 
-        this.voltageSensor = (VoltageSensor) hardwareMap.voltageSensor.iterator().next();
+        motionProfile = new MotionProfile(
+                FtcDashboard.getInstance().getTelemetry(),
+                "ROTATOR",
+                MotionProfile.Type.ACCELERATION_LIMITED,
+                ACCELERATION,
+                ACCELERATION,
+                NOMINAL_VELOCITY,
+                0,
+                PROPORTIONAL,
+                0,
+                DERIVATIVE,
+                0,
+                0);
+
+        motionProfile.enableTelemetry(DEBUG_MODE);
         timer.reset();
 
         if  (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)){
             thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             updateEncoderPosition();
-            setTargetPosition(getAngleDegrees());
+            setTargetPosition(getAngleDegrees(), 0);
         }
 
         else {
             encoderOffset = 0;
             thoughBoreEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             thoughBoreEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            setTargetPosition(0);
+            setTargetPosition(0, 0);
             updateEncoderPosition();
         }
     }
 
 
-    public void setTargetPosition(double angleDegrees) {
+    public void setTargetPosition(double angleDegrees, double slideExtension) {
         VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "NEW ROTATOR ANGLE OF " + angleDegrees + " JUST SET");
-        updateCoefficientsForOperationMode();
         double target = clamp(angleDegrees, MIN_ANGLE, MAX_ANGLE);
+        double maxVelocity = mapToRange(slideExtension, 0, 1, NOMINAL_VELOCITY, EXTENDED_VELOCITY);
 
-        if (operationMode == OPERATION_MODE.NORMAL){
-            controller.setPID(PROPORTIONAL, INTEGRAL, DERIVATIVE);
+        if (Math.abs(angleDegrees - getAngleDegrees()) < 8){
+            motionProfile.updateCoefficients(ACCELERATION, ACCELERATION, maxVelocity, PROPORTIONAL, INTEGRAL , DERIVATIVE, 0, 0);
         }
-        else if (operationMode == OPERATION_MODE.NORMAL_SLOWER){
-            controller.setPID(0, 0, 0);
+        else{
+            motionProfile.updateCoefficients(ACCELERATION, ACCELERATION, maxVelocity, PROPORTIONAL, 0 , DERIVATIVE, 0, 0);
         }
-        controller.setTargetPosition(target);
+        motionProfile.setTargetPosition(target);
         holdPointController.setTargetPosition(target);
     }
 
@@ -111,11 +108,11 @@ public class ArmRotatorSubsystem {
     }
 
     public boolean reachedTargetPosition() {
-        return reachedPosition(controller.getTargetPosition());
+        return reachedPosition(motionProfile.getTargetPosition());
     }
 
     public double getTargetPosition(){
-        return controller.getTargetPosition();
+        return motionProfile.getTargetPosition();
     }
 
 
@@ -124,20 +121,16 @@ public class ArmRotatorSubsystem {
     }
 
     public double getT(){
-        if (controller.getT() > 0.96)
-            return 1;
-        else{
-            return controller.getT();
-        }
+        return motionProfile.getT();
     }
 
-    public void updateCoefficientsForOperationMode(){
-        holdPointController.setPID(HOLD_POINT_PROPORTIONAL, 0, HOLD_POINT_DERIVATIVE);
-        if (operationMode == OPERATION_MODE.HANG) {controller.setPID(0,0,0);}
-        else {controller.setPID(PROPORTIONAL, INTEGRAL, DERIVATIVE);}
-    }
+//    public void updateCoefficientsForOperationMode(){
+//        holdPointController.setPID(HOLD_POINT_PROPORTIONAL, 0, HOLD_POINT_DERIVATIVE);
+//        if (operationMode == OPERATION_MODE.HANG) {motionProfile.updateCoefficients(0,0 , 0 , 0 ,0 ,0 ,0 , 0);}
+//        else {motionProfile.updateCoefficients(ACCELERATION, ACCELERATION, NOMINAL_VELOCITY).setPID(PROPORTIONAL, 0, DERIVATIVE);}
+//    }
 
-    private void resetEncoder(){
+    public void resetEncoder(){
         encoderOffset = thoughBoreEncoder.getCurrentPosition();
     }
 
@@ -170,30 +163,34 @@ public class ArmRotatorSubsystem {
         this.operationMode = operationMode;
 
         if (DEBUG_MODE){
-            updateCoefficientsForOperationMode();
+            //updateCoefficientsForOperationMode();
         }
 
         double feedForward = FEEDFORWARD_GAIN;
         if (operationMode == OPERATION_MODE.HANG){
             feedForward = FEEDFORWARD_GAIN_HANG;
         }
+        else{
+            feedForward = mapToRange(slideExtension, 0, 1, FEEDFORWARD_GAIN, FEEDFORWARD_GAIN_EXTENDED);
+        }
 
         double feedForwardPower = Math.cos(Math.toRadians(currentAngle)) * feedForward;
-        double power;
+        double power = motionProfile.getPower(currentAngle) + feedForwardPower;
+
 
         if (operationMode == OPERATION_MODE.HOLD_POINT){
-            power = holdPointController.getPower(currentAngle) + feedForwardPower;
-        }
-        else{
-            power = controller.getPower(currentAngle) + feedForwardPower;
+            power = holdPointController.getPower(currentAngle);
+            if (motionProfile.getTargetPosition() != 0){
+                power += feedForwardPower;
+            }
         }
 
         power = clamp(power, -powerLimit, powerLimit);
 
-        if (currentBeamBreakState && controller.getTargetPosition() == 0) {
+        if (currentBeamBreakState && motionProfile.getTargetPosition() == 0) {
             if (!prevBreamBreakState) {timer.reset();}
             else if(timer.seconds() > 2 && !encoderReset) {
-                resetEncoder();
+                //resetEncoder();
                 encoderReset = true;
             }
 
@@ -201,15 +198,17 @@ public class ArmRotatorSubsystem {
                 power = 0;
             }
         }
-        else {encoderReset = false;}
+        else {
+            encoderReset = false;
+        }
         prevBreamBreakState = currentBeamBreakState;
 
         if (DEBUG_MODE) {
             Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
             telemetry.addData("CURRENT_OPERATION_MODE: ", operationMode);
-            telemetry.addData("ROTATOR_targetPosition: ", controller.getTargetPosition());
-            telemetry.addData("ROTATOR_currentPosition: ", currentAngle);
-            telemetry.addData("ROTATOR T: ", getT());
+            //telemetry.addData("ROTATOR_targetPosition: ", motionProfile.getTargetPosition());
+            //telemetry.addData("ROTATOR_currentPosition: ", currentAngle);
+            //telemetry.addData("ROTATOR T: ", getT());
             telemetry.addData("ROTATOR_power: ", power);
         }
 //        Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());

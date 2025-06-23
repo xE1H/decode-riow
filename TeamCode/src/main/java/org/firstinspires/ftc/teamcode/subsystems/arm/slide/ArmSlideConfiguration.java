@@ -14,10 +14,10 @@ public class ArmSlideConfiguration {
     public static double ACCELERATION = 340;
     public static double DECELERATION = 220;
     public static double MAX_VELOCITY = 108;
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.24;
-    public static double FEEDBACK_INTEGRAL_GAIN = 0.0000;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0119;
-    public static double FEED_FORWARD_GAIN = 0.065;
+    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.2;
+    public static double FEEDBACK_INTEGRAL_GAIN = 0.0001;
+    public static double FEEDBACK_DERIVATIVE_GAIN = 0.0125;
+    public static double FEED_FORWARD_GAIN = 0.06;
     public static double VELOCITY_GAIN = 0.024;
     public static double ACCELERATION_GAIN = 0.0002;
 

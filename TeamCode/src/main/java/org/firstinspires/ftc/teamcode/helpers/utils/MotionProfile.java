@@ -92,6 +92,12 @@ public class MotionProfile {
         //else {System.out.println("TRIED OVERWRITING MOTION PROFILE COEFFICIENTS MID TRAVEL, REJECTING");}
     }
 
+    public void updateP(double p){
+        double i = pid.getI();
+        double d = pid.getD();
+        pid.setPID(p, i , d);
+    }
+
 
     public void setTargetPosition(double targetPosition) {
         this.targetPosition = targetPosition;

@@ -154,7 +154,7 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     @Override
     public void periodic(){
         if (!prevTargetPoint.equals(targetPoint)){
-            rotator.setTargetPosition(targetPoint.angleDegrees());
+            rotator.setTargetPosition(targetPoint.angleDegrees(), slides.getExtension());
             slides.setTargetPosition(targetPoint.magnitude());
             prevTargetPoint = targetPoint;
         }
@@ -207,6 +207,8 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     public void enableRotatorPowerOverride(double power) {rotator.enablePowerOverride(power);}
 
     public void disableRotatorPowerOverride() {rotator.disablePowerOverride();}
+
+    public void resetRotatorEncoder() {rotator.resetEncoder();}
 
     public double currentExtension() {return slides.getExtension();}
 

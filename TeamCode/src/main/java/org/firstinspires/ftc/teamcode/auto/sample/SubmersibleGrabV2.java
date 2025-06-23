@@ -123,7 +123,7 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
                                 .withTimeout(1200),
 
                         new SetArmPosition().intakeSampleAuto(
-                                (0.7742 * (forwardComponent + 1.5)) / MAX_POSITION,
+                                (0.8 * (forwardComponent + 1.5)) / MAX_POSITION, //0.7742
                                 (sampleAngle / -180.0) + 1
                         )
                 )

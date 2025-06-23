@@ -147,8 +147,8 @@ public class ArmSlideSubsystem {
         VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "NEW SLIDE EXTENSION OF " + position + " JUST SET");
 
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
-        motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
         updateCoefficientsForOperationMode();
+        motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
     }
 
 
@@ -311,7 +311,6 @@ public class ArmSlideSubsystem {
             return;
         }
 
-
         this.operationMode = operationMode;
         if (operationMode == OPERATION_MODE.HOLD_POINT && prevOperationMode != OPERATION_MODE.HOLD_POINT){
             VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "SLIDES HOLDING POINT");
@@ -322,6 +321,7 @@ public class ArmSlideSubsystem {
             holdPointPID.setPID(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
         }
 
+        motionProfile.updateP(mapToRange(getExtension(), 0 ,1, FEEDBACK_PROPORTIONAL_GAIN * 1.2, FEEDBACK_PROPORTIONAL_GAIN));
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
         double power = motionProfile.getPower(getPosition()) + feedForwardPower;

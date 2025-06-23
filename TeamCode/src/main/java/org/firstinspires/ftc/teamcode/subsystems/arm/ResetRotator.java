@@ -6,12 +6,13 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 
-public class ResetSlides extends SequentialCommandGroup {
-    public ResetSlides(){
+public class ResetRotator extends SequentialCommandGroup {
+    public ResetRotator(){
         addCommands(
-                new InstantCommand(()-> VLRSubsystem.getArm().enableSlidePowerOverride(-0.1)),
+                new InstantCommand(()-> VLRSubsystem.getArm().enableRotatorPowerOverride(-0.2)),
                 new WaitCommand(200),
-                new InstantCommand(()-> VLRSubsystem.getArm().disableSlidePowerOverride())
+                new InstantCommand(()-> VLRSubsystem.getArm().disableRotatorPowerOverride()),
+                new InstantCommand(()-> VLRSubsystem.getArm().resetRotatorEncoder())
         );
     }
 }

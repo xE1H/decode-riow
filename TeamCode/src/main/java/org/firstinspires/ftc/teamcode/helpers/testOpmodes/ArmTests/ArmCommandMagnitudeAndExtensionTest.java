@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.helpers.testOpmodes.ArmTests;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
@@ -15,6 +18,7 @@ import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRTestOpMode;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
+import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
@@ -81,19 +85,19 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
         VLRSubsystem.getArm().setRotatorPowerLimit(1);
 
         if (gamepad1.square && !prevSquare){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(101));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET));
         }
 
         else if (gamepad1.circle && !prevCircle){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(70));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().intakeSampleAuto(0.4, 0.5));
         }
 
         if (gamepad1.triangle && !prevTriangle){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(0.8));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(0));
         }
 
         else if (gamepad1.cross && !prevCross){
-            CommandScheduler.getInstance().schedule(new SetArmPosition().extension(0));
+            CommandScheduler.getInstance().schedule(new SetArmPosition().angleDegrees(58));
         }
 
         prevTriangle = gamepad1.triangle;
