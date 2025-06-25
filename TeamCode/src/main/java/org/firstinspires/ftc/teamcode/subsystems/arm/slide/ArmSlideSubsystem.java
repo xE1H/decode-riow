@@ -82,8 +82,8 @@ public class ArmSlideSubsystem {
     private ElapsedTime timer = new ElapsedTime();
     private boolean disableThirdMotor = false;
 
-    private double power = 0.3;
-    private double delta = 0.06;
+    private double Hangpower = 0.3;
+    private double delta = 0.055;
     private double direction = 1;
     private double maxPower = 0;
     VoltageSensor voltageSensor;
@@ -124,7 +124,7 @@ public class ArmSlideSubsystem {
                 ACCELERATION_GAIN);
 
 
-        motionProfile.enableTelemetry(true);
+        motionProfile.enableTelemetry(DEBUG_MODE);
         timer.reset();
 
         if  (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)){
@@ -147,8 +147,8 @@ public class ArmSlideSubsystem {
         VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "NEW SLIDE EXTENSION OF " + position + " JUST SET");
 
         position = mapToRange(position, 0, 1, MIN_POSITION, MAX_POSITION);
-        motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
         updateCoefficientsForOperationMode();
+        motionProfile.setTargetPosition(clamp(position, MIN_POSITION, MAX_POSITION));
     }
 
 
@@ -250,7 +250,7 @@ public class ArmSlideSubsystem {
 
 
     private void updateEncoderPosition(){
-        encoderPosition = -(extensionEncoder.getCurrentPosition() - encoderOffset) / 8192d;
+        encoderPosition = (extensionEncoder.getCurrentPosition() - encoderOffset) / 8192d;
     }
 
 
@@ -275,17 +275,18 @@ public class ArmSlideSubsystem {
         else{
             direction *= -1;
         }
-        power += delta * direction;
-        power = clamp(power, -1, 1);
+        Hangpower += delta * direction;
+        Hangpower = clamp(Hangpower, -1, 1);
 
-        System.out.println("VOLTAGE: " + voltage + " CURRENT: " + current + " POWER: " + outputPower + " MOTOR POWER: " + power);
-        return power;
+        System.out.println("VOLTAGE: " + voltage + " CURRENT: " + current + " POWER: " + outputPower + " MOTOR POWER: " + Hangpower);
+        return Hangpower;
     }
 
 
     public void periodic(double armAngleDegrees, OPERATION_MODE operationMode) {
         limitSwitchPressed = limitSwitch.isPressed();
         updateEncoderPosition();
+        this.operationMode = operationMode;
 
 //        if (operationMode == OPERATION_MODE.MAX_POWER_PULL && prevOperationMode != OPERATION_MODE.MAX_POWER_PULL){
 //            bomboTimer.reset();
@@ -311,8 +312,6 @@ public class ArmSlideSubsystem {
             return;
         }
 
-
-        this.operationMode = operationMode;
         if (operationMode == OPERATION_MODE.HOLD_POINT && prevOperationMode != OPERATION_MODE.HOLD_POINT){
             VLRSubsystem.getLogger(MainArmSubsystem.class).log(Level.WARNING, "SLIDES HOLDING POINT");
         }
@@ -322,9 +321,30 @@ public class ArmSlideSubsystem {
             holdPointPID.setPID(FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT, FEEDBACK_INTEGRAL_GAIN_HOLD_POINT, FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT);
         }
 
+        if (operationMode == OPERATION_MODE.HANG){
+            setHangCoefficients();
+        }
+        else{
+            motionProfile.updateP(mapToRange(getExtension(), 0 ,1, FEEDBACK_PROPORTIONAL_GAIN * 1.3, FEEDBACK_PROPORTIONAL_GAIN));
+        }
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
-        double power = motionProfile.getPower(getPosition()) + feedForwardPower;
+        double power = motionProfile.getPower(getPosition());
+
+        if (getExtension() > 0.1){
+            power += feedForwardPower;
+        }
+
+        if (overridePowerState) {
+            setMotorPower(overridePowerValue);
+            return;
+        }
+
+        if (operationMode == OPERATION_MODE.HANG){
+            setMotorPower(power);
+            System.out.println("SLIDE POWER " + power);
+            return;
+        }
 
         if (operationMode == OPERATION_MODE.HOLD_POINT && motionProfile.getTargetPosition() != 0) {
             power = holdPointPID.calculate(getPosition(), motionProfile.getTargetPosition()) + feedForwardPower;
@@ -332,22 +352,20 @@ public class ArmSlideSubsystem {
         power = clamp(power, -powerLimit, powerLimit);
 
 
-        if (limitSwitchPressed && motionProfile.getTargetPosition() == 0) {
-            extensionMotor1.setPower(0);
-            extensionMotor2.setPower(0);
 
+        if (limitSwitchPressed && motionProfile.getTargetPosition() == 0) {
             if (!prevLimitSwitchPressed) {
                 timer.reset();
             }
 
-            else if (timer.seconds() < 0.4){
-                extensionMotor0.setPower(-0.3);
+            else if (timer.seconds() < 0.5){
+                setMotorPower(-0.2);
             }
 
-            else if (timer.seconds() > 0.4) {
+            else if (timer.seconds() > 0.5) {
                 setMotorPower(0);
 
-                if (timer.seconds() > 0.7 && !encoderReset) {
+                if (timer.seconds() > 1 && !encoderReset) {
                     resetEncoder();
                     encoderReset = true;
                 }
@@ -357,15 +375,8 @@ public class ArmSlideSubsystem {
         else {
             encoderReset = false;
 
-            if (overridePowerState) {
-                setMotorPower(overridePowerValue);
-//                extensionMotor0.setPower(clamp(overridePowerValue, -0.5, 0.5));
-//                extensionMotor1.setPower(0);
-//                extensionMotor2.setPower(0);
-            }
-
-            else if (reachedTargetPosition()) {
-                extensionMotor0.setPower(0);
+            if (reachedTargetPosition()) {
+                extensionMotor0.setPower(power);
                 extensionMotor1.setPower(power);
                 extensionMotor2.setPower(power);
             }
@@ -383,10 +394,12 @@ public class ArmSlideSubsystem {
 
         prevLimitSwitchPressed = limitSwitchPressed;
 
-        Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
-        telemetry.addData("ARM SLIDE SUBSYSTEM POWER TIMER: ", timer.seconds());
-        telemetry.addData("ARM SLIDE SUBSYSTEM ENCODER RESET: ", encoderReset ? 1 : 0);
-        telemetry.addData("ARM SLIDE SUBSYSTEM LIMIT SWITCH STATE: ", limitSwitchPressed);
-        telemetry.addData("ARM SLIDE SUBSYSTEM PREV LIMIT SWITCH STATE: ", prevLimitSwitchPressed);
+        if (DEBUG_MODE) {
+            Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+            telemetry.addData("ARM SLIDE SUBSYSTEM POWER TIMER: ", timer.seconds());
+            telemetry.addData("ARM SLIDE SUBSYSTEM ENCODER RESET: ", encoderReset ? 1 : 0);
+            telemetry.addData("ARM SLIDE SUBSYSTEM LIMIT SWITCH STATE: ", limitSwitchPressed);
+            telemetry.addData("ARM SLIDE SUBSYSTEM PREV LIMIT SWITCH STATE: ", prevLimitSwitchPressed);
+        }
     }
 }

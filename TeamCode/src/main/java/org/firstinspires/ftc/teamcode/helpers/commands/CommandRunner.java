@@ -63,15 +63,17 @@ public class CommandRunner implements Runnable {
         }
 
         while (runningInterface.isOpModeRunning()) {
-            long startTime = System.nanoTime();
+            //long startTime = System.nanoTime();
 
-            for (LynxModule hub : allHubs) {hub.clearBulkCache();}
+            for (LynxModule hub : allHubs) {
+                hub.clearBulkCache();
+                //hub.getBulkData();
+            }
             CommandScheduler.getInstance().run();
 
-            GlobalLoopTimeMonitor.setCommandLoopDurationNs(System.nanoTime() - startTime);
-            GlobalLoopTimeMonitor.logLoopTimes(telemetry);
+            //GlobalLoopTimeMonitor.setCommandLoopDurationNs(System.nanoTime() - startTime);
+            //GlobalLoopTimeMonitor.logLoopTimes(telemetry);
             telemetry.update();
-            Thread.yield();
         }
     }
 }

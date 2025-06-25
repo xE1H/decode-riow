@@ -6,47 +6,68 @@ import com.acmerobotics.dashboard.config.Config;
 public class ArmRotatorConfiguration {
 
     public static String MOTOR_NAME = "MotorRotator";
-    public static String ENCODER_NAME = "MotorRightBack";
+    public static String ENCODER_NAME = "MotorLeftFront";
     public static String BEAM_BREAK_NAME = "BeamBreak";
 
-    public static double ACCELERATION_JERK = 36000;
-    public static double DECELERATION_JERK = 28000;
-    public static double MAX_VELOCITY = 900;
+    public static double PROPORTIONAL = 0.12;
+    public static double DERIVATIVE = 0.0039;
+    public static double INTEGRAL = 0.004;
 
-    public static double ACCELERATION_JERK_SLOW = 10000;
-    public static double DECELERATION_JERK_SLOW = 9000;
-    public static double MAX_VELOCITY_SLOW = 500;
+    public static double ACCELERATION = 8000;
+    public static double ACCELERATION_SLOW = 500;
+    public static double NOMINAL_VELOCITY = 950;
+    public static double EXTENDED_VELOCITY = 110;
 
-    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.031;
-    public static double FEEDBACK_INTEGRAL_GAIN = 0.00001;
-    public static double FEEDBACK_DERIVATIVE_GAIN = 0.00048;
-    public static double VELOCITY_GAIN = 0.0021;
-    public static double ACCELERATION_GAIN = 0.00018;
-    public static double FEEDFORWARD_GAIN = 0.078;
+    public static double PROPORTIONAL_HANG = 0.4;
 
-    public static double EXTENDED_ACCELERATION_JERK = 9000;
-    public static double EXTENDED_DECELERATION_JERK = 3000;
-    public static double EXTENDED_MAX_VELOCITY = 75;
-    public static double EXTENDED_FEEDBACK_PROPORTIONAL_GAIN = 0.1;
-    public static double EXTENDED_FEEDBACK_INTEGRAL_GAIN = 0.0001;
-    public static double EXTENDED_FEEDBACK_DERIVATIVE_GAIN = 0.0045;
-    public static double EXTENDED_VELOCITY_GAIN = 0.0012;
-    public static double EXTENDED_ACCELERATION_GAIN = 0.0012;
-    public static double EXTENDED_FEEDFORWARD_GAIN = 0.38;
+    public static double HOLD_POINT_PROPORTIONAL = 0.25;
+    public static double HOLD_POINT_INTEGRAL = 0.002;
+    public static double HOLD_POINT_DERIVATIVE = 0.004;
 
-    public static double ACCELERATION_HANG = 3000;
-    public static double DECELERATION_HANG = 2500;
-    public static double MAX_VELOCITY_HANG = 50;
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.1;
-    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.0002;//.0001;
-    public static double FEEDBACK_DERIVATIVE_GAIN_HANG = 0.0006;
-    public static double VELOCITY_GAIN_HANG = 0.002;
-    public static double ACCELERATION_GAIN_HANG = 0.00009;
-    public static double FEEDFORWARD_GAIN_HANG = -0.1;
+    public static double FEEDFORWARD_GAIN = 0.08;
+    public static double FEEDFORWARD_GAIN_EXTENDED = 0.13;
+    public static double FEEDFORWARD_GAIN_HANG = -0.4;
 
-    public static double FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT = 0.14;
-    public static double FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT = 0.001;
-    public static double FEEDBACK_INTEGRAL_GAIN_HOLD_POINT = 0.0002;
+
+//    PLANETARY GEARBOX VALUES
+//    public static double ACCELERATION_JERK = 36000;
+//    public static double DECELERATION_JERK = 28000;
+//    public static double MAX_VELOCITY = 900;
+//
+//    public static double ACCELERATION_JERK_SLOW = 10000;
+//    public static double DECELERATION_JERK_SLOW = 9000;
+//    public static double MAX_VELOCITY_SLOW = 500;
+//
+//    public static double FEEDBACK_PROPORTIONAL_GAIN = 0.031;
+//    public static double FEEDBACK_INTEGRAL_GAIN = 0.00001;
+//    public static double FEEDBACK_DERIVATIVE_GAIN = 0.00048;
+//    public static double VELOCITY_GAIN = 0.0021;
+//    public static double ACCELERATION_GAIN = 0.00018;
+//    public static double FEEDFORWARD_GAIN = 0.078;
+//
+//    public static double EXTENDED_ACCELERATION_JERK = 9000;
+//    public static double EXTENDED_DECELERATION_JERK = 3000;
+//    public static double EXTENDED_MAX_VELOCITY = 75;
+//    public static double EXTENDED_FEEDBACK_PROPORTIONAL_GAIN = 0.1;
+//    public static double EXTENDED_FEEDBACK_INTEGRAL_GAIN = 0.0001;
+//    public static double EXTENDED_FEEDBACK_DERIVATIVE_GAIN = 0.0045;
+//    public static double EXTENDED_VELOCITY_GAIN = 0.0012;
+//    public static double EXTENDED_ACCELERATION_GAIN = 0.0012;
+//    public static double EXTENDED_FEEDFORWARD_GAIN = 0.38;
+//
+//    public static double ACCELERATION_HANG = 3000;
+//    public static double DECELERATION_HANG = 2500;
+//    public static double MAX_VELOCITY_HANG = 50;
+//    public static double FEEDBACK_PROPORTIONAL_GAIN_HANG = 0.1;
+//    public static double FEEDBACK_INTEGRAL_GAIN_HANG = 0.0002;//.0001;
+//    public static double FEEDBACK_DERIVATIVE_GAIN_HANG = 0.0006;
+//    public static double VELOCITY_GAIN_HANG = 0.002;
+//    public static double ACCELERATION_GAIN_HANG = 0.00009;
+//    public static double FEEDFORWARD_GAIN_HANG = -0.1;
+//
+//    public static double FEEDBACK_PROPORTIONAL_GAIN_HOLD_POINT = 0.14;
+//    public static double FEEDBACK_DERIVATIVE_GAIN_HOLD_POINT = 0.001;
+//    public static double FEEDBACK_INTEGRAL_GAIN_HOLD_POINT = 0.0002;
 
     public static double ERROR_MARGIN = 10;
 

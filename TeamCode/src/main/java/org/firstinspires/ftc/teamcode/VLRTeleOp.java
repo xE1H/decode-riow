@@ -30,6 +30,7 @@ import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
+import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
@@ -55,7 +56,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
         f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
         //noinspection unchecked
-        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class, Wiper.class);
+        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class, Wiper.class, BlinkinSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         if (!PoseSaver.isPoseSaved()) {

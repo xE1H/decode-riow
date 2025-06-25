@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.rad;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
@@ -49,6 +50,7 @@ public class LimelightAimerTest extends VLRLinearOpMode {
 //        }
 
         cs.schedule(new SubmersibleGrabV2(f, reader).andThen(new SetArmPosition().retract()));
+        //cs.schedule(SubGrabWithFailsafe(f, reader));
 
         while (opModeIsActive()) {
             f.update();

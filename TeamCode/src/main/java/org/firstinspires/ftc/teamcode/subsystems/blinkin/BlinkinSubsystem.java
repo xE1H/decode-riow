@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems.blinkin;
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.BLACK;
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_PARTY_PALETTE;
 
+import static org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig.DEBUG_MODE;
+
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -26,7 +28,7 @@ public class BlinkinSubsystem extends VLRSubsystem <BlinkinSubsystem>{
         currentPattern = pattern;
         blinkinLedDriver.setPattern(pattern);
 
-        logger.info("CURRENT PATTERN: " + currentPattern.toString());
+        if (DEBUG_MODE) {logger.info("CURRENT PATTERN: " + currentPattern.toString());}
     }
 
     public void next(){

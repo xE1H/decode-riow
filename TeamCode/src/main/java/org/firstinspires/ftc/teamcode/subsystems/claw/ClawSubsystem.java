@@ -4,7 +4,7 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 
 import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.LowPassFilter;
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 
 public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawConfiguration {
     private Servo angleServo, twistServo, grabServos;
-    private AnalogInput proximitySensor;
-    private LowPassFilter analogFilter = new LowPassFilter(0.7);
+    private RevTouchSensor proximitySensor;
+    private final LowPassFilter proximityFilter = new LowPassFilter(0.88);
 
     private VerticalRotation targetAngle = VerticalRotation.UP;
     private GripperState clawState = GripperState.CLOSED;
@@ -28,7 +28,7 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
         twistServo = hardwareMap.get(Servo.class, TWIST_SERVO);
         grabServos = hardwareMap.get(Servo.class, GRAB_SERVO);
 
-        proximitySensor = hardwareMap.get(AnalogInput.class, ANALOG_PROXIMITY);
+        proximitySensor = hardwareMap.get(RevTouchSensor.class, PROXIMITY_SENSOR);
     }
 
 
@@ -65,8 +65,8 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
 
 
     public boolean isSamplePresent(){
-        boolean state = analogFilter.estimate(proximitySensor.getVoltage()) > CLAW_ANALOG_PROXIMITY_THRESHOLD;
-        logger.info("SAMPLE PRESENT SATE: " + state);
+        boolean state = proximityFilter.estimate(proximitySensor.isPressed() ? 1 : 0) > CLAW_PROXIMITY_THRESHOLD;
+        //logger.info("SAMPLE PRESENT SATE: " + state);
         return state;
     }
 
@@ -78,6 +78,6 @@ public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawCo
 
     @Override
     public void periodic(){
-        FtcDashboard.getInstance().getTelemetry().addData("CLAW ANALOG SENSOR: ", proximitySensor.getVoltage());
+        FtcDashboard.getInstance().getTelemetry().addData("CLAW PROXIMITY STATE SENSOR: ", isSamplePresent());
     }
 }

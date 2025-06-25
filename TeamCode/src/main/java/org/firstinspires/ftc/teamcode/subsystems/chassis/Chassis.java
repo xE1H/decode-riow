@@ -155,17 +155,17 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         backDistance = backSensorFilter.estimate(backSensor.getVoltage() / 3.3 * 800);
     }
 
-    @Override
-    public void periodic(){
-        updateLeftDistanceMM();
-        updateRightDistanceMM();
-        updateBackSensor();
-
-        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-        telemetry.addData("LEFT DISTANCE: ", leftDistance);
-        telemetry.addData("RIGHT DISTANCE: ", rightDistance);
-        telemetry.addData("BACK DISTANCE: ", backDistance);
-    }
+//    @Override
+//    public void periodic(){
+//        updateLeftDistanceMM();
+//        updateRightDistanceMM();
+//        updateBackSensor();
+//
+//        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+//        telemetry.addData("LEFT DISTANCE: ", leftDistance);
+//        telemetry.addData("RIGHT DISTANCE: ", rightDistance);
+//        telemetry.addData("BACK DISTANCE: ", backDistance);
+//    }
 
 
     public double getLeftDistance(){

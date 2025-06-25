@@ -7,13 +7,15 @@ import com.pedropathing.localization.Pose;
 public class PointsSample {
     public static Pose START_POSE = new Pose(10, 111.5, 0);
 
+    public static Pose PRELOAD_BUCKET_HIGH_SCORE_POSE = new Pose(21, 116.5, rad(-45));
+
     public static Pose BUCKET_HIGH_SCORE_POSE = new Pose(24, 118.5, rad(-45));
 
     public static Pose BUCKET_HIGH_SCORE_POSE_SUB = new Pose(22.5, 120, rad(-45));
 
-    public static Pose FIRST_MARK_GRAB = new Pose(29, 118.4, 0);
+    public static Pose FIRST_MARK_GRAB = new Pose(29, 118.8, 0);
 
-    public static Pose SECOND_MARK_GRAB = new Pose(FIRST_MARK_GRAB.getX(), FIRST_MARK_GRAB.getY() + 9.75, 0);
+    public static Pose SECOND_MARK_GRAB = new Pose(FIRST_MARK_GRAB.getX(), FIRST_MARK_GRAB.getY() + 9.2, 0);
 
     public static Pose THIRD_MARK_GRAB = new Pose(32.5, 130, rad(30));
 

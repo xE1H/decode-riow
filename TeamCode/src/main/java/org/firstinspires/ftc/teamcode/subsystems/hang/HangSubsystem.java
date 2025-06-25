@@ -35,33 +35,38 @@ public class HangSubsystem extends VLRSubsystem<HangSubsystem> implements HangCo
     }
 
 
-    @Override
-    public void periodic(){
-        double powerLeft = p * (getAngle(analogLeft.getVoltage()) - leftAnalogThreshold - 20);
-        double powerRight = p * (rightAnalogThreshold - 20 - getAngle(analogRight.getVoltage()));
+//    @Override
+//    public void periodic(){
+//        double powerLeft = p * (getAngle(analogLeft.getVoltage()) - leftAnalogThreshold - 20);
+//        double powerRight = p * (rightAnalogThreshold - 20 - getAngle(analogRight.getVoltage()));
+//
+//        if (overridePower) {
+//            left.setPower(powerOverride);
+//            right.setPower(powerOverride);
+//        }
+//        else {
+//            left.setPower(powerLeft);
+//            right.setPower(powerRight);
+//        }
+//
+//
+//
+//        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+//
+//        telemetry.addData("HANG_LEFT_ANALOG_ANGLE: ", getAngle(analogLeft.getVoltage()));
+//        telemetry.addData("HANG_RIGHT_ANALOG_ANGLE: ", getAngle(analogRight.getVoltage()));
+//        telemetry.addData("HANG_ANALOG_THRESHOLD_STATE: ", analogFeedbackThresholdReached() ? 1 : 0);
+//    }
 
-        if (overridePower) {
-            left.setPower(powerOverride);
-            right.setPower(powerOverride);
-        }
-        else {
-            left.setPower(powerLeft);
-            right.setPower(powerRight);
-        }
 
-
-
-        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-
-        telemetry.addData("HANG_LEFT_ANALOG_ANGLE: ", getAngle(analogLeft.getVoltage()));
-        telemetry.addData("HANG_RIGHT_ANALOG_ANGLE: ", getAngle(analogRight.getVoltage()));
-        telemetry.addData("HANG_ANALOG_THRESHOLD_STATE: ", analogFeedbackThresholdReached() ? 1 : 0);
-    }
-
+//    public void setPower(double power){
+//        overridePower = true;
+//        powerOverride = power;
+//    }
 
     public void setPower(double power){
-        overridePower = true;
-        powerOverride = power;
+        left.setPower(power);
+        right.setPower(power);
     }
 
 

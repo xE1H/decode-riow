@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.BUCKET_HIG
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.DELTA;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.FIRST_MARK_GRAB;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.GRAB_POSES;
+import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.PRELOAD_BUCKET_HIGH_SCORE_POSE;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.START_POSE;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB_0;
@@ -27,11 +28,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
+import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalTimer;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ResetRotator;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ResetSlides;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
@@ -42,7 +47,7 @@ import java.util.logging.Level;
 public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private boolean sampleScored = false;
     private final LimelightYoloReader reader;
-    private final double jointPathTValue = 0.94;
+    private final double jointPathTValue = 0.92;
 
     public AutonomousPeriodActionSample(Follower follower, LimelightYoloReader reader) {
         this.reader = reader;
@@ -76,20 +81,22 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
         return new ParallelCommandGroup(
                 new SequentialCommandGroup(
                         new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
-                        new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE, 3, 3, Math.toRadians(4))),
+                        new WaitCommand(60),
+                        //new WaitUntilCommand(() -> follower.atPose(PRELOAD_BUCKET_HIGH_SCORE_POSE, 3, 3, Math.toRadians(4))),
                         new InstantCommand(() -> sampleScored = true),
-                        new SetArmPosition().intakeSample(0.34)
+                        new SetArmPosition().intakeSample(0.32)
                 ),
 
                 new SequentialCommandGroup(
-                        new FollowPath(follower, bezierPath(START_POSE, BUCKET_HIGH_SCORE_POSE)
-                                .setLinearHeadingInterpolation(START_POSE.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build()
+                        new FollowPath(follower, bezierPath(START_POSE, PRELOAD_BUCKET_HIGH_SCORE_POSE)
+                                .setLinearHeadingInterpolation(START_POSE.getHeading(), PRELOAD_BUCKET_HIGH_SCORE_POSE.getHeading()).build()
                         ),
                         new WaitUntilCommand(() -> sampleScored),
                         new InstantCommand(() -> sampleScored = false),
+
                         new WaitCommand(200),
-                        new FollowPath(follower, bezierPath(BUCKET_HIGH_SCORE_POSE, FIRST_MARK_GRAB)
-                                .setLinearHeadingInterpolation(BUCKET_HIGH_SCORE_POSE.getHeading(), FIRST_MARK_GRAB.getHeading()).build()
+                        new FollowPath(follower, bezierPath(PRELOAD_BUCKET_HIGH_SCORE_POSE, FIRST_MARK_GRAB)
+                                .setLinearHeadingInterpolation(PRELOAD_BUCKET_HIGH_SCORE_POSE.getHeading(), FIRST_MARK_GRAB.getHeading()).build()
                         )
                 )
         );
@@ -109,6 +116,11 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new SetArmPosition().retract(),
+                                new ConditionalCommand(
+                                        new LogCommand("AUTONOMOUS PERIOD ACTIONS", "CLAW SAMPLE PICKED UP SUCCESSFULLY"),
+                                        new LogCommand("AUTONOMOUS PERIOD ACTIONS", Level.SEVERE, "CLAW SAMPLE PICKUP FAILED"),
+                                        ()-> VLRSubsystem.getInstance(ClawSubsystem.class).isSamplePresent()
+                                ),
 
                                 new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
                                 new WaitUntilCommand(() -> follower.atPose(BUCKET_HIGH_SCORE_POSE_SUB, 3, 3, Math.toRadians(2))),
@@ -140,7 +152,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
                                 new WaitUntilCommand(() -> sampleScored),
                                 new InstantCommand(() -> sampleScored = false),
-                                new WaitCommand(200),
+                                new WaitCommand(100),
 
                                 new CustomConditionalCommand(
                                         new SequentialCommandGroup(
@@ -180,8 +192,16 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                         new SetArmPosition().setArmState(ArmState.State.SAMPLE_SCORE),
 
                         new ConditionalCommand(
-                                new SetArmPosition().intakeSampleAuto(0.31, sample == 4 ? 0.3 : 0.5),
-                                new SetArmPosition().retract().andThen(new SetClawState(ClawConfiguration.GripperState.OPEN)),
+                                new SetArmPosition().intakeSampleAuto(sample == 3 ? 0.29 : 0.3285, sample == 3 ? 0.685 : 0.5),
+                                new SequentialCommandGroup(
+                                        new SetArmPosition().retract(),
+                                        new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                        new WaitCommand(100),
+                                        new ParallelCommandGroup(
+                                                new ResetSlides(),
+                                                new ResetRotator()
+                                        )
+                                ),
                                 () -> sample <= 3
                         )
                 ),
