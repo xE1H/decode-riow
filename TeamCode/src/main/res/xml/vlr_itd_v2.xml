@@ -28,8 +28,8 @@
             <goBILDA5202SeriesMotor name="MotorRightFront" port="2" />
             <goBILDA5202SeriesMotor name="MotorLeftFront" port="0" />
             <goBILDA5202SeriesMotor name="MotorLeftBack" port="1" />
-            <Servo name="ServoWiper" port="1" />
-            <RevBlinkinLedDriver name="blinkin" port="5" />
+            <Servo name="ServoWiper" port="5" />
+            <RevBlinkinLedDriver name="blinkin" port="0" />
             <AnalogInput name="CHanalog0" port="0" />
             <AnalogInput name="CHanalog1" port="1" />
             <AnalogInput name="CHanalog2" port="2" />

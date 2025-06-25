@@ -12,6 +12,7 @@ import com.pedropathing.localization.Pose;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
@@ -31,6 +32,8 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
 
     private final LimelightYoloReader reader;
     private LimelightYoloReader.Limelight.Sample.Color sampleColour;
+
+    private double positiveNegativeYLimit = 0;
 
     private final SequentialCommandGroup submersibleGrabCommand = new SequentialCommandGroup();
     double sampleAngle = 90;
@@ -115,19 +118,21 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
         Pose strafePose = new Pose(strafeX, strafeY, currentRobotHeading);
         logger.info("CLAW TWIST: " + (sampleAngle / -180.0) + 1);
 
-        submersibleGrabCommand.addCommands(
-                new ParallelCommandGroup(
-                        new FollowPath(f, bezierPath(currentPose, strafePose)
-                                .setConstantHeadingInterpolation(currentRobotHeading)
-                                .build())
-                                .withTimeout(1200),
+        if (positiveNegativeYLimit == 0 || strafeY > positiveNegativeYLimit) {
+            submersibleGrabCommand.addCommands(
+                    new ParallelCommandGroup(
+                            new FollowPath(f, bezierPath(currentPose, strafePose)
+                                    .setConstantHeadingInterpolation(currentRobotHeading)
+                                    .build())
+                                    .withTimeout(1200),
 
-                        new SetArmPosition().intakeSampleAuto(
-                                (0.8 * (forwardComponent + 1.5)) / MAX_POSITION, //0.7742
-                                (sampleAngle / -180.0) + 1
-                        )
-                )
-        );
+                            new SetArmPosition().intakeSampleAuto(
+                                    (0.81 * (forwardComponent + 1.5)) / MAX_POSITION, //0.7742
+                                    (sampleAngle / -180.0) + 1
+                            )
+                    ).andThen(new LogCommand("SKIBIDI LOGGER", "SKIBIDI SUB INTAKE FINITO"))
+            );
+        }
     }
 
     public SubmersibleGrabV2(Follower f, LimelightYoloReader reader, boolean skipWaiting) {
@@ -140,5 +145,10 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
 
     public SubmersibleGrabV2(Follower f, LimelightYoloReader reader) {
         this(f, reader, null, false);
+    }
+
+    public SubmersibleGrabV2 setNegativeYLimit(double negativeYLimit){
+        this.positiveNegativeYLimit = negativeYLimit;
+        return this;
     }
 }

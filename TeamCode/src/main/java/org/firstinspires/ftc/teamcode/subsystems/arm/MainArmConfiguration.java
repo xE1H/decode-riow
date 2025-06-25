@@ -38,7 +38,7 @@ public class MainArmConfiguration {
 
     public enum SAMPLE_SCORE_HEIGHT {
         LOW_BASKET (0.4),
-        HIGH_BASKET (1);
+        HIGH_BASKET (0.95);
 
         public final double extension;
         SAMPLE_SCORE_HEIGHT (double extension){

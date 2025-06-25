@@ -10,21 +10,23 @@ public class ArmRotatorConfiguration {
     public static String BEAM_BREAK_NAME = "BeamBreak";
 
     public static double PROPORTIONAL = 0.12;
-    public static double DERIVATIVE = 0.004;
+    public static double DERIVATIVE = 0.0039;
     public static double INTEGRAL = 0.004;
 
     public static double ACCELERATION = 8000;
+    public static double ACCELERATION_SLOW = 500;
     public static double NOMINAL_VELOCITY = 950;
     public static double EXTENDED_VELOCITY = 110;
 
-    public static double PROPORTIONAL_HANG = 0.1;
+    public static double PROPORTIONAL_HANG = 0.4;
 
     public static double HOLD_POINT_PROPORTIONAL = 0.25;
+    public static double HOLD_POINT_INTEGRAL = 0.002;
     public static double HOLD_POINT_DERIVATIVE = 0.004;
 
     public static double FEEDFORWARD_GAIN = 0.08;
-    public static double FEEDFORWARD_GAIN_EXTENDED = 0.12;
-    public static double FEEDFORWARD_GAIN_HANG = -0.1;
+    public static double FEEDFORWARD_GAIN_EXTENDED = 0.13;
+    public static double FEEDFORWARD_GAIN_HANG = -0.4;
 
 
 //    PLANETARY GEARBOX VALUES

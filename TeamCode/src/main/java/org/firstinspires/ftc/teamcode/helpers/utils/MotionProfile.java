@@ -169,6 +169,8 @@ public class MotionProfile {
 
     public double getT() {return t;}
 
+    public double getStartingPosition() {return initialPosition;}
+
 
     private double calculateDistance(double jerk, double time) {
         return jerk * Math.pow(time, 2) * time;

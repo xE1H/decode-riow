@@ -59,9 +59,14 @@ public class HangSubsystem extends VLRSubsystem<HangSubsystem> implements HangCo
 //    }
 
 
+//    public void setPower(double power){
+//        overridePower = true;
+//        powerOverride = power;
+//    }
+
     public void setPower(double power){
-        overridePower = true;
-        powerOverride = power;
+        left.setPower(power);
+        right.setPower(power);
     }
 
 

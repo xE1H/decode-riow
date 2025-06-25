@@ -47,7 +47,7 @@ import java.util.logging.Level;
 public class AutonomousPeriodActionSample extends SequentialCommandGroup {
     private boolean sampleScored = false;
     private final LimelightYoloReader reader;
-    private final double jointPathTValue = 0.94;
+    private final double jointPathTValue = 0.92;
 
     public AutonomousPeriodActionSample(Follower follower, LimelightYoloReader reader) {
         this.reader = reader;
@@ -71,7 +71,6 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
                 grabAndScoreSpikeMarkSample(follower, 4),
 
                 subCycle(follower, 5),
-
                 subCycle(follower, 6),
                 subCycle(follower, 7)
         );
@@ -82,7 +81,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
         return new ParallelCommandGroup(
                 new SequentialCommandGroup(
                         new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
-                        new WaitCommand(40),
+                        new WaitCommand(60),
                         //new WaitUntilCommand(() -> follower.atPose(PRELOAD_BUCKET_HIGH_SCORE_POSE, 3, 3, Math.toRadians(4))),
                         new InstantCommand(() -> sampleScored = true),
                         new SetArmPosition().intakeSample(0.32)
@@ -153,7 +152,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
                                 new WaitUntilCommand(() -> sampleScored),
                                 new InstantCommand(() -> sampleScored = false),
-                                new WaitCommand(200),
+                                new WaitCommand(100),
 
                                 new CustomConditionalCommand(
                                         new SequentialCommandGroup(
@@ -194,11 +193,15 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
 
                         new ConditionalCommand(
                                 new SetArmPosition().intakeSampleAuto(sample == 3 ? 0.29 : 0.3285, sample == 3 ? 0.685 : 0.5),
-                                new SetArmPosition().retract().andThen(new SetClawState(ClawConfiguration.GripperState.OPEN).andThen(
+                                new SequentialCommandGroup(
+                                        new SetArmPosition().retract(),
+                                        new SetClawState(ClawConfiguration.GripperState.OPEN),
+                                        new WaitCommand(100),
                                         new ParallelCommandGroup(
                                                 new ResetSlides(),
                                                 new ResetRotator()
-                                        ))),
+                                        )
+                                ),
                                 () -> sample <= 3
                         )
                 ),

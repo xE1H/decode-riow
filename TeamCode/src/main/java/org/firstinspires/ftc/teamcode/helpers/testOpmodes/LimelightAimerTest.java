@@ -49,8 +49,8 @@ public class LimelightAimerTest extends VLRLinearOpMode {
 //            sleep(10);
 //        }
 
-        //cs.schedule(new SubmersibleGrabV2(f, reader).andThen(new SetArmPosition().retract()));
-        cs.schedule(SubGrabWithFailsafe(f, reader));
+        cs.schedule(new SubmersibleGrabV2(f, reader).andThen(new SetArmPosition().retract()));
+        //cs.schedule(SubGrabWithFailsafe(f, reader));
 
         while (opModeIsActive()) {
             f.update();
