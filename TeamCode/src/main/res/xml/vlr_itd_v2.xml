@@ -8,9 +8,9 @@
             <goBILDA5202SeriesMotor name="MotorArm3" port="3" />
             <RevTouchSensor name="SlideLimit" port="0" />
             <RevTouchSensor name="clawProximity" port="3" />
-            <AnalogInput name="backAnalog" port="3" />
-            <AnalogInput name="leftAnalog" port="0" />
-            <AnalogInput name="rightAnalog" port="1" />
+            <AnalogInput name="backAnalog" port="0" />
+<!--            <AnalogInput name="leftAnalog" port="0" />-->
+<!--            <AnalogInput name="rightAnalog" port="1" />-->
         </LynxModule>
     </LynxUsbDevice>
 
@@ -28,7 +28,7 @@
             <goBILDA5202SeriesMotor name="MotorRightFront" port="2" />
             <goBILDA5202SeriesMotor name="MotorLeftFront" port="0" />
             <goBILDA5202SeriesMotor name="MotorLeftBack" port="1" />
-            <Servo name="ServoWiper" port="5" />
+            <Servo name="ServoWiper" port="3" />
             <RevBlinkinLedDriver name="blinkin" port="0" />
             <AnalogInput name="CHanalog0" port="0" />
             <AnalogInput name="CHanalog1" port="1" />

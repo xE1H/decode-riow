@@ -27,9 +27,8 @@ public class HangSubsystem extends VLRSubsystem<HangSubsystem> implements HangCo
 
         left.setDirection(DcMotorSimple.Direction.REVERSE);
         right.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        analogLeft = hardwareMap.get(AnalogInput.class, LEFT_ANALOG);
-        analogRight = hardwareMap.get(AnalogInput.class, RIGHT_ANALOG);
+//        analogLeft = hardwareMap.get(AnalogInput.class, LEFT_ANALOG);
+//        analogRight = hardwareMap.get(AnalogInput.class, RIGHT_ANALOG);
 
         setPower(0);
     }
@@ -79,17 +78,16 @@ public class HangSubsystem extends VLRSubsystem<HangSubsystem> implements HangCo
         right.getController().pwmDisable();
     }
 
-
-    public double getAngle(double voltage){ return voltage / 3.3 * 360;}
-
-    public double getLeftAngle(){ return getAngle(analogLeft.getVoltage());}
-    public double getRightAngle(){ return getAngle(analogRight.getVoltage());}
-
-
-    public boolean analogFeedbackThresholdReached(){
-        return (
-                getAngle(analogLeft.getVoltage()) < leftAnalogThreshold &&
-                getAngle(analogRight.getVoltage()) > rightAnalogThreshold
-        );
-    }
+//    public double getAngle(double voltage){ return voltage / 3.3 * 360;}
+//
+//    public double getLeftAngle(){ return getAngle(analogLeft.getVoltage());}
+//    public double getRightAngle(){ return getAngle(analogRight.getVoltage());}
+//
+//
+//    public boolean analogFeedbackThresholdReached(){
+//        return (
+//                getAngle(analogLeft.getVoltage()) < leftAnalogThreshold &&
+//                getAngle(analogRight.getVoltage()) > rightAnalogThreshold
+//        );
+//    }
 }

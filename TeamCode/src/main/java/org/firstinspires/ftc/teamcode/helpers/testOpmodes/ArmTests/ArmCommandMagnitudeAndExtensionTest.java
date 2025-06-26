@@ -76,9 +76,9 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
     public void Start(){
         //CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad1.dpad_down, ()-> analogEnabled));
 
-        CommandScheduler.getInstance().schedule(new SetClawState(ClawConfiguration.GripperState.CLOSED));
-        CommandScheduler.getInstance().schedule(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL));
-        CommandScheduler.getInstance().schedule(new SetClawAngle(ClawConfiguration.VerticalRotation.UP));
+//        CommandScheduler.getInstance().schedule(new SetClawState(ClawConfiguration.GripperState.CLOSED));
+//        CommandScheduler.getInstance().schedule(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL));
+//        CommandScheduler.getInstance().schedule(new SetClawAngle(ClawConfiguration.VerticalRotation.UP));
     }
 
 

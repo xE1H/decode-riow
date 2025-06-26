@@ -48,6 +48,10 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
     boolean sampleMapActive = true;
     boolean isBlue = true;
+    boolean analogHangActive = false;
+    boolean prevTriangle = false;
+    boolean hangHoldPosition = false;
+    boolean prevDpad = false;
 
 
     @Override
@@ -99,6 +103,31 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
         while (opModeIsActive()) {
             gp.update();
+
+            if (analogHangActive){
+                VLRSubsystem.getArm().enableSlidePowerOverride(-0.5 + gamepad2.right_stick_y);
+                VLRSubsystem.getArm().enableRotatorPowerOverride(-0.35 + gamepad2.left_stick_y);
+            }
+
+            if (gamepad1.triangle && !prevTriangle && !hangHoldPosition){
+                analogHangActive = true;
+            }
+
+            if (gamepad2.right_trigger > 0.9 && !hangHoldPosition){
+                analogHangActive = false;
+                VLRSubsystem.getArm().disableSlidePowerOverride();
+                VLRSubsystem.getArm().disableRotatorPowerOverride();
+                CommandScheduler.getInstance().schedule(new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50));
+            }
+
+            if (gamepad2.dpad_down && !prevDpad){
+                CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad2.dpad_down, ()-> analogHangActive));
+            }
+
+            prevTriangle = gamepad1.triangle;
+            prevDpad = gamepad2.dpad_down;
+
+
 
             if (globalMap.followerActive) f.update();
             else {

@@ -224,6 +224,10 @@ public class ArmRotatorSubsystem {
         }
         prevBreamBreakState = currentBeamBreakState;
 
+        if (currentAngle < 1 && motionProfile.getTargetPosition() == 0){
+            power = 0;
+        }
+
         if (operationMode == OPERATION_MODE.HANG){
             System.out.println("rotator power: " + power);
         }

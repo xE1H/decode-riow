@@ -21,6 +21,8 @@ import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.trigger.TriggerCtl;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ResetRotator;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ResetSlides;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
@@ -65,7 +67,7 @@ public class SampleMap extends ControlMap {
     //
     private void retractArm() {
         if (retractTimer.milliseconds() > 800) {
-            cs.schedule(new SetArmPosition().retract());
+            cs.schedule(new SetArmPosition().retract().andThen(new WaitCommand(100), new ResetSlides().alongWith(new ResetRotator())));
             retractTimer.reset();
         }
     }
@@ -87,10 +89,14 @@ public class SampleMap extends ControlMap {
         cs.schedule(
                 new SequentialCommandGroup(
                         new SubmersibleGrabV2(f, globalMap.reader, rc),
-                        new WaitCommand(230),
-                        new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                        new WaitCommand(150),
-                        new SetArmPosition().retract()
+                        new SetArmPosition().retract(),
+                        new InstantCommand() {
+                            @Override
+                            public void run() {
+                                globalMap.followerActive = false;
+                                rc.singleBlip();
+                            }
+                        }
                 )
         );
     }
@@ -100,15 +106,16 @@ public class SampleMap extends ControlMap {
         cs.schedule(
                 new SequentialCommandGroup(
                         new ParallelCommandGroup(
-                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                new SequentialCommandGroup(
-                                        new SetArmPosition().retract(),
-                                        new SetArmPosition().scoreSample(armState)
-                                ),
+                                new SetArmPosition().scoreSample(armState),
+//                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
+//                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
+//                                new SequentialCommandGroup(
+//                                        new SetArmPosition().retract(),
+//                                        new SetArmPosition().scoreSample(armState)
+//                                ),
                                 new SequentialCommandGroup(
                                         new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)
-                                                .setLinearHeadingInterpolation(SUB_GRAB.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build()
+                                                .setLinearHeadingInterpolation(SUB_GRAB_0.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build()
                                         ),
                                         new InstantCommand() {
                                             @Override
