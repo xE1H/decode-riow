@@ -8,6 +8,9 @@ import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloR
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.outoftheboxrobotics.photoncore.Photon;
@@ -120,8 +123,19 @@ public class VLRTeleOp extends VLRLinearOpMode {
                 CommandScheduler.getInstance().schedule(new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50));
             }
 
+
             if (gamepad2.dpad_down && !prevDpad){
-                CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(()-> gamepad2.dpad_down, ()-> analogHangActive));
+                CommandScheduler.getInstance().schedule(
+                        new SetArmPosition().level_3_hang(()-> gamepad2.dpad_down, ()-> analogHangActive).alongWith(
+                                new SequentialCommandGroup(
+                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.05 && VLRSubsystem.getArm().currentAngleDegrees() < 65),
+                                        new InstantCommand(()-> analogHangActive = false),
+                                        new InstantCommand(()-> VLRSubsystem.getArm().disableRotatorPowerOverride()),
+                                        new InstantCommand(()-> VLRSubsystem.getArm().disableSlidePowerOverride()),
+                                        new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50)
+                                )
+                        )
+                );
             }
 
             prevTriangle = gamepad1.triangle;

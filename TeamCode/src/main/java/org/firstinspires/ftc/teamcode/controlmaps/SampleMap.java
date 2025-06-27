@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode.controlmaps;
 
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.BUCKET_HIGH_SCORE_POSE;
-import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB_0;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
-
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
@@ -13,21 +12,18 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.trigger.TriggerCtl;
+import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ResetRotator;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ResetSlides;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawAngle;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawState;
-import org.firstinspires.ftc.teamcode.subsystems.claw.commands.SetClawTwist;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 
 public class SampleMap extends ControlMap {
     GlobalMap globalMap;
@@ -67,10 +63,24 @@ public class SampleMap extends ControlMap {
     //
     private void retractArm() {
         if (retractTimer.milliseconds() > 800) {
-            cs.schedule(new SetArmPosition().retract().andThen(new WaitCommand(100), new ResetSlides().alongWith(new ResetRotator())));
+            cs.schedule(new SetArmPosition().retract().andThen(
+                    new WaitCommand(100),
+                    new ParallelCommandGroup(
+                            new ResetSlides(),
+                            new ResetRotator(),
+                            new InstantCommand() {
+                                @Override
+                                public void run() {
+                                    globalMap.followerActive = false;
+                                    rc.singleBlip();
+                            }}
+                    ))
+            );
             retractTimer.reset();
         }
     }
+
+
 
     private void toggleArmLowState() {
         if (armState == MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET) {
@@ -89,7 +99,6 @@ public class SampleMap extends ControlMap {
         cs.schedule(
                 new SequentialCommandGroup(
                         new SubmersibleGrabV2(f, globalMap.reader, rc),
-                        new SetArmPosition().retract(),
                         new InstantCommand() {
                             @Override
                             public void run() {
@@ -97,6 +106,7 @@ public class SampleMap extends ControlMap {
                                 rc.singleBlip();
                             }
                         }
+
                 )
         );
     }

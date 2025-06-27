@@ -331,7 +331,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
     public Command intakeSpecimen(double extension) {
-        return intake(extension, 0.75, ClawConfiguration.HorizontalRotation.NORMAL.pos, true)
+        return intake(extension, 0.825, ClawConfiguration.HorizontalRotation.NORMAL.pos, true)
                 .andThen(setArmState(ArmState.State.SPECIMEN_INTAKE));
     }
 
@@ -555,10 +555,10 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
                                 new WaitCommand(80),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                new SetClawTwist(0.25),
 
 
                                 new ParallelCommandGroup(
+                                        new WaitCommand(100).andThen(new SetClawTwist(0.25)),
                                         new SetArmPosition().extension(0),
                                         new SequentialCommandGroup(
                                                 new WaitUntilCommand(()-> arm.currentExtension() < 0.12),
@@ -568,7 +568,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                                         new SetArmPosition().angleDegrees(110.5),
                                                         new SequentialCommandGroup(
                                                                 new WaitUntilCommand(()-> (arm.currentAngleDegrees() > 20 && !arm.areSlidesMoving())),
-                                                                new SetArmPosition().extension(0.29)
+                                                                new SetArmPosition().extension(0.31)
                                                         ),
                                                         new WaitUntilCommand(()-> arm.currentAngleDegrees() > 80).andThen(new SetClawAngle(0.15))
                                                 )

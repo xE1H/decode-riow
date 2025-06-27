@@ -95,7 +95,7 @@ public class GlobalMap extends ControlMap {
     private void startRotatorOverride() {
         Logger.getLogger("RotatorOverride").fine("Start override");
         rotatorResetActive = true;
-        VLRSubsystem.getArm().enableRotatorPowerOverride(-0.1);
+        VLRSubsystem.getArm().enableRotatorPowerOverride(-0.2);
     }
 
     private void endRotatorOverride() {
