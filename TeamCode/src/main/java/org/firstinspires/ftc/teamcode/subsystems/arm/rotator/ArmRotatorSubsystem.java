@@ -214,10 +214,6 @@ public class ArmRotatorSubsystem {
                 //resetEncoder();
                 encoderReset = true;
             }
-
-//            if (Math.abs(currentAngle) < 0.2){
-//                power = 0;
-//            }
         }
         else {
             encoderReset = false;

@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
@@ -613,7 +614,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
 
-    public Command level_3_hang(BooleanSupplier gamepadCondition, BooleanSupplier mainGamepadCondition){
+    public Command level_3_hang(BooleanSupplier gamePadCondition, BooleanSupplier hangStartCondition){
         return new CustomConditionalCommand(
                 new SequentialCommandGroup(
                         new LogCommand("THIRD STAGE HANG", Level.SEVERE, "STARTING LEVEL 3 HANG COMMAND"),
@@ -623,42 +624,44 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new SetArmPosition().angleDegrees(100).alongWith(
                                 new WaitUntilCommand(()-> arm.currentAngleDegrees() > 45).andThen(new SetArmPosition().extension(0.314))),
 
-                        new WaitUntilCommand(gamepadCondition),
+                        new WaitUntilCommand(gamePadCondition),
 
                         new ParallelCommandGroup(
                                 new SetArmPosition().extension(0.13),
-                                new WaitCommand(300).andThen(new SetArmPosition().angleDegrees(82)),
-//                                new SequentialCommandGroup(
-//                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.65)),
-//                                        new WaitCommand(450),
-//                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1))
-//                                ),
+                                new WaitCommand(300).andThen(new SetArmPosition().setArmOperationMode(OPERATION_MODE.NORMAL_SLOWER), new SetArmPosition().angleDegrees(82)),
+                                new SequentialCommandGroup(
+                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.65)),
+                                        new WaitCommand(450),
+                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1))
+                                ),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)
                         ),
-//
-//                        new WaitCommand(500),
-//                        new SetArmPosition().extension(0.24),
-//                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
-//
-//                        new SetArmPosition().extensionAndAngleDegrees(0.85, 82),
-//                        new WaitCommand(300),
-//                        new SetArmPosition().angleDegrees(93),
-//                        new WaitCommand(1000),
-//                        new SetArmPosition().extension(0.75),
-//
-//                        new WaitCommand(500),
 
+                        new WaitCommand(500),
+                        new SetArmPosition().extension(0.24),
+                       // new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
 
-                        new WaitUntilCommand(mainGamepadCondition),
+                        new SetArmPosition().setArmOperationMode(OPERATION_MODE.NORMAL_SLOWER),
+                        new SetArmPosition().extensionAndAngleDegrees(0.85, 82),
+                        new WaitCommand(300),
+
+                        new SetArmPosition().setArmOperationMode(OPERATION_MODE.NORMAL_SLOWER),
+                        new SetArmPosition().angleDegrees(93),
+                        new WaitCommand(1000),
+                        new SetArmPosition().extension(0.75),
+
+                        new WaitCommand(500),
+
+                        new InstantCommand(()-> VLRSubsystem.getArm().proceedToLevel3()),
+                        new WaitUntilCommand(hangStartCondition),
 
                         new InstantCommand(()-> VLRSubsystem.getArm().setOperationMode(OPERATION_MODE.HANG)),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1)),
-//
+
                         new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.15),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(-0.2)),
                         new WaitCommand(500),
-                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
-                        new SetArmPosition().extensionAndAngleDegrees(0, 55)
+                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0))
                 ),
                 ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
         );
