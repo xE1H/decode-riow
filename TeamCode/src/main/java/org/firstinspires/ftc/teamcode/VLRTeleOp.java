@@ -18,6 +18,7 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.helpers.monitoring.GlobalLoopTimeMonitor;
+import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
 import org.firstinspires.ftc.teamcode.controlmaps.GlobalMap;
@@ -55,10 +56,13 @@ public class VLRTeleOp extends VLRLinearOpMode {
     boolean prevTriangle = false;
     boolean hangHoldPosition = false;
     boolean prevDpad = false;
+    boolean prevFollowerActive = false;
 
 
     @Override
     public void run() {
+        GlobalConfig.DEBUG_MODE = true;
+
         cs = CommandScheduler.getInstance();
         f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
@@ -84,7 +88,10 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
 
         GamepadEx gpEx = new GamepadEx(gamepad1);
+
+
         DriverControls gp = new DriverControls(gpEx);
+
         rc = new RumbleControls(gamepad1);
 
         // GlobalMap is for general controls that are not specific to samples/specimen
@@ -100,55 +107,65 @@ public class VLRTeleOp extends VLRLinearOpMode {
         // Add switch control for swithing between the maps
         addSwitchCtrl(gp, globalMap, sampleMap, specimenMap);
 
+
+
         waitForStart();
         cs.schedule(new SetArmPosition().retractAfterAuto());
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
+        GlobalConfig.DEBUG_MODE = true;
+
         while (opModeIsActive()) {
             gp.update();
 
-            if (analogHangActive){
-                VLRSubsystem.getArm().enableSlidePowerOverride(-0.5 + gamepad2.right_stick_y);
-                VLRSubsystem.getArm().enableRotatorPowerOverride(-0.35 + gamepad2.left_stick_y);
-            }
+//            if (analogHangActive){
+//                VLRSubsystem.getArm().enableSlidePowerOverride(-0.5 + gamepad2.right_stick_y);
+//                VLRSubsystem.getArm().enableRotatorPowerOverride(-0.35 + gamepad2.left_stick_y);
+//            }
 
-            if (gamepad1.triangle && !prevTriangle && !hangHoldPosition){
-                analogHangActive = true;
-            }
+//            if (gamepad1.triangle && !prevTriangle && !hangHoldPosition){
+//                analogHangActive = true;
+//            }
 
-            if (gamepad2.right_trigger > 0.9 && !hangHoldPosition){
-                analogHangActive = false;
-                VLRSubsystem.getArm().disableSlidePowerOverride();
-                VLRSubsystem.getArm().disableRotatorPowerOverride();
-                CommandScheduler.getInstance().schedule(new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50));
-            }
+//            if (gamepad2.right_trigger > 0.9 && !hangHoldPosition){
+//                analogHangActive = false;
+//                VLRSubsystem.getArm().disableSlidePowerOverride();
+//                VLRSubsystem.getArm().disableRotatorPowerOverride();
+//                CommandScheduler.getInstance().schedule(new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50));
+//            }
 
 
             if (gamepad2.dpad_down && !prevDpad){
+                prevDpad = true;
                 CommandScheduler.getInstance().schedule(
-                        new SetArmPosition().level_3_hang(()-> gamepad2.dpad_down, ()-> analogHangActive).alongWith(
-                                new SequentialCommandGroup(
-                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.05 && VLRSubsystem.getArm().currentAngleDegrees() < 65),
-                                        new InstantCommand(()-> analogHangActive = false),
-                                        new InstantCommand(()-> VLRSubsystem.getArm().disableRotatorPowerOverride()),
-                                        new InstantCommand(()-> VLRSubsystem.getArm().disableSlidePowerOverride()),
-                                        new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50)
-                                )
-                        )
+                        new SetArmPosition().level_3_hang(()-> gamepad1.dpad_right, ()-> false)
+//                                .alongWith(
+//                                new SequentialCommandGroup(
+//                                        new WaitUntilCommand(()-> analogHangActive),
+//                                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.05 && VLRSubsystem.getArm().currentAngleDegrees() < 65),
+//                                        new InstantCommand(()-> analogHangActive = false),
+//                                        new InstantCommand(()-> VLRSubsystem.getArm().disableRotatorPowerOverride()),
+//                                        new InstantCommand(()-> VLRSubsystem.getArm().disableSlidePowerOverride()),
+//                                        new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50)
+//                                )
+//                        )
                 );
             }
 
             prevTriangle = gamepad1.triangle;
-            prevDpad = gamepad2.dpad_down;
-
 
 
             if (globalMap.followerActive) f.update();
             else {
+                if (!prevFollowerActive){
+                    VLRSubsystem.getInstance(Chassis.class).setMotorsToBrake();
+                }
+
                 // Not defining these controls through DriverControls cuz ts pmo
                 VLRSubsystem.getInstance(Chassis.class).drive(gpEx.getLeftY(), -gpEx.getLeftX(), -0.3 * gpEx.getRightX());
                 f.updatePose();
             }
+            prevFollowerActive = globalMap.followerActive;
 
             telemetry.update();
         }

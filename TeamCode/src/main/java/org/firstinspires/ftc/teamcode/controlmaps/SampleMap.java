@@ -13,6 +13,7 @@ import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
+import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
@@ -105,8 +106,8 @@ public class SampleMap extends ControlMap {
                                 globalMap.followerActive = false;
                                 rc.singleBlip();
                             }
-                        }
-
+                        },
+                        new SetArmPosition().retract()
                 )
         );
     }
@@ -124,6 +125,8 @@ public class SampleMap extends ControlMap {
 //                                        new SetArmPosition().scoreSample(armState)
 //                                ),
                                 new SequentialCommandGroup(
+
+
                                         new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)
                                                 .setLinearHeadingInterpolation(SUB_GRAB_0.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build()
                                         ),

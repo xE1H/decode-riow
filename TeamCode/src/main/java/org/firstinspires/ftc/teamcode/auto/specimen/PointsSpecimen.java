@@ -14,7 +14,7 @@ public class PointsSpecimen {
 
     public static Pose SCORE_PRELOAD_AND_SUB_PICKUP = new Pose(41.75, 57.25 + OFFSET, Math.toRadians(0));
 
-    public static Pose PICK_UP_SAMPLE_1 = new Pose(29, 15.15 + OFFSET, Math.toRadians(0));
+    public static Pose PICK_UP_SAMPLE_1 = new Pose(29, 15.4 + OFFSET, Math.toRadians(0));
 
     public static Pose PICK_UP_SAMPLE_2 = new Pose(29, 5.4 + OFFSET, Math.toRadians(0));
 

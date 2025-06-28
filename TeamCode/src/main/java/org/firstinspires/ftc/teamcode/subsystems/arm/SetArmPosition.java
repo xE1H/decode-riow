@@ -628,64 +628,38 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new ParallelCommandGroup(
                                 new SetArmPosition().extension(0.13),
                                 new WaitCommand(300).andThen(new SetArmPosition().angleDegrees(82)),
-                                new SequentialCommandGroup(
-                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.65)),
-                                        new WaitCommand(450),
-                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1))
-                                ),
+//                                new SequentialCommandGroup(
+//                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.65)),
+//                                        new WaitCommand(450),
+//                                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1))
+//                                ),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)
                         ),
-
-                        new WaitCommand(500),
-                        new SetArmPosition().extension(0.24),
-                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
-
-                        new SetArmPosition().extensionAndAngleDegrees(0.85, 82),
-                        new WaitCommand(300),
-                        new SetArmPosition().angleDegrees(93),
-                        new WaitCommand(1000),
-                        new SetArmPosition().extension(0.75),
-
-                        new WaitCommand(500),
-
-//                        new InstantCommand(()->VLRSubsystem.getArm().enableRotatorPowerOverride(0)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().enableSlidePowerOverride(0)),
 //
-//                        new InstantCommand(()-> VLRSubsystem.getInstance(ClawSubsystem.class).disable()),
-//                        new InstantCommand(()-> VLRSubsystem.getInstance(Chassis.class).stop()),
-//                        new SetPattern().blank(),
+//                        new WaitCommand(500),
+//                        new SetArmPosition().extension(0.24),
+//                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
+//
+//                        new SetArmPosition().extensionAndAngleDegrees(0.85, 82),
+//                        new WaitCommand(300),
+//                        new SetArmPosition().angleDegrees(93),
+//                        new WaitCommand(1000),
+//                        new SetArmPosition().extension(0.75),
+//
+//                        new WaitCommand(500),
+
 
                         new WaitUntilCommand(mainGamepadCondition),
+
                         new InstantCommand(()-> VLRSubsystem.getArm().setOperationMode(OPERATION_MODE.HANG)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().disableRotatorPowerOverride()),
-//                        new InstantCommand(()->VLRSubsystem.getArm().setRotatorPowerLimit(0.8)),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1)),
-//                        //new InstantCommand(()->VLRSubsystem.getArm().enableSlidePowerOverride(-0.95)),
-//
-//                        new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.MAX_POWER_PULL)),
-//
-//                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.3),
-//                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().setRotatorTargetIllegal(70)),
 //
                         new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.15),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(-0.2)),
                         new WaitCommand(500),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
                         new SetArmPosition().extensionAndAngleDegrees(0, 55)
-//
-//
-//                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.05),
-//                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().setRotatorPowerLimit(1)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().setSlidePowerLimit(1)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
-//
-//
-//                        new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HANG)),
-//                        new SetArmPosition().extensionAndAngleDegrees(0, 75),
-//                        new SetArmPosition().angleDegrees(45)
-                        ),
+                ),
                 ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
         );
     }

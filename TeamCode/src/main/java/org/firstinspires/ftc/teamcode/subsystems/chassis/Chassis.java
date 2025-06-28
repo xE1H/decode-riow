@@ -65,10 +65,7 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         MotorLeftBack = new MotorEx(hardwareMap, MOTOR_LEFT_BACK);
         MotorRightBack = new MotorEx(hardwareMap, MOTOR_RIGHT_BACK);
 
-        MotorLeftFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        MotorRightFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        MotorLeftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        MotorRightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        setMotorsToBrake();
 
         MotorLeftBack.setRunMode(Motor.RunMode.RawPower);
         MotorRightBack.setRunMode(Motor.RunMode.RawPower);
@@ -137,6 +134,13 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         MotorRightBack.stopMotor();
 
         motorPower = 0.0;
+    }
+
+    public void setMotorsToBrake(){
+        MotorLeftFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        MotorRightFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        MotorLeftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        MotorRightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
     }
 
     public void setPower(double power) {
