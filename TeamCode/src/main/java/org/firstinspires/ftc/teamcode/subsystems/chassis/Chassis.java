@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.chassis;
 
+import static org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig.DEBUG_MODE;
+
 import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.LowPassFilter;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -31,11 +33,11 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
     AnalogInput backSensor;
 
     public static double motorPower = 1;
-    public static double acceleration_a = 0.9;
-    public static double deceleration_a = 0.6;
+    public static double acceleration_a = 0.4;
+    public static double deceleration_a = 0.2;
 
-    public static double forwardsMultiplier = 0.95;
-    public static double strafeMultiplier = 0.7;
+    public static double forwardsMultiplier = 1;
+    public static double strafeMultiplier = 0.8;
 
     public static double staticFrictionBar = 0.05;
 
@@ -63,10 +65,7 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         MotorLeftBack = new MotorEx(hardwareMap, MOTOR_LEFT_BACK);
         MotorRightBack = new MotorEx(hardwareMap, MOTOR_RIGHT_BACK);
 
-        MotorLeftFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        MotorRightFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        MotorLeftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        MotorRightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        setMotorsToBrake();
 
         MotorLeftBack.setRunMode(Motor.RunMode.RawPower);
         MotorRightBack.setRunMode(Motor.RunMode.RawPower);
@@ -103,7 +102,6 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
     public void drive(double xSpeed, double ySpeed, double zRotation) {
         // This sometimes fails and causes the whole robot to die
         Vector2d vector = new Vector2d(x_filter.estimatePower(xSpeed) * forwardsMultiplier, y_filter.estimatePower(ySpeed) * strafeMultiplier);
-
         this.driveMotors(new MecanumDriveController(vector.getX(), vector.getY(), zRotation));
     }
 
@@ -138,6 +136,13 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         motorPower = 0.0;
     }
 
+    public void setMotorsToBrake(){
+        MotorLeftFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        MotorRightFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        MotorLeftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        MotorRightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    }
+
     public void setPower(double power) {
         motorPower = Math.min(power, 1.0);
     }
@@ -155,17 +160,19 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         backDistance = backSensorFilter.estimate(backSensor.getVoltage() / 3.3 * 800);
     }
 
-//    @Override
-//    public void periodic(){
-//        updateLeftDistanceMM();
-//        updateRightDistanceMM();
-//        updateBackSensor();
-//
-//        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-//        telemetry.addData("LEFT DISTANCE: ", leftDistance);
-//        telemetry.addData("RIGHT DISTANCE: ", rightDistance);
-//        telemetry.addData("BACK DISTANCE: ", backDistance);
-//    }
+    @Override
+    public void periodic(){
+        //updateLeftDistanceMM();
+        //updateRightDistanceMM();
+        updateBackSensor();
+
+        if (DEBUG_MODE) {
+            Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+            //telemetry.addData("LEFT DISTANCE: ", leftDistance);
+            //telemetry.addData("RIGHT DISTANCE: ", rightDistance);
+            telemetry.addData("BACK DISTANCE: ", backDistance);
+        }
+    }
 
 
     public double getLeftDistance(){

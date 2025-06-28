@@ -34,8 +34,10 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     private OPERATION_MODE operationMode = OPERATION_MODE.NORMAL;
 
     private SAMPLE_SCORE_HEIGHT sampleScoreHeight = SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
+    private boolean readyToProceedToLevel3 = false;
 
     protected void initialize(HardwareMap hardwareMap){
+        readyToProceedToLevel3 = false;
         rotator = new ArmRotatorSubsystem(hardwareMap);
         slides = new ArmSlideSubsystem(hardwareMap);
 
@@ -114,6 +116,10 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
     }
 
     public Point getTargetPoint() {return targetPoint;}
+
+    public void proceedToLevel3() {readyToProceedToLevel3 = true;}
+
+    public boolean isReadyToProceedToLevel3() {return readyToProceedToLevel3;}
 
     public double getTargetAngleDegrees() {return clamp(targetPoint.angleDegrees(), 0, 180);}
 

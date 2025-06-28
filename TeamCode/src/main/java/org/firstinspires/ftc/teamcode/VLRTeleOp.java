@@ -8,13 +8,16 @@ import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloR
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.helpers.monitoring.GlobalLoopTimeMonitor;
+import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
 import org.firstinspires.ftc.teamcode.controlmaps.GlobalMap;
@@ -48,10 +51,17 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
     boolean sampleMapActive = true;
     boolean isBlue = true;
+    boolean analogHangActive = false;
+    boolean hangInitiated = false;
+    boolean prevFollowerActive = false;
+    boolean proceededToLevel3 = false;
+    boolean holdOverride = false;
 
 
     @Override
     public void run() {
+        GlobalConfig.DEBUG_MODE = true;
+
         cs = CommandScheduler.getInstance();
         f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
@@ -77,7 +87,10 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
 
         GamepadEx gpEx = new GamepadEx(gamepad1);
+        GamepadEx gpHang = new GamepadEx(gamepad2);
+
         DriverControls gp = new DriverControls(gpEx);
+
         rc = new RumbleControls(gamepad1);
 
         // GlobalMap is for general controls that are not specific to samples/specimen
@@ -93,19 +106,64 @@ public class VLRTeleOp extends VLRLinearOpMode {
         // Add switch control for swithing between the maps
         addSwitchCtrl(gp, globalMap, sampleMap, specimenMap);
 
+
+
         waitForStart();
         cs.schedule(new SetArmPosition().retractAfterAuto());
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
+        GlobalConfig.DEBUG_MODE = true;
+
         while (opModeIsActive()) {
             gp.update();
+            MainArmSubsystem arm = VLRSubsystem.getArm();
+
+            if (gamepad2.left_stick_y < -0.2 && gamepad2.right_stick_y < -0.2 && hangInitiated && arm.isReadyToProceedToLevel3() && !proceededToLevel3){
+                analogHangActive = true;
+                proceededToLevel3 = true;
+            }
+
+            if (analogHangActive){
+                arm.enableSlidePowerOverride(-0.5 + gamepad2.right_stick_y); //-0.5
+                arm.enableRotatorPowerOverride(-0.35 + gamepad2.left_stick_y); //-0.35
+            }
+
+            if (gamepad2.right_trigger > 0.9 && arm.isReadyToProceedToLevel3()){
+                holdOverride = true;
+            }
+
+            if (gpHang.isDown(GamepadKeys.Button.RIGHT_BUMPER) && !hangInitiated){
+                hangInitiated = true;
+                CommandScheduler.getInstance().schedule(
+                        new SetArmPosition().level_3_hang(
+                                ()-> gpHang.isDown(GamepadKeys.Button.RIGHT_BUMPER),
+                                ()-> analogHangActive
+                        ).alongWith(
+                                new SequentialCommandGroup(
+                                        new WaitUntilCommand(()-> analogHangActive),
+                                        new WaitUntilCommand(()-> ((VLRSubsystem.getArm().currentExtension() < 0.05 && VLRSubsystem.getArm().currentAngleDegrees() < 78) || holdOverride)),
+                                        new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50),
+                                        new InstantCommand(()-> analogHangActive = false),
+                                        new InstantCommand(()-> VLRSubsystem.getArm().disableRotatorPowerOverride()),
+                                        new InstantCommand(()-> VLRSubsystem.getArm().disableSlidePowerOverride())
+                                )
+                        )
+                );
+            }
+
+
 
             if (globalMap.followerActive) f.update();
             else {
+                if (!prevFollowerActive){
+                    VLRSubsystem.getInstance(Chassis.class).setMotorsToBrake();
+                }
+
                 // Not defining these controls through DriverControls cuz ts pmo
                 VLRSubsystem.getInstance(Chassis.class).drive(gpEx.getLeftY(), -gpEx.getLeftX(), -0.3 * gpEx.getRightX());
                 f.updatePose();
             }
+            prevFollowerActive = globalMap.followerActive;
 
             telemetry.update();
         }

@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.LogCommand;
@@ -56,7 +57,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new InstantCommand(()-> arm.setTargetPoint(targetPoint)),
                                 new WaitCommand(5),
                                 new WaitUntilCommand(arm::motionProfilePathsAtParametricEnd),
-                                new WaitCommand(60),
+                                new WaitCommand(40),
 
                                 new CustomConditionalCommand(
                                         new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HOLD_POINT)),
@@ -243,7 +244,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("INTAKE SAMPLE COMMAND", "INTAKING SAMPLE FROM IN SAMPLE SCORE STATE"),
 
                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
-                                new WaitCommand(100),
+                                new WaitCommand(110),
                                 new CustomConditionalCommand(
                                         new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN).andThen(new WaitCommand(90)),
                                         ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)
@@ -331,7 +332,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
     public Command intakeSpecimen(double extension) {
-        return intake(extension, 0.75, ClawConfiguration.HorizontalRotation.NORMAL.pos, true)
+        return intake(extension, 0.825, ClawConfiguration.HorizontalRotation.NORMAL.pos, true)
                 .andThen(setArmState(ArmState.State.SPECIMEN_INTAKE));
     }
 
@@ -345,6 +346,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                new WaitCommand(100),
 
                                new ParallelCommandGroup(
+                                       new SetArmPosition().extension(0),
                                        new SequentialCommandGroup(
                                                new WaitCommand(50),
                                                new SetClawAngle(0.7),
@@ -353,7 +355,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP)
                                        ),
                                        new SequentialCommandGroup(
-                                               new SetArmPosition().extension(0),
+                                               new WaitUntilCommand(()-> arm.currentExtension() < 0.14),
                                                new SetArmPosition().angleDegrees(0)
                                        )
                                ),
@@ -371,8 +373,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                         new WaitCommand(80),
                                         new SequentialCommandGroup(
                                                 new WaitCommand(100),
-                                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
-                                                new WaitCommand(30)
+                                                new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN)
                                         ),
                                         ()-> ArmState.isCurrentState(ArmState.State.SPECIMEN_SCORE_BACK)
                                 ),
@@ -381,7 +382,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                                         new SetArmPosition().extensionAndAngleDegrees(0, 64, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE),
                                         new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.185).andThen(new SetArmPosition().angleDegrees(0)),
 
-                                        new WaitCommand(250).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
+                                        new WaitCommand(200).andThen(new SetClawAngle(ClawConfiguration.VerticalRotation.UP))
                                 ),
 
                                 setArmState(ArmState.State.IN_ROBOT)
@@ -513,13 +514,13 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new LogCommand("SCORE SPECIMEN FRONT", Level.SEVERE, "SCORING SPECIMEN FRONT FROM IN ROBOT STATE"),
 
                                 new ParallelCommandGroup(
-                                        new SetArmPosition().angleDegrees(66.25),
+                                        new SetArmPosition().angleDegrees(69),
 
                                         new SequentialCommandGroup(
                                                 new WaitUntilCommand(()-> arm.currentAngleDegrees() > 19),
                                                 new SetClawAngle(ClawConfiguration.VerticalRotation.DOWN),
                                                 new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
-                                                new SetArmPosition().extension(0.4)
+                                                new SetArmPosition().extension(0.39)
                                         )
                                 ),
                                 setArmState(ArmState.State.SPECIMEN_SCORE_FRONT)
@@ -540,8 +541,8 @@ public class SetArmPosition extends SequentialCommandGroup{
                 new CustomConditionalCommand(
                         new SequentialCommandGroup(
                                 new LogCommand("SCORE SPECIMEN BACK", Level.SEVERE, "SCORING SPECIMEN BACK FROM IN ROBOT STATE"),
-                                new SetArmPosition().extensionAndAngleDegrees(0.27, 102, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE).alongWith(
-                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 80).andThen(new SetClawAngle(0.24))
+                                new SetArmPosition().extensionAndAngleDegrees(0.29, 111, MainArmConfiguration.GAME_PIECE_TYPE.SAMPLE).alongWith(
+                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 80).andThen(new SetClawAngle(0.15))
                                 ),
                                 setArmState(ArmState.State.SPECIMEN_SCORE_BACK)
                         ),
@@ -555,22 +556,22 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 new SetClawState(ClawConfiguration.GripperState.CLOSED),
                                 new WaitCommand(80),
                                 new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                new SetClawTwist(0.25),
 
 
                                 new ParallelCommandGroup(
+                                        new WaitCommand(100).andThen(new SetClawTwist(0.25)),
                                         new SetArmPosition().extension(0),
                                         new SequentialCommandGroup(
                                                 new WaitUntilCommand(()-> arm.currentExtension() < 0.12),
                                                 setArmOperationMode(OPERATION_MODE.NORMAL_SLOWER),
                                                 new ParallelCommandGroup(
                                                         new WaitCommand(300).andThen(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)),
-                                                        new SetArmPosition().angleDegrees(121.5),
+                                                        new SetArmPosition().angleDegrees(110.5),
                                                         new SequentialCommandGroup(
                                                                 new WaitUntilCommand(()-> (arm.currentAngleDegrees() > 20 && !arm.areSlidesMoving())),
-                                                                new SetArmPosition().extension(0.32)
+                                                                new SetArmPosition().extension(0.31)
                                                         ),
-                                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 80).andThen(new SetClawAngle(0.19))
+                                                        new WaitUntilCommand(()-> arm.currentAngleDegrees() > 80).andThen(new SetClawAngle(0.15))
                                                 )
                                         )
                                 ),
@@ -613,7 +614,7 @@ public class SetArmPosition extends SequentialCommandGroup{
     }
 
 
-    public Command level_3_hang(BooleanSupplier gamepadCondition, BooleanSupplier mainGamepadCondition){
+    public Command level_3_hang(BooleanSupplier gamePadCondition, BooleanSupplier hangStartCondition){
         return new CustomConditionalCommand(
                 new SequentialCommandGroup(
                         new LogCommand("THIRD STAGE HANG", Level.SEVERE, "STARTING LEVEL 3 HANG COMMAND"),
@@ -623,11 +624,11 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new SetArmPosition().angleDegrees(100).alongWith(
                                 new WaitUntilCommand(()-> arm.currentAngleDegrees() > 45).andThen(new SetArmPosition().extension(0.314))),
 
-                        new WaitUntilCommand(gamepadCondition),
+                        new WaitUntilCommand(gamePadCondition),
 
                         new ParallelCommandGroup(
                                 new SetArmPosition().extension(0.13),
-                                new WaitCommand(300).andThen(new SetArmPosition().angleDegrees(82)),
+                                new WaitCommand(300).andThen(new SetArmPosition().setArmOperationMode(OPERATION_MODE.NORMAL_SLOWER), new SetArmPosition().angleDegrees(82)),
                                 new SequentialCommandGroup(
                                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.65)),
                                         new WaitCommand(450),
@@ -638,54 +639,30 @@ public class SetArmPosition extends SequentialCommandGroup{
 
                         new WaitCommand(500),
                         new SetArmPosition().extension(0.24),
-                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
+                       // new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
 
+                        new SetArmPosition().setArmOperationMode(OPERATION_MODE.NORMAL_SLOWER),
                         new SetArmPosition().extensionAndAngleDegrees(0.85, 82),
                         new WaitCommand(300),
+
+                        new SetArmPosition().setArmOperationMode(OPERATION_MODE.NORMAL_SLOWER),
                         new SetArmPosition().angleDegrees(93),
                         new WaitCommand(1000),
                         new SetArmPosition().extension(0.75),
 
                         new WaitCommand(500),
 
-//                        new InstantCommand(()->VLRSubsystem.getArm().enableRotatorPowerOverride(0)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().enableSlidePowerOverride(0)),
-//
-//                        new InstantCommand(()-> VLRSubsystem.getInstance(ClawSubsystem.class).disable()),
-//                        new InstantCommand(()-> VLRSubsystem.getInstance(Chassis.class).stop()),
-//                        new SetPattern().blank(),
+                        new InstantCommand(()-> VLRSubsystem.getArm().proceedToLevel3()),
+                        new WaitUntilCommand(hangStartCondition),
 
-                        new WaitUntilCommand(mainGamepadCondition),
                         new InstantCommand(()-> VLRSubsystem.getArm().setOperationMode(OPERATION_MODE.HANG)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().disableRotatorPowerOverride()),
-//                        new InstantCommand(()->VLRSubsystem.getArm().setRotatorPowerLimit(0.8)),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1)),
-//                        //new InstantCommand(()->VLRSubsystem.getArm().enableSlidePowerOverride(-0.95)),
-//
-//                        new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.MAX_POWER_PULL)),
-//
-//                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.3),
-//                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().setRotatorTargetIllegal(70)),
-//
+
                         new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.15),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(-0.2)),
                         new WaitCommand(500),
-                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
-                        new SetArmPosition().extensionAndAngleDegrees(0, 55)
-//
-//
-//                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.05),
-//                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().setRotatorPowerLimit(1)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().setSlidePowerLimit(1)),
-//                        new InstantCommand(()->VLRSubsystem.getArm().disableSlidePowerOverride()),
-//
-//
-//                        new InstantCommand(()-> arm.setOperationMode(OPERATION_MODE.HANG)),
-//                        new SetArmPosition().extensionAndAngleDegrees(0, 75),
-//                        new SetArmPosition().angleDegrees(45)
-                        ),
+                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(0))
+                ),
                 ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
         );
     }
@@ -714,6 +691,8 @@ public class SetArmPosition extends SequentialCommandGroup{
                                 ),
                                 new WaitCommand(200),
                                 new SetArmPosition().angleDegrees(0),
+                                new WaitCommand(100),
+                                new ResetRotator(),
                                 new SetArmPosition().setArmState(ArmState.State.IN_ROBOT)
                         ),
                         ()-> ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE)

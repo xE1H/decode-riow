@@ -12,9 +12,9 @@ public class PointsSpecimen {
 
     public static Pose START_POSE = new Pose(10, 57 + OFFSET, Math.toRadians(0)); //63.5
 
-    public static Pose SCORE_PRELOAD_AND_SUB_PICKUP = new Pose(40.8, 57 + OFFSET, Math.toRadians(0));
+    public static Pose SCORE_PRELOAD_AND_SUB_PICKUP = new Pose(41.75, 57.25 + OFFSET, Math.toRadians(0));
 
-    public static Pose PICK_UP_SAMPLE_1 = new Pose(29, 15 + OFFSET, Math.toRadians(0));
+    public static Pose PICK_UP_SAMPLE_1 = new Pose(29, 15.4 + OFFSET, Math.toRadians(0));
 
     public static Pose PICK_UP_SAMPLE_2 = new Pose(29, 5.4 + OFFSET, Math.toRadians(0));
 
@@ -24,9 +24,9 @@ public class PointsSpecimen {
 
     public static Pose DEPOSIT_SAMPLE_3_END = new Pose(24.4, 16 + OFFSET, Math.toRadians(0));
 
-    public static Pose SCORE_SECOND_SPECIMEN = new Pose(34.4, 54 + OFFSET, Math.toRadians(0));
+    public static Pose SCORE_SECOND_SPECIMEN = new Pose(34.3, 59 + OFFSET, Math.toRadians(0));
 
-    public static Pose SECOND_SPECIMEN_CONTROL = new Pose(23.9, 54.16 + OFFSET, Math.toRadians(0));
+    public static Pose SECOND_SPECIMEN_CONTROL = new Pose(23.9, 58.16 + OFFSET, Math.toRadians(0));
 
     public static Pose DRIVE_BACK = new Pose(28, SCORE_SECOND_SPECIMEN.getY(), Math.toRadians(0));
 
@@ -40,9 +40,9 @@ public class PointsSpecimen {
             PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getY() + distance * Math.cos(pickupAngle),
             PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading());
 
-    public static Pose SCORE_SPECIMEN_BACK = new Pose(27, 61 + OFFSET, Math.toRadians(-180)); //x = 31.55
+    public static Pose SCORE_SPECIMEN_BACK = new Pose(26, 61 + OFFSET, Math.toRadians(-180)); //x = 31.55
 
-    public static double DELTA = 2.5; //Y OFFSET FOR 4TH AND 5TH SPECIMEN
+    public static double DELTA = 2.25; //Y OFFSET FOR 4TH AND 5TH SPECIMEN
 
     public static Pose SUB_GRAB_SPEC = new Pose(64, 24.5, Math.toRadians(90));
     public static Pose SUB_GRAB_SPEC_CONTROL = new Pose(27, 20, Math.toRadians(0));

@@ -325,7 +325,7 @@ public class ArmSlideSubsystem {
             setHangCoefficients();
         }
         else{
-            motionProfile.updateP(mapToRange(getExtension(), 0 ,1, FEEDBACK_PROPORTIONAL_GAIN * 1.3, FEEDBACK_PROPORTIONAL_GAIN));
+            motionProfile.updateP(mapToRange(getExtension(), 0 ,1, FEEDBACK_PROPORTIONAL_GAIN * 1.2, FEEDBACK_PROPORTIONAL_GAIN));
         }
 
         double feedForwardPower = Math.sin(Math.toRadians(armAngleDegrees)) * feedForwardGain;
@@ -378,7 +378,7 @@ public class ArmSlideSubsystem {
             if (reachedTargetPosition()) {
                 extensionMotor0.setPower(power);
                 extensionMotor1.setPower(power);
-                extensionMotor2.setPower(power);
+                extensionMotor2.setPower(0);
             }
             else {
                 extensionMotor1.setPower(power);

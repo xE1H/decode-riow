@@ -10,7 +10,7 @@ public class ArmRotatorConfiguration {
     public static String BEAM_BREAK_NAME = "BeamBreak";
 
     public static double PROPORTIONAL = 0.12;
-    public static double DERIVATIVE = 0.0039;
+    public static double DERIVATIVE = 0.0041;
     public static double INTEGRAL = 0.004;
 
     public static double ACCELERATION = 8000;

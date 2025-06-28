@@ -214,15 +214,15 @@ public class ArmRotatorSubsystem {
                 //resetEncoder();
                 encoderReset = true;
             }
-
-//            if (Math.abs(currentAngle) < 0.2){
-//                power = 0;
-//            }
         }
         else {
             encoderReset = false;
         }
         prevBreamBreakState = currentBeamBreakState;
+
+        if (currentAngle < 1 && motionProfile.getTargetPosition() == 0){
+            power = 0;
+        }
 
         if (operationMode == OPERATION_MODE.HANG){
             System.out.println("rotator power: " + power);
