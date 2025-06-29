@@ -122,9 +122,9 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
             submersibleGrabCommand.addCommands(
                     new ParallelCommandGroup(
                             new FollowPath(f, bezierPath(currentPose, strafePose)
-                                    .setConstantHeadingInterpolation(currentRobotHeading)
+                                    .setConstantHeadingInterpolation(currentRobotHeading).setPathEndTValueConstraint(0.95).setZeroPowerAccelerationMultiplier(5)
                                     .build())
-                                    .withTimeout(1200),
+                                    .withTimeout(600),
 
                             new SetArmPosition().intakeSampleAuto(
                                     (0.83 * (forwardComponent + 1.5)) / MAX_POSITION, //0.7742

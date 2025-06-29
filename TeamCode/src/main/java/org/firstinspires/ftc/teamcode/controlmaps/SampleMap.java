@@ -8,9 +8,11 @@ import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
@@ -20,10 +22,13 @@ import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.trigger.TriggerCtl;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.pedro.DriveToBucketTeleop;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ResetRotator;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ResetSlides;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
+import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 
 public class SampleMap extends ControlMap {
@@ -34,8 +39,10 @@ public class SampleMap extends ControlMap {
     RumbleControls rc;
 
     ElapsedTime retractTimer = new ElapsedTime();
-
     MainArmConfiguration.SAMPLE_SCORE_HEIGHT armState = MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET;
+
+    boolean samplePickedUp = false;
+    boolean depositCompleted = false;
 
 
     public SampleMap(DriverControls driverControls, CommandScheduler cs, GlobalMap globalMap) {
@@ -63,7 +70,7 @@ public class SampleMap extends ControlMap {
     // ARM OPS
     //
     private void retractArm() {
-        if (retractTimer.milliseconds() > 800) {
+        if (retractTimer.milliseconds() > 800 && depositCompleted) {
             cs.schedule(new SetArmPosition().retract().andThen(
                     new WaitCommand(100),
                     new ParallelCommandGroup(
@@ -99,25 +106,56 @@ public class SampleMap extends ControlMap {
 
         cs.schedule(
                 new SequentialCommandGroup(
+                        new com.arcrobotics.ftclib.command.InstantCommand(()-> samplePickedUp = false),
                         new SubmersibleGrabV2(f, globalMap.reader, rc),
-                        new InstantCommand() {
-                            @Override
-                            public void run() {
-                                globalMap.followerActive = false;
-                                rc.singleBlip();
-                            }
-                        },
-                        new SetArmPosition().retract()
+
+                        new ParallelCommandGroup(
+                                new WaitCommand(200).andThen(
+                                        new ConditionalCommand(
+                                                new InstantCommand() {
+                                                    @Override
+                                                    public void run() {
+                                                        deposit();
+                                                    }
+                                                },
+                                                new SequentialCommandGroup(
+                                                        new WaitCommand(200),
+                                                        new ConditionalCommand(
+                                                                new InstantCommand() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        deposit();
+                                                                    }
+                                                                },
+                                                                new InstantCommand() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        globalMap.followerActive = false;
+                                                                        rc.singleBlip();
+                                                                    }
+                                                                },
+                                                                ()-> VLRSubsystem.getInstance(ClawSubsystem.class).isSamplePresent()
+                                                        )
+
+                                                ),
+                                                ()-> VLRSubsystem.getInstance(ClawSubsystem.class).isSamplePresent()
+                                        )
+                                ),
+                                new SetArmPosition().retract()
+                        )
                 )
         );
     }
 
+
     private void deposit() {
         globalMap.followerActive = true;
+        depositCompleted = false;
         cs.schedule(
                 new SequentialCommandGroup(
                         new ParallelCommandGroup(
-                                new SetArmPosition().scoreSample(armState),
+                                new WaitUntilCommand(()-> getDistance(f.getPose(), BUCKET_HIGH_SCORE_POSE) < 50)
+                                        .andThen(new SetArmPosition().scoreSample(armState)),
 //                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 //                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
 //                                new SequentialCommandGroup(
@@ -125,11 +163,7 @@ public class SampleMap extends ControlMap {
 //                                        new SetArmPosition().scoreSample(armState)
 //                                ),
                                 new SequentialCommandGroup(
-
-
-                                        new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_0, BUCKET_HIGH_SCORE_POSE)
-                                                .setLinearHeadingInterpolation(SUB_GRAB_0.getHeading(), BUCKET_HIGH_SCORE_POSE.getHeading()).build()
-                                        ),
+                                        new DriveToBucketTeleop(f),
                                         new InstantCommand() {
                                             @Override
                                             public void run() {
@@ -138,9 +172,14 @@ public class SampleMap extends ControlMap {
                                             }
                                         }
                                 )
-                        )
-
+                        ),
+                        new com.arcrobotics.ftclib.command.InstantCommand(()-> depositCompleted = true)
                 )
         );
+
+    }
+
+    private double getDistance(Pose start, Pose end){
+        return Math.hypot(start.getX() - end.getX(), start.getY() - end.getY());
     }
 }

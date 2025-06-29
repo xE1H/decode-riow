@@ -211,8 +211,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                 new SetClawTwist(twist),
                 new WaitUntilCommand(()-> arm.currentExtension() > extension - 0.265),
                 new SetArmPosition().angleDegrees(0),
-                new WaitCommand((long) ((Math.abs(0.5 - twist) * 60))),
-                new WaitCommand(30)
+                new WaitCommand((long) ((Math.abs(0.5 - twist) * 50)))
         );
     }
 
@@ -659,8 +658,8 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0.1)),
 
                         new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.15),
-                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(-0.2)),
-                        new WaitCommand(500),
+                        new InstantCommand(()-> VLRSubsystem.getHang().setPower(-0.5)),
+                        new WaitCommand(600),
                         new InstantCommand(()-> VLRSubsystem.getHang().setPower(0))
                 ),
                 ()-> ArmState.isCurrentState(ArmState.State.IN_ROBOT)
