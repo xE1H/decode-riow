@@ -17,6 +17,7 @@ import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
@@ -36,6 +37,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 
 
@@ -66,7 +68,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
         f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
         //noinspection unchecked
-        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, Chassis.class, Wiper.class, BlinkinSubsystem.class);
+        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, HangSubsystem.class, Chassis.class, Wiper.class, BlinkinSubsystem.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         if (!PoseSaver.isPoseSaved()) {
@@ -105,6 +107,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
         // Add switch control for swithing between the maps
         addSwitchCtrl(gp, globalMap, sampleMap, specimenMap);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 
 
@@ -128,9 +131,9 @@ public class VLRTeleOp extends VLRLinearOpMode {
                 arm.enableRotatorPowerOverride(-0.35 + gamepad2.left_stick_y); //-0.35
             }
 
-            if (gamepad2.right_trigger > 0.9 && arm.isReadyToProceedToLevel3()){
-                holdOverride = true;
-            }
+//            if (gamepad2.right_trigger > 0.9 && arm.isReadyToProceedToLevel3()){
+//                holdOverride = true;
+//            }
 
             if (gpHang.isDown(GamepadKeys.Button.RIGHT_BUMPER) && !hangInitiated){
                 hangInitiated = true;
@@ -152,7 +155,6 @@ public class VLRTeleOp extends VLRLinearOpMode {
             }
 
 
-
             if (globalMap.followerActive) f.update();
             else {
                 if (!prevFollowerActive){
@@ -165,6 +167,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
             }
             prevFollowerActive = globalMap.followerActive;
 
+            //telemetry.addData("Follower Pose", f.getPose());
             telemetry.update();
         }
     }
