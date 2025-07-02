@@ -174,6 +174,7 @@ public class SpecimenMap extends ControlMap {
                     new SetClawState(ClawConfiguration.GripperState.CLOSED),
                     new WaitCommand(120),
                     new SetArmPosition().retract(),
+                    new WaitCommand(60),
                     new ResetRotator().alongWith(new ResetSlides()),
                     new CustomConditionalCommand(
                             new SequentialCommandGroup(
@@ -201,7 +202,7 @@ public class SpecimenMap extends ControlMap {
                                         }
                                     },
                                     new SetArmPosition().extensionRelative(0.21),
-                                    new WaitCommand(600),
+                                    new WaitCommand(300),
                                     new InstantCommand() {
                                         @Override
                                         public void run() {

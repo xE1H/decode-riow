@@ -588,7 +588,7 @@ public class SetArmPosition extends SequentialCommandGroup{
                         new LogCommand("SECOND STAGE HANG", Level.SEVERE, "STARTING LEVEL 2 HANG COMMAND"),
 
                         new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                        new SetArmPosition().angleDegrees(94).alongWith(
+                        new SetArmPosition().angleDegrees(100).alongWith(
                                 new WaitUntilCommand(()-> arm.currentAngleDegrees() > 45).andThen(new SetArmPosition().extension(0.314))),
 
                         new WaitUntilCommand(gamepadCondition),
