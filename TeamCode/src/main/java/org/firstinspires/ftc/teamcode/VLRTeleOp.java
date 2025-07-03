@@ -172,6 +172,8 @@ public class VLRTeleOp extends VLRLinearOpMode {
             //telemetry.addData("Follower Pose", f.getPose());
             telemetry.update();
         }
+
+        PoseSaver.setPedroPose(f.getPose());
     }
 
     private void addSwitchCtrl(DriverControls gp, GlobalMap globalMap, SampleMap sampleMap, SpecimenMap specimenMap) {

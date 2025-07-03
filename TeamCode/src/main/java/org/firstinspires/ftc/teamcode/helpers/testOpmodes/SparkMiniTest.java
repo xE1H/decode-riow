@@ -3,13 +3,14 @@ package org.firstinspires.ftc.teamcode.helpers.testOpmodes;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 
 @Config
-//@Disabled
+@Disabled
 @TeleOp(name="SPARK MINI TEST", group="Utils")
 public class SparkMiniTest extends OpMode {
     private CRServo spark;

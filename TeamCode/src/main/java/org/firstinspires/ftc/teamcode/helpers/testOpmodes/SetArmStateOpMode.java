@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 
-@TeleOp
+@TeleOp(group = "Utils")
 public class SetArmStateOpMode extends VLRLinearOpMode {
     @Override
     public void run(){

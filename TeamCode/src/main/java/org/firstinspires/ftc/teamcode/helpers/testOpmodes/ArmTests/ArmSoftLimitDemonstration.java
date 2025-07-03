@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 
 @Config
 @Photon
-@TeleOp()
+@TeleOp(group = "Utils")
 
 public class ArmSoftLimitDemonstration extends VLRLinearOpMode {
     public boolean prevDpadUp;

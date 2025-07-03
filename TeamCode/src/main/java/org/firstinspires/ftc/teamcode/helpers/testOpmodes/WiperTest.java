@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 
 @Config
 @Photon
-@TeleOp()
+@TeleOp(group = "Utils")
 public class WiperTest extends VLRLinearOpMode {
     @Override
     public void run(){

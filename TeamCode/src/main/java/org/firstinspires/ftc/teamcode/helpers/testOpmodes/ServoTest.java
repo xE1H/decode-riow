@@ -8,7 +8,7 @@ import com.roboctopi.cuttlefishftcbridge.devices.CuttleServo;
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 
 @Config
-@TeleOp()
+@TeleOp(group = "Utils")
 public class ServoTest extends VLRLinearOpMode {
     CuttleRevHub controlHub;
     CuttleServo servo0, servo1;

@@ -34,7 +34,7 @@ import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
 
 @Config
 @Photon
-@TeleOp()
+@TeleOp(group = "Utils")
 public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
     public static double extension = 0;
     public static double angle = 0;
@@ -76,30 +76,30 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
     public void Start(){
         //CommandScheduler.getInstance().schedule(new SetArmPosition().level_3_hang(gamepad1, ()-> analogEnabled));
 
-        CommandScheduler.getInstance().schedule(new SetClawState(ClawConfiguration.GripperState.CLOSED));
-        CommandScheduler.getInstance().schedule(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL));
-        CommandScheduler.getInstance().schedule(new SetClawAngle(ClawConfiguration.VerticalRotation.UP));
+        CommandScheduler.getInstance().schedule(new SetClawState(ClawConfiguration.GripperState.OPEN));
+        //CommandScheduler.getInstance().schedule(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL));
+        //CommandScheduler.getInstance().schedule(new SetClawAngle(ClawConfiguration.VerticalRotation.UP));
     }
 
 
     @Override
     public void Loop() {
-        if (gamepad1.triangle && !prevTriangle){
-            analogEnabled = true;
-        }
-
-        if (analogEnabled){
-            VLRSubsystem.getArm().enableSlidePowerOverride(-0.5 + gamepad1.right_stick_y);
-            VLRSubsystem.getArm().enableRotatorPowerOverride(-0.35 + gamepad1.left_stick_y);
-        }
-
-        if (gamepad1.circle && !prevCircle){
-            analogEnabled = false;
-            VLRSubsystem.getArm().disableSlidePowerOverride();
-            VLRSubsystem.getArm().disableRotatorPowerOverride();
-
-            CommandScheduler.getInstance().schedule(new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50));
-        }
+//        if (gamepad1.triangle && !prevTriangle){
+//            analogEnabled = true;
+//        }
+//
+//        if (analogEnabled){
+//            VLRSubsystem.getArm().enableSlidePowerOverride(-0.5 + gamepad1.right_stick_y);
+//            VLRSubsystem.getArm().enableRotatorPowerOverride(-0.35 + gamepad1.left_stick_y);
+//        }
+//
+//        if (gamepad1.circle && !prevCircle){
+//            analogEnabled = false;
+//            VLRSubsystem.getArm().disableSlidePowerOverride();
+//            VLRSubsystem.getArm().disableRotatorPowerOverride();
+//
+//            CommandScheduler.getInstance().schedule(new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50));
+//        }
 
 
 //        if (gamepad1.triangle && !prevTriangle){
