@@ -58,12 +58,11 @@ public class VLRTeleOp extends VLRLinearOpMode {
     boolean prevFollowerActive = false;
     boolean proceededToLevel3 = false;
     boolean holdOverride = false;
+    boolean level2HangInitiated = false;
 
 
     @Override
     public void run() {
-        GlobalConfig.DEBUG_MODE = true;
-
         cs = CommandScheduler.getInstance();
         f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
@@ -115,8 +114,6 @@ public class VLRTeleOp extends VLRLinearOpMode {
         cs.schedule(new SetArmPosition().retractAfterAuto());
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        GlobalConfig.DEBUG_MODE = true;
-
         while (opModeIsActive()) {
             gp.update();
             MainArmSubsystem arm = VLRSubsystem.getArm();
@@ -131,9 +128,9 @@ public class VLRTeleOp extends VLRLinearOpMode {
                 arm.enableRotatorPowerOverride(-0.35 + gamepad2.left_stick_y); //-0.35
             }
 
-//            if (gamepad2.right_trigger > 0.9 && arm.isReadyToProceedToLevel3()){
-//                holdOverride = true;
-//            }
+            if (gamepad2.right_trigger > 0.9 && arm.isReadyToProceedToLevel3()){
+                holdOverride = true;
+            }
 
             if (gpHang.isDown(GamepadKeys.Button.RIGHT_BUMPER) && !hangInitiated){
                 hangInitiated = true;
@@ -152,6 +149,11 @@ public class VLRTeleOp extends VLRLinearOpMode {
                                 )
                         )
                 );
+            }
+
+            if (gpHang.isDown(GamepadKeys.Button.LEFT_BUMPER) && !level2HangInitiated){
+                level2HangInitiated = true;
+                CommandScheduler.getInstance().schedule(new SetArmPosition().level2Hang(()-> gpHang.isDown(GamepadKeys.Button.LEFT_BUMPER)));
             }
 
 

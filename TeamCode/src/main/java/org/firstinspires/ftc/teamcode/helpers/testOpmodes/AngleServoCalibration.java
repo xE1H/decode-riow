@@ -4,10 +4,12 @@ import static org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration.G
 
 import com.acmerobotics.dashboard.config.Config;
 import com.outoftheboxrobotics.photoncore.Photon;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Disabled
 @TeleOp(name = "AngleServoCalibration", group = "Utils")
 @Photon
 @Config

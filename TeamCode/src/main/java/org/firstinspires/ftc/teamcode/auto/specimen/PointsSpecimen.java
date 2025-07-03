@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.auto.specimen;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.MathFunctions;
 
 import org.firstinspires.ftc.teamcode.helpers.pedro.MathUtils;
 
@@ -40,7 +39,7 @@ public class PointsSpecimen {
             PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getY() + distance * Math.cos(pickupAngle),
             PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading());
 
-    public static Pose SCORE_SPECIMEN_BACK = new Pose(26, 61 + OFFSET, Math.toRadians(-180)); //x = 31.55
+    public static Pose SCORE_SPECIMEN_BACK = new Pose(24.5, 61 + OFFSET, Math.toRadians(-180)); //x = 31.55
 
     public static double DELTA = 2.25; //Y OFFSET FOR 4TH AND 5TH SPECIMEN
 
@@ -48,6 +47,7 @@ public class PointsSpecimen {
     public static Pose SUB_GRAB_SPEC_CONTROL = new Pose(27, 20, Math.toRadians(0));
 
     public static Pose SUB_GRAB_SPEC_DEPOSIT = new Pose(25, 19.5, 0);
+    public static Pose HUMAN_PLAYER_SPEC_DEPOSIT = new Pose(23, 13, Math.toRadians(0));
 
     public static Pose SUB_GRAB_SPEC_DEPOSIT_TRANSITION_CONTROL = new Pose(30, 25.5, 0);
     public static Pose SUB_GRAB_SPEC_DEPOSIT_TRANSITION = new Pose(26.5, 25.5, 0);
