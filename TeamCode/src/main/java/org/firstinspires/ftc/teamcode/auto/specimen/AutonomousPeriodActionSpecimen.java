@@ -341,7 +341,7 @@ public class AutonomousPeriodActionSpecimen extends SequentialCommandGroup {
                         new SetArmPosition().setArmState(ArmState.State.IN_ROBOT)
                 ),
                 new SequentialCommandGroup(
-                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.33),
+                        new WaitUntilCommand(()-> VLRSubsystem.getArm().currentExtension() < 0.25),
                         new ParallelCommandGroup(
                                 new WaitCommand(100).andThen(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL)),
                                 new SequentialCommandGroup(

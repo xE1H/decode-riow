@@ -28,6 +28,7 @@ import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.pedro.DriveToHumanPlayerTeleop;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ResetRotator;
 import org.firstinspires.ftc.teamcode.subsystems.arm.ResetSlides;
@@ -92,29 +93,27 @@ public class SpecimenMap extends ControlMap {
 //                                new WaitCommand(150)
                         ),
                         new ParallelCommandGroup(
+                                new SetArmPosition().retract(),
+
                                 new SequentialCommandGroup(
-                                        new SetArmPosition().retract(),
-                                        //new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
-                                        //new WaitCommand(700),
-                                        new SetArmPosition().setArmOperationMode(MainArmConfiguration.OPERATION_MODE.NORMAL_SLOWER),
-                                        new SetArmPosition().angleDegrees(155)
-                                ),
-                                new SequentialCommandGroup(
-                                        new WaitCommand(200),
+                                        new WaitCommand(350),
                                         new CustomConditionalCommand(
                                                 new CustomConditionalCommand(
                                                         new SequentialCommandGroup(
+                                                                new SetArmPosition().setArmOperationMode(MainArmConfiguration.OPERATION_MODE.NORMAL_SLOWER),
+                                                                new SetArmPosition().angleDegrees(155),
+
                                                                 new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_SPEC_DEPOSIT_TRANSITION_CONTROL, SUB_GRAB_SPEC_DEPOSIT_TRANSITION)
                                                                         .setLinearHeadingInterpolation(f.getPose().getHeading(), SUB_GRAB_SPEC_DEPOSIT_TRANSITION.getHeading())
                                                                         .build()),
                                                                 new WaitUntilCommand(() -> VLRSubsystem.getArm().currentAngleDegrees() > 140),
                                                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                                                 new WaitCommand(100),
-                                                                new SetArmPosition().setArmOperationMode(MainArmConfiguration.OPERATION_MODE.NORMAL_SLOWER),
-                                                                new SetArmPosition().angleDegrees(80),
+                                                                new SetArmPosition().setArmOperationMode(MainArmConfiguration.OPERATION_MODE.NORMAL),
+                                                                new SetArmPosition().angleDegrees(0),
                                                                 new ParallelCommandGroup(
                                                                         new FollowPath(f, bezierPath(SUB_GRAB_SPEC_DEPOSIT_TRANSITION, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER).setLinearHeadingInterpolation(SUB_GRAB_SPEC_DEPOSIT_TRANSITION.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build()),
-                                                                        new SetArmPosition().intakeSpecimen(0.44)
+                                                                        new WaitCommand(400).andThen(new SetArmPosition().intakeSpecimen(0.44))
                                                                 ),
                                                                 new DisableFollower()
                                                         ),
@@ -122,21 +121,28 @@ public class SpecimenMap extends ControlMap {
 
                                                         // NORMAL
                                                         new SequentialCommandGroup(
-                                                                new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_SPEC_CONTROL, SUB_GRAB_SPEC_DEPOSIT)
-                                                                        .setLinearHeadingInterpolation(f.getPose().getHeading(), SUB_GRAB_SPEC_DEPOSIT.getHeading())
-                                                                        .build()).setCompletionThreshold(0.6),
-                                                                new WaitUntilCommand(() -> VLRSubsystem.getArm().currentAngleDegrees() > 125),
+                                                                new SetArmPosition().setArmOperationMode(MainArmConfiguration.OPERATION_MODE.NORMAL_SLOWER),
+
+                                                                new ParallelCommandGroup(
+                                                                        new DriveToHumanPlayerTeleop(f),
+                                                                        new SetArmPosition().angleDegrees(165)
+                                                                ),
+//                                                                new FollowPath(f, bezierPath(f.getPose(), SUB_GRAB_SPEC_CONTROL, SUB_GRAB_SPEC_DEPOSIT)
+//                                                                        .setLinearHeadingInterpolation(f.getPose().getHeading(), SUB_GRAB_SPEC_DEPOSIT.getHeading())
+//                                                                        .build()).setCompletionThreshold(0.6),
+
+                                                                new WaitUntilCommand(() -> VLRSubsystem.getArm().currentAngleDegrees() > 130),
                                                                 new SetClawState(ClawConfiguration.GripperState.OPEN),
                                                                 new WaitCommand(100),
 //                                                                new SetClawState(ClawConfiguration.GripperState.CLOSED),
 //                                                                new SetArmPosition().angleDegrees(80),
                                                                 new ParallelCommandGroup(
-                                                                        new SetArmPosition().angleDegrees(0).andThen(new ResetRotator().alongWith(new ResetSlides())),
-                                                                        new WaitCommand(150).andThen(
+                                                                        new SetArmPosition().angleDegrees(0).andThen(new WaitCommand(50), new ResetRotator().alongWith(new ResetSlides())),
+                                                                        new WaitCommand(50).andThen(
                                                                                 new FollowPath(f, bezierPath(SUB_GRAB_SPEC_DEPOSIT, SUB_GRAB_SPEC)
                                                                                     .setLinearHeadingInterpolation(SUB_GRAB_SPEC_DEPOSIT.getHeading(), SUB_GRAB_SPEC.getHeading())
                                                                                     .build()
-                                                                            ).setCompletionThreshold(0.6)
+                                                                            ).setCompletionThreshold(0.85)
                                                                         )
                                                                 ),
                                                                 new DisableFollower()
@@ -172,7 +178,7 @@ public class SpecimenMap extends ControlMap {
 
             addCommands(
                     new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                    new WaitCommand(120),
+                    new WaitCommand(80),
                     new SetArmPosition().retract(),
                     new WaitCommand(60),
                     new ResetRotator().alongWith(new ResetSlides()),

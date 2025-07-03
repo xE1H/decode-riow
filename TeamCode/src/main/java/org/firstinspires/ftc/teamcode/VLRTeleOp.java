@@ -58,6 +58,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
     boolean prevFollowerActive = false;
     boolean proceededToLevel3 = false;
     boolean holdOverride = false;
+    boolean level2HangInitiated = false;
 
 
     @Override
@@ -148,6 +149,11 @@ public class VLRTeleOp extends VLRLinearOpMode {
                                 )
                         )
                 );
+            }
+
+            if (gpHang.isDown(GamepadKeys.Button.LEFT_BUMPER) && !level2HangInitiated){
+                level2HangInitiated = true;
+                CommandScheduler.getInstance().schedule(new SetArmPosition().level2Hang(()-> gpHang.isDown(GamepadKeys.Button.LEFT_BUMPER)));
             }
 
 

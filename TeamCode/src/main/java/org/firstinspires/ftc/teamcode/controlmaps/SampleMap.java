@@ -31,6 +31,8 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 
+import java.util.Set;
+
 public class SampleMap extends ControlMap {
     GlobalMap globalMap;
     CommandScheduler cs;

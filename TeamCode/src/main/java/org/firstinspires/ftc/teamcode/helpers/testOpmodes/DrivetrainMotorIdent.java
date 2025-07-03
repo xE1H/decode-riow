@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.helpers.testOpmodes;
 
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 
+@Disabled
 @TeleOp(name = "Drivetrain Motor Identification", group = "Utils")
 public class DrivetrainMotorIdent extends VLRLinearOpMode {
     @Override
