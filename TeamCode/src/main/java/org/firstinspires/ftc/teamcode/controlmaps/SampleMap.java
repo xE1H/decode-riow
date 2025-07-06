@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.controlmaps;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.BUCKET_HIGH_SCORE_POSE;
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.SUB_GRAB_0;
 import static org.firstinspires.ftc.teamcode.helpers.pedro.PoseToPath.bezierPath;
+
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
@@ -14,6 +15,7 @@ import com.pedropathing.commands.FollowPath;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
@@ -30,7 +32,9 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.ResetSlides;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
+import java.util.Arrays;
 import java.util.Set;
 
 public class SampleMap extends ControlMap {
@@ -65,8 +69,16 @@ public class SampleMap extends ControlMap {
         gp.add(new TriggerCtl(GamepadKeys.Trigger.RIGHT_TRIGGER, (Double a) -> {
             if (a > 0.3) retractArm();
         }));
+
+        gp.add(new ButtonCtl(GamepadKeys.Button.DPAD_UP, this::sendColorRequest));
     }
 
+    private void sendColorRequest() {
+        if (globalMap.isBlue)
+            globalMap.reader.setAllowedColors(Arrays.asList(LimelightYoloReader.Limelight.Sample.Color.BLUE, LimelightYoloReader.Limelight.Sample.Color.YELLOW));
+        else
+            globalMap.reader.setAllowedColors(Arrays.asList(LimelightYoloReader.Limelight.Sample.Color.RED, LimelightYoloReader.Limelight.Sample.Color.YELLOW));
+    }
 
     //
     // ARM OPS
@@ -83,13 +95,13 @@ public class SampleMap extends ControlMap {
                                 public void run() {
                                     globalMap.followerActive = false;
                                     rc.singleBlip();
-                            }}
+                                }
+                            }
                     ))
             );
             retractTimer.reset();
         }
     }
-
 
 
     private void toggleArmLowState() {
@@ -108,7 +120,7 @@ public class SampleMap extends ControlMap {
 
         cs.schedule(
                 new SequentialCommandGroup(
-                        new com.arcrobotics.ftclib.command.InstantCommand(()-> samplePickedUp = false),
+                        new com.arcrobotics.ftclib.command.InstantCommand(() -> samplePickedUp = false),
                         new SubmersibleGrabV2(f, globalMap.reader, rc),
 
                         new ParallelCommandGroup(
@@ -117,7 +129,8 @@ public class SampleMap extends ControlMap {
                                                 new InstantCommand() {
                                                     @Override
                                                     public void run() {
-                                                        deposit();
+                                                        System.out.println("GOING TO SCORE");
+                                                        //deposit();
                                                     }
                                                 },
                                                 new SequentialCommandGroup(
@@ -126,21 +139,22 @@ public class SampleMap extends ControlMap {
                                                                 new InstantCommand() {
                                                                     @Override
                                                                     public void run() {
-                                                                        deposit();
+                                                                        System.out.println("GOING TO SCORE");
+//                                                                        deposit();
                                                                     }
                                                                 },
                                                                 new InstantCommand() {
                                                                     @Override
                                                                     public void run() {
-                                                                        globalMap.followerActive = false;
-                                                                        rc.singleBlip();
+                                                                        //globalMap.followerActive = false;
+                                                                        //rc.singleBlip();
                                                                     }
                                                                 },
-                                                                ()-> VLRSubsystem.getInstance(ClawSubsystem.class).isSamplePresent()
+                                                                () -> VLRSubsystem.getInstance(ClawSubsystem.class).isSamplePresent()
                                                         )
 
                                                 ),
-                                                ()-> VLRSubsystem.getInstance(ClawSubsystem.class).isSamplePresent()
+                                                () -> VLRSubsystem.getInstance(ClawSubsystem.class).isSamplePresent()
                                         )
                                 ),
                                 new SetArmPosition().retract()
@@ -156,8 +170,11 @@ public class SampleMap extends ControlMap {
         cs.schedule(
                 new SequentialCommandGroup(
                         new ParallelCommandGroup(
-                                new WaitUntilCommand(()-> getDistance(f.getPose(), BUCKET_HIGH_SCORE_POSE) < 50)
-                                        .andThen(new SetArmPosition().scoreSample(armState)),
+                                new SequentialCommandGroup(
+                                        new WaitUntilCommand(() -> getDistance(f.getPose(), BUCKET_HIGH_SCORE_POSE) < 50)
+                                                .andThen(new SetArmPosition().scoreSample(armState)),
+                                        new com.arcrobotics.ftclib.command.InstantCommand(() -> depositCompleted = true)
+                                ),
 //                                new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL),
 //                                new SetClawAngle(ClawConfiguration.VerticalRotation.UP),
 //                                new SequentialCommandGroup(
@@ -174,14 +191,13 @@ public class SampleMap extends ControlMap {
                                             }
                                         }
                                 )
-                        ),
-                        new com.arcrobotics.ftclib.command.InstantCommand(()-> depositCompleted = true)
+                        )
                 )
         );
 
     }
 
-    private double getDistance(Pose start, Pose end){
+    private double getDistance(Pose start, Pose end) {
         return Math.hypot(start.getX() - end.getX(), start.getY() - end.getY());
     }
 }

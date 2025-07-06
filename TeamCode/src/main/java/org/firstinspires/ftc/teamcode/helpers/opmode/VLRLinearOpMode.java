@@ -53,6 +53,10 @@ public abstract class VLRLinearOpMode extends LinearOpMode {
         VLRSubsystem.clearSubsystems(); // Clear all subsystems
     }
 
+    protected void setBeforeEndRunnable(Runnable beforeEndRunnable) {
+        this.beforeEndRunnable = beforeEndRunnable;
+    }
+
     public abstract void run();
 
     @Override

@@ -127,7 +127,7 @@ public class SubmersibleGrabV2 extends SequentialCommandGroup {
                                     .withTimeout(600),
 
                             new SetArmPosition().intakeSampleAuto(
-                                    (0.905 * (forwardComponent + 1.5)) / MAX_POSITION, //0.7742
+                                    (0.925 * (forwardComponent + 1.5)) / MAX_POSITION, //0.7742
                                     (sampleAngle / -180.0) + 1
                             )
                     ).andThen(new LogCommand("SKIBIDI LOGGER", "SKIBIDI SUB INTAKE FINITO"))

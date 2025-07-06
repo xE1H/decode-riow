@@ -81,7 +81,7 @@ public class AutonomousPeriodActionSample extends SequentialCommandGroup {
         return new ParallelCommandGroup(
                 new SequentialCommandGroup(
                         new SetArmPosition().scoreSample(MainArmConfiguration.SAMPLE_SCORE_HEIGHT.HIGH_BASKET),
-                        new WaitCommand(60),
+                        new WaitCommand(200),
                         //new WaitUntilCommand(() -> follower.atPose(PRELOAD_BUCKET_HIGH_SCORE_POSE, 3, 3, Math.toRadians(4))),
                         new InstantCommand(() -> sampleScored = true),
                         new SetArmPosition().intakeSample(0.32)

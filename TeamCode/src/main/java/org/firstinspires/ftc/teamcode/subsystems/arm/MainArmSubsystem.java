@@ -15,16 +15,20 @@ import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorCo
 import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MAX_EXTENSION_CM;
 
 import com.arcrobotics.ftclib.geometry.Vector2d;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.Point;
+import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration;
 import org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideSubsystem;
 
 import java.util.logging.Level;
 
-public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
+public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem> {
     private ArmRotatorSubsystem rotator;
     private ArmSlideSubsystem slides;
 
@@ -38,12 +42,37 @@ public class MainArmSubsystem extends VLRSubsystem<MainArmSubsystem>{
 
     protected void initialize(HardwareMap hardwareMap){
         readyToProceedToLevel3 = false;
+
         rotator = new ArmRotatorSubsystem(hardwareMap);
         slides = new ArmSlideSubsystem(hardwareMap);
 
         if (ArmState.isCurrentState(ArmState.State.SAMPLE_SCORE, ArmState.State.SPECIMEN_SCORE_BACK)){
             targetPoint = new Point(slides.getTargetExtension(), rotator.getTargetPosition());
             prevTargetPoint = targetPoint;
+        }
+    }
+
+    public void enableAfterEndBrake(HardwareMap hardwareMap) {
+        //afterEndBrake = new Thread(new AfterEndThread(hardwareMap));
+        //afterEndBrake.start();
+    }
+
+    private class AfterEndThread implements Runnable {
+        private HardwareMap hardwareMap;
+
+        public AfterEndThread(HardwareMap hardwareMap) {
+            this.hardwareMap = hardwareMap;
+        }
+        @Override
+        public void run() {
+            while (true) {
+                hardwareMap.get(DcMotorEx.class, ArmSlideConfiguration.MOTOR_NAME_0).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                hardwareMap.get(DcMotorEx.class, ArmSlideConfiguration.MOTOR_NAME_1).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                hardwareMap.get(DcMotorEx.class, ArmSlideConfiguration.MOTOR_NAME_2).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                hardwareMap.get(DcMotorEx.class, ArmRotatorConfiguration.MOTOR_NAME).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                System.out.println("After hang, overriding power");
+            }
         }
     }
 

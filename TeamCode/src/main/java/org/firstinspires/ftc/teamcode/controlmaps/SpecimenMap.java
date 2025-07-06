@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.controlmaps;
 
+import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.MIDPOINT_BEFORE_PICKUP;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SUB_GRAB_SPEC;
 import static org.firstinspires.ftc.teamcode.auto.specimen.PointsSpecimen.SUB_GRAB_SPEC_CONTROL;
@@ -24,6 +25,7 @@ import com.pedropathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.auto.sample.SubmersibleGrabV2;
 import org.firstinspires.ftc.teamcode.helpers.commands.CustomConditionalCommand;
 import org.firstinspires.ftc.teamcode.helpers.commands.InstantCommand;
+import org.firstinspires.ftc.teamcode.helpers.commands.ScheduleRuntimeCommand;
 import org.firstinspires.ftc.teamcode.helpers.controls.DriverControls;
 import org.firstinspires.ftc.teamcode.helpers.controls.button.ButtonCtl;
 import org.firstinspires.ftc.teamcode.helpers.controls.rumble.RumbleControls;
@@ -177,26 +179,27 @@ public class SpecimenMap extends ControlMap {
             Logger.getLogger("HangCycle").info("Hang cycle count: " + hangCycleCount);
 
             addCommands(
-                    new SetClawState(ClawConfiguration.GripperState.CLOSED),
-                    new WaitCommand(80),
-                    new SetArmPosition().retract(),
-                    new WaitCommand(60),
-                    new ResetRotator().alongWith(new ResetSlides()),
+//                    new SetClawState(ClawConfiguration.GripperState.CLOSED),
+//                    new WaitCommand(80),
+//                    new SetArmPosition().retract(),
+//                    new WaitCommand(60),
+//                    new ResetRotator().alongWith(new ResetSlides()),
                     new CustomConditionalCommand(
                             new SequentialCommandGroup(
                                     // This means that there is not much time to actually react and cancel the sequence if the grab failed. (only have time until the arm fully retracts)
                                     // Might need to start driving, and have some sort of cancellation, as to where it goes back to the grab pos if it fails.
                                     // This also means that the retraction will be blocking, and the path won't start until the arm has retracted.
-                                    new SetArmPosition().intakeSpecimen(0.44),
+                                    new SetArmPosition().intakeSpecimen(0.4),
                                     new DisableFollower()
                             ),
                             new SequentialCommandGroup(
                                     new ParallelCommandGroup(
+                                            new WaitCommand(100).andThen(
                                             new FollowPath(f, bezierPath(PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER, TELEOP_SPEC_HANG_TRANSITION, hangPose)
-                                                    .setConstantHeadingInterpolation(hangPose.getHeading()).build()),
+                                                    .setLinearHeadingInterpolation(PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading(), hangPose.getHeading()).build())),
                                             new SetArmPosition().scoreSpecimenBack()
                                     ),
-                                    new WaitCommand(350),
+                                    new WaitCommand(50),
                                     new DisableFollower(),
                                     new WaitUntilCommand(() -> gp.gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.3),
                                     new InstantCommand() {
@@ -207,22 +210,26 @@ public class SpecimenMap extends ControlMap {
 
                                         }
                                     },
-                                    new SetArmPosition().extensionRelative(0.21),
-                                    new WaitCommand(300),
-                                    new InstantCommand() {
-                                        @Override
-                                        public void run() {
-                                            hangCycleCount++;
-                                        }
-                                    },
+
                                     new ParallelCommandGroup(
                                             new SequentialCommandGroup(
-                                                    //new SetArmPosition().retract(),
+//                                                    new SetArmPosition().retract(),
+                                                    new SetArmPosition().extensionRelative(0.24),
+                                                    new WaitCommand(50),
+                                                    new InstantCommand() {
+                                                        @Override
+                                                        public void run() {
+                                                            hangCycleCount++;
+                                                        }
+                                                    },
                                                     new SetArmPosition().intakeSpecimen(0.44)
                                             ),
-                                            new WaitCommand(100).andThen(
-                                                    new FollowPath(f, bezierPath(hangPose, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER)
-                                                            .setLinearHeadingInterpolation(hangPose.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build()
+                                            new WaitCommand(400).andThen(
+                                                    new ScheduleRuntimeCommand(()-> new FollowPath(f, bezierPath(f.getPose(), MIDPOINT_BEFORE_PICKUP)
+                                                            .setLinearHeadingInterpolation(f.getPose().getHeading(), MIDPOINT_BEFORE_PICKUP.getHeading()).build(), false)),
+
+                                                    new FollowPath(f, bezierPath(MIDPOINT_BEFORE_PICKUP, PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER)
+                                                            .setLinearHeadingInterpolation(MIDPOINT_BEFORE_PICKUP.getHeading(), PICK_UP_SPECIMENS_FROM_HUMAN_PLAYER.getHeading()).build()
                                                     )
                                             )
                                     ),

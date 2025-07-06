@@ -79,6 +79,9 @@ public class ArmCommandMagnitudeAndExtensionTest extends VLRTestOpMode {
         CommandScheduler.getInstance().schedule(new SetClawState(ClawConfiguration.GripperState.OPEN));
         //CommandScheduler.getInstance().schedule(new SetClawTwist(ClawConfiguration.HorizontalRotation.NORMAL));
         //CommandScheduler.getInstance().schedule(new SetClawAngle(ClawConfiguration.VerticalRotation.UP));
+
+        VLRSubsystem.getArm().setRotatorPowerLimit(0);
+        VLRSubsystem.getArm().setSlidePowerLimit(0);
     }
 
 
