@@ -51,7 +51,7 @@ public class PointsSpecimen {
 
     public static Pose SUB_GRAB_SPEC_DEPOSIT_TRANSITION_CONTROL = new Pose(30, 25.5, 0);
     public static Pose SUB_GRAB_SPEC_DEPOSIT_TRANSITION = new Pose(26.5, 25.5, 0);
-    public static Pose TELEOP_SPEC_HANG_TRANSITION = new Pose(26, 60, 0);
+    public static Pose TELEOP_SPEC_HANG_TRANSITION = new Pose(25, 60, 0);
 
     public static Pose TELEOP_SPEC_HANG_TRANSITION_FINAL_FWD = new Pose(35, 60, 0);
 

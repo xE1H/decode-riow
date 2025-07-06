@@ -116,6 +116,10 @@ public class ArmRotatorSubsystem {
         return motionProfile.getTargetPosition();
     }
 
+    public void enableAfterHangOverride() {
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
 
     public boolean reachedPosition(double angleDegrees) {
         return Math.abs(getAngleDegrees() - angleDegrees) < ERROR_MARGIN;

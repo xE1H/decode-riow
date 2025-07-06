@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration;
 
 //@Disabled
-@TeleOp(group = "Utils")
+@TeleOp(group = "!TELEOP")
 public class ManualRotatorAndSlideRecalibration extends OpMode {
     DcMotorEx rotator;
     DcMotorEx slideMotor0, slideMotor1, slideMotor2, slideEncoder, rotatorEncoder;

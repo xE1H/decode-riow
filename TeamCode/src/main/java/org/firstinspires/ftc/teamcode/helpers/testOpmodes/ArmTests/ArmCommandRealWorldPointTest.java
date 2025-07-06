@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 
 @Config
 @Photon
-@TeleOp()
+@TeleOp(group = "Utils")
 
 public class ArmCommandRealWorldPointTest extends VLRLinearOpMode {
     public static double xOffset = 0;

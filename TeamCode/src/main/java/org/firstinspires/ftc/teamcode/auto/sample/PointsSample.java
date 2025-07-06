@@ -7,9 +7,9 @@ import com.pedropathing.localization.Pose;
 public class PointsSample {
     public static Pose START_POSE = new Pose(10, 111.5, 0);
 
-    public static Pose PRELOAD_BUCKET_HIGH_SCORE_POSE = new Pose(21, 118.25, rad(-45));
+    public static Pose PRELOAD_BUCKET_HIGH_SCORE_POSE = new Pose(20, 118.25, rad(-45));
 
-    public static Pose BUCKET_HIGH_SCORE_POSE = new Pose(24, 119.25, rad(-45));
+    public static Pose BUCKET_HIGH_SCORE_POSE = new Pose(23.5, 119.25, rad(-45));
 
     public static Pose BUCKET_HIGH_SCORE_POSE_TELEOP = new Pose(28, 117, rad(-45));
 

@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.helpers.utils.MotionState;
 
 @Config
 @Disabled
-@TeleOp()
+@TeleOp(group = "Utils")
 public class MotionProfileGenerationTest extends OpMode
 {
     private MotionProfile motionProfile;

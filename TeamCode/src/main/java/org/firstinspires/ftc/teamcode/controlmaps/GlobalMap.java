@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 public class GlobalMap extends ControlMap {
     boolean slideResetActive = false;
     boolean rotatorResetActive = false;
+    public boolean isBlue = false;
 
     public boolean followerActive = false;
     GamepadKeys.Button triangle = GamepadKeys.Button.A;
@@ -28,10 +29,11 @@ public class GlobalMap extends ControlMap {
     public Follower f;
     public RumbleControls rc;
 
-    public GlobalMap(DriverControls driverControls, Follower f, RumbleControls rc) {
+    public GlobalMap(DriverControls driverControls, Follower f, RumbleControls rc, boolean isBlue) {
         super(driverControls);
         this.f = f;
         this.rc = rc;
+        this.isBlue = isBlue;
     }
 
     @Override

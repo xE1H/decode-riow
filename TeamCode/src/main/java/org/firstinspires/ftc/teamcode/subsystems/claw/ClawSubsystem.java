@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 public class ClawSubsystem extends VLRSubsystem<ClawSubsystem> implements ClawConfiguration {
     private Servo angleServo, twistServo, grabServos;
     private RevTouchSensor proximitySensor;
-    private final LowPassFilter proximityFilter = new LowPassFilter(0.88);
+    private final LowPassFilter proximityFilter = new LowPassFilter(0.89);
 
     private VerticalRotation targetAngle = VerticalRotation.UP;
     private GripperState clawState = GripperState.CLOSED;

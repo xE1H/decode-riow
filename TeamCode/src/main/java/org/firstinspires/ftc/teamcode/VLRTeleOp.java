@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.START_POSE;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.rotator.ArmRotatorConfiguration.MOTOR_NAME;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MOTOR_NAME_0;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MOTOR_NAME_1;
+import static org.firstinspires.ftc.teamcode.subsystems.arm.slide.ArmSlideConfiguration.MOTOR_NAME_2;
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.BLUE;
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.RED;
 import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.YELLOW;
@@ -10,14 +14,18 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.helpers.utils.BrakeArmMotors;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
 import org.firstinspires.ftc.teamcode.pedro.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedro.constants.LConstants;
@@ -32,17 +40,21 @@ import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
 import org.firstinspires.ftc.teamcode.helpers.persistence.AllianceSaver;
 import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.arm.SetArmPosition;
 import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 import org.firstinspires.ftc.teamcode.subsystems.wiper.Wiper;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @TeleOp(name = "VLRTeleOp", group = "!TELEOP")
 @Photon
@@ -95,12 +107,18 @@ public class VLRTeleOp extends VLRLinearOpMode {
         rc = new RumbleControls(gamepad1);
 
         // GlobalMap is for general controls that are not specific to samples/specimen
-        GlobalMap globalMap = new GlobalMap(gp, f, rc);
+        GlobalMap globalMap = new GlobalMap(gp, f, rc, isBlue);
         globalMap.initialize();
 
         SampleMap sampleMap = new SampleMap(gp, cs, globalMap);
         sampleMap.initialize(); // initialize sample controls as default
-        globalMap.reader.setAllowedColors(Arrays.asList(BLUE, YELLOW));
+
+        List<LimelightYoloReader.Limelight.Sample.Color> colorArrayList = isBlue ? Arrays.asList(BLUE, YELLOW) : Arrays.asList(RED, YELLOW);
+
+        boolean setColorSucceeded = false;
+        while (!setColorSucceeded) {
+            setColorSucceeded = globalMap.reader.setAllowedColors(colorArrayList);
+        }
 
         SpecimenMap specimenMap = new SpecimenMap(gp, cs, globalMap);
 
@@ -108,15 +126,24 @@ public class VLRTeleOp extends VLRLinearOpMode {
         addSwitchCtrl(gp, globalMap, sampleMap, specimenMap);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-
+        MainArmSubsystem arm = VLRSubsystem.getArm();
+//        setBeforeEndRunnable(() -> arm.enableAfterEndBrake(hardwareMap));
+//        BrakeArmMotors brakeArmMotors = new BrakeArmMotors(hardwareMap
+//                hardwareMap.get(DcMotorEx.class, MOTOR_NAME),
+//                hardwareMap.get(DcMotorEx.class, MOTOR_NAME_0),
+//                hardwareMap.get(DcMotorEx.class, MOTOR_NAME_1),
+//                hardwareMap.get(DcMotorEx.class, MOTOR_NAME_2)
+//        );
 
         waitForStart();
         cs.schedule(new SetArmPosition().retractAfterAuto());
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
+        //arm.setRotatorPowerLimit(0.3);
+        //arm.setSlidePowerLimit(0.2);
+
         while (opModeIsActive()) {
             gp.update();
-            MainArmSubsystem arm = VLRSubsystem.getArm();
 
             if (gamepad2.left_stick_y < -0.2 && gamepad2.right_stick_y < -0.2 && hangInitiated && arm.isReadyToProceedToLevel3() && !proceededToLevel3){
                 analogHangActive = true;
@@ -141,11 +168,16 @@ public class VLRTeleOp extends VLRLinearOpMode {
                         ).alongWith(
                                 new SequentialCommandGroup(
                                         new WaitUntilCommand(()-> analogHangActive),
-                                        new WaitUntilCommand(()-> ((VLRSubsystem.getArm().currentExtension() < 0.05 && VLRSubsystem.getArm().currentAngleDegrees() < 78) || holdOverride)),
-                                        new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50),
+                                        new WaitUntilCommand(()-> ((VLRSubsystem.getArm().currentExtension() < 0.18 && VLRSubsystem.getArm().currentAngleDegrees() < 90) || holdOverride)),
                                         new InstantCommand(()-> analogHangActive = false),
+
+                                        new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0, 50),
                                         new InstantCommand(()-> VLRSubsystem.getArm().disableRotatorPowerOverride()),
-                                        new InstantCommand(()-> VLRSubsystem.getArm().disableSlidePowerOverride())
+                                        new InstantCommand(()-> VLRSubsystem.getArm().disableSlidePowerOverride()),
+
+                                        new WaitCommand(1500),
+                                        new SetArmPosition().extensionAndAngleDegreesNOTSAFEJUSTFORHANG(0.095, 45)
+
                                 )
                         )
                 );
@@ -171,7 +203,17 @@ public class VLRTeleOp extends VLRLinearOpMode {
 
             //telemetry.addData("Follower Pose", f.getPose());
             telemetry.update();
+
+            Pose currentPose = f.getPose();
+            if (!currentPose.roughlyEquals(new Pose(0,0,0))) {
+                PoseSaver.setPedroPose(currentPose);
+            }
         }
+
+//        if (level3hangFinished) {
+////            Thread thread = new Thread(brakeArmMotors);
+////            thread.start();
+//        }
     }
 
     private void addSwitchCtrl(DriverControls gp, GlobalMap globalMap, SampleMap sampleMap, SpecimenMap specimenMap) {

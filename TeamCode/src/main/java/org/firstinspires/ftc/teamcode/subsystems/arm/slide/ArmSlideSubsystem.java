@@ -217,6 +217,12 @@ public class ArmSlideSubsystem {
         overridePowerValue = 0;
     }
 
+    public void enableAfterHangOverride() {
+        extensionMotor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
     public boolean getPowerOverride(){
         return overridePowerState;
     }
