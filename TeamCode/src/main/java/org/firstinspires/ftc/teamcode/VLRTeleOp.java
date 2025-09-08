@@ -38,7 +38,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
         f = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
         //noinspection unchecked
-        VLRSubsystem.requireSubsystems();
+        VLRSubsystem.requireSubsystems(Chassis.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
         if (!PoseSaver.isPoseSaved()) {
@@ -77,7 +77,7 @@ public class VLRTeleOp extends VLRLinearOpMode {
                 }
 
                 // Not defining these controls through DriverControls cuz ts pmo
-                VLRSubsystem.getInstance(Chassis.class).drive(gpEx.getLeftY(), -gpEx.getLeftX(), -0.3 * gpEx.getRightX());
+                VLRSubsystem.getInstance(Chassis.class).drive(gpEx.getLeftY(), -gpEx.getLeftX(), -0.45 * gpEx.getRightX());
                 f.updatePose();
             }
             prevFollowerActive = globalMap.followerActive;

@@ -5,16 +5,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.helpers.opmode.VLRLinearOpMode;
+import org.firstinspires.ftc.teamcode.subsystems.chassis.ChassisConfiguration;
 
 @Disabled
 @TeleOp(name = "Drivetrain Motor Identification", group = "Utils")
 public class DrivetrainMotorIdent extends VLRLinearOpMode {
     @Override
     public void run() {
-        MotorEx lf = new MotorEx(hardwareMap, "MotorLeftFront");
-        MotorEx rf = new MotorEx(hardwareMap, "MotorRightFront");
-        MotorEx lb = new MotorEx(hardwareMap, "MotorLeftBack");
-        MotorEx rb = new MotorEx(hardwareMap, "MotorRightBack");
+        MotorEx lf = new MotorEx(hardwareMap, ChassisConfiguration.MOTOR_LEFT_FRONT);
+        MotorEx rf = new MotorEx(hardwareMap, ChassisConfiguration.MOTOR_RIGHT_FRONT);
+        MotorEx lb = new MotorEx(hardwareMap, ChassisConfiguration.MOTOR_LEFT_BACK);
+        MotorEx rb = new MotorEx(hardwareMap, ChassisConfiguration.MOTOR_RIGHT_BACK);
 
         MotorEx motors[] = {lf, rf, lb, rb};
         String motornames[] = {"lf", "rf", "lb", "rb"};

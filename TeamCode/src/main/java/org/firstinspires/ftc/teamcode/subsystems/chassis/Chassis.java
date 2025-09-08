@@ -28,10 +28,6 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
     MotorEx MotorLeftBack;
     MotorEx MotorRightBack;
 
-    AnalogInput leftAngledSensor;
-    AnalogInput rightAngledSensor;
-    AnalogInput backSensor;
-
     public static double motorPower = 1;
     public static double acceleration_a = 0.4;
     public static double deceleration_a = 0.2;
@@ -45,17 +41,6 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
     AsymmetricLowPassFilter x_filter = new AsymmetricLowPassFilter(acceleration_a, deceleration_a);
     AsymmetricLowPassFilter y_filter = new AsymmetricLowPassFilter(acceleration_a, deceleration_a);
-
-    LowPassFilter rightSensorFilter = new LowPassFilter(0.97);
-    LowPassFilter leftSensorFilter = new LowPassFilter(0.97);
-    LowPassFilter backSensorFilter = new LowPassFilter(0.3);
-
-    private double leftDistance = 0;
-    private double rightDistance = 0;
-    private double backDistance = 0;
-
-    public static double sensorScalar = 1105;
-
 
     @Override
     protected void initialize(HardwareMap hardwareMap) {
@@ -71,10 +56,6 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         MotorRightBack.setRunMode(Motor.RunMode.RawPower);
         MotorRightFront.setRunMode(Motor.RunMode.RawPower);
         MotorLeftFront.setRunMode(Motor.RunMode.RawPower);
-
-        leftAngledSensor = hardwareMap.get(AnalogInput.class, LEFT_ANGLED_SENSOR);
-        rightAngledSensor = hardwareMap.get(AnalogInput.class, RIGHT_ANGLED_SENSOR);
-        backSensor = hardwareMap.get(AnalogInput.class, BACK_SENSOR);
 
 //        MotorRightBack.setInverted(true);
 //        MotorRightFront.setInverted(true);
@@ -112,14 +93,6 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
         MotorRightFront.set(clampPower(driveController.frontRightMetersPerSecond) * motorPower);
         MotorLeftBack.set(clampPower(driveController.rearLeftMetersPerSecond) * motorPower);
         MotorRightBack.set(clampPower(driveController.rearRightMetersPerSecond) * motorPower);
-
-//        if(GlobalConfig.DEBUG_MODE){
-//            Telemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
-//            telemetry.addData("Motor FL", MotorLeftFront.motorEx.getCurrent(CurrentUnit.AMPS));
-//            telemetry.addData("Motor FR", MotorRightFront.motorEx.getCurrent(CurrentUnit.AMPS));
-//            telemetry.addData("Motor BL", MotorLeftBack.motorEx.getCurrent(CurrentUnit.AMPS));
-//            telemetry.addData("Motor BR", MotorRightBack.motorEx.getCurrent(CurrentUnit.AMPS));
-//        }
     }
 
     public double clampPower(double motorPower) {
@@ -145,61 +118,5 @@ public class Chassis extends VLRSubsystem<Chassis> implements ChassisConfigurati
 
     public void setPower(double power) {
         motorPower = Math.min(power, 1.0);
-    }
-
-
-    private void updateLeftDistanceMM(){
-        leftDistance = leftSensorFilter.estimate(leftAngledSensor.getVoltage() / 3.3 * sensorScalar);
-    }
-
-    private void updateRightDistanceMM(){
-        rightDistance =  rightSensorFilter.estimate(rightAngledSensor.getVoltage() / 3.3 * sensorScalar);
-    }
-
-    private void updateBackSensor(){
-        backDistance = backSensorFilter.estimate(backSensor.getVoltage() / 3.3 * 800);
-    }
-
-    @Override
-    public void periodic(){
-        //updateLeftDistanceMM();
-        //updateRightDistanceMM();
-        updateBackSensor();
-
-        if (DEBUG_MODE) {
-            Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-            //telemetry.addData("LEFT DISTANCE: ", leftDistance);
-            //telemetry.addData("RIGHT DISTANCE: ", rightDistance);
-            telemetry.addData("BACK DISTANCE: ", backDistance);
-        }
-    }
-
-
-    public double getLeftDistance(){
-        return leftDistance;
-    }
-
-    public double getRightDistance(){
-        return rightDistance;
-    }
-
-    public double getBackDistance(){
-        return backDistance;
-    }
-
-    public Pose calculateRobotPoseFromDistanceSensors(Follower follower){
-        double robotAngle = follower.getPose().getHeading();
-
-        logger.info("left distance: " + leftDistance);
-        logger.info("right distance: " + rightDistance);
-
-        double X_offset = rightDistance + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.sin(robotAngle);
-        double Y_offset = leftDistance + 0.5 * DISTANCE_BETWEEN_ANGLED_SENSORS_MM * Math.cos(robotAngle);
-
-        Pose midpointBetweenSensors = new Pose(BUCKET_CORNER.getX() + X_offset / 25.4, BUCKET_CORNER.getY() - Y_offset / 25.4, robotAngle);
-        Vector2d rotatedOffset = OFFSET_FROM_SENSOR_MIDPOINT_TO_PEDRO_CENTER.rotateBy(Math.toDegrees(robotAngle)).div(25.4);
-        logger.info("rotated offset: " + rotatedOffset.getX() + "; " + rotatedOffset.getY());
-
-        return new Pose(midpointBetweenSensors.getX() + rotatedOffset.getX(), midpointBetweenSensors.getY() + rotatedOffset.getY(), robotAngle);
     }
 }
