@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.helpers.opmode;
 
-import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.BLUE;
-import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.RED;
-import static org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader.Limelight.Sample.Color.YELLOW;
-
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -23,11 +19,7 @@ import org.firstinspires.ftc.teamcode.helpers.persistence.AllianceSaver;
 import org.firstinspires.ftc.teamcode.helpers.persistence.PoseSaver;
 import org.firstinspires.ftc.teamcode.helpers.subsystems.VLRSubsystem;
 import org.firstinspires.ftc.teamcode.helpers.utils.GlobalConfig;
-import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.blinkin.BlinkinSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.chassis.Chassis;
-import org.firstinspires.ftc.teamcode.subsystems.claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.limelight.LimelightYoloReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,12 +42,10 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
         f.setStartingPose(StartPose());
 
         //noinspection unchecked
-        VLRSubsystem.requireSubsystems(MainArmSubsystem.class, ClawSubsystem.class, BlinkinSubsystem.class, Chassis.class);
+        VLRSubsystem.requireSubsystems(Chassis.class);
         VLRSubsystem.initializeAll(hardwareMap);
 
-        LimelightYoloReader reader = new LimelightYoloReader();
-
-        autoCommand = autoCommand(f, reader);
+        autoCommand = autoCommand(f);
 
         ///SCHEDULE AUTO COMMAND, THEN SAVE PEDRO POSE AND LOG TOTAL AUTO TIME
         cs.schedule(new SequentialCommandGroup(
@@ -64,7 +54,6 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
                 GlobalTimer.logAutoTime()
         ));
 
-        VLRSubsystem.getInstance(BlinkinSubsystem.class).setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_LAVA_PALETTE);
         GlobalLoopTimeMonitor.reset();
 
         ac = new AutoConfigurator(telemetry, gamepad1, ()-> isStopRequested() || opModeIsActive());
@@ -76,13 +65,7 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
 
         if (!isStopRequested()) {
             boolean isBlue = color.text.equals("Blue");
-            List<LimelightYoloReader.Limelight.Sample.Color> allowedColors = new ArrayList<>();
 
-            if (isBlue) {allowedColors.add(BLUE);}
-            else {allowedColors.add(RED);}
-            if (!SpecimenOnly()) {allowedColors.add(YELLOW);}
-
-            reader.setAllowedColors(allowedColors);
             AllianceSaver.setAlliance(isBlue ? Alliance.BLUE : Alliance.RED);
 
             waitForStart();
@@ -125,7 +108,7 @@ public abstract class VLRAutoTestOpMode extends VLRLinearOpMode {
     public void InitLoop() {
     }
 
-    public abstract Command autoCommand(Follower f, LimelightYoloReader reader);
+    public abstract Command autoCommand(Follower f);
 
     public abstract Pose StartPose();
 

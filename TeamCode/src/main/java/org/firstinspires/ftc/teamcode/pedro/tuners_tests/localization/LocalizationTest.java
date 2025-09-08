@@ -8,8 +8,6 @@ import static com.pedropathing.follower.FollowerConstants.rightFrontMotorDirecti
 import static com.pedropathing.follower.FollowerConstants.rightFrontMotorName;
 import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
 import static com.pedropathing.follower.FollowerConstants.rightRearMotorName;
-import static org.firstinspires.ftc.teamcode.auto.sample.PointsSample.START_POSE;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -57,7 +55,7 @@ public class LocalizationTest extends OpMode {
     public void init() {
         FConstants fConstants = new FConstants();
         poseUpdater = new PoseUpdater(hardwareMap, FConstants.class, LConstants.class);
-        poseUpdater.setStartingPose(START_POSE);
+        poseUpdater.setStartingPose(new com.pedropathing.localization.Pose(0, 0, 0));
 
         dashboardPoseTracker = new DashboardPoseTracker(poseUpdater);
 

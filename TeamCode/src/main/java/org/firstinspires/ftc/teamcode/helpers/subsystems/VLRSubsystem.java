@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode.helpers.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.subsystems.arm.MainArmSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.hang.HangSubsystem;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -48,10 +45,6 @@ public abstract class VLRSubsystem<T extends VLRSubsystem<T>> extends SubsystemB
             throw new RuntimeException("Error getting instance of " + clazz.getName(), e);
         }
     }
-
-    public static MainArmSubsystem getArm() {return getInstance(MainArmSubsystem.class);}
-
-    public static HangSubsystem getHang() {return getInstance(HangSubsystem.class);}
 
     /**
      * Initializes the subsystem with the given hardware map.
