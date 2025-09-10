@@ -27,6 +27,7 @@ public class GlobalMap extends ControlMap {
     @Override
     public void initialize() {
         gp.add(new ButtonCtl(triangle, this::toggleFollower));
+        //gp.add(new ButtonCtl(GamepadKeys.Button.LEFT_BUMPER, STATE_JUST_CHANGED, this::load));
     }
 
     //

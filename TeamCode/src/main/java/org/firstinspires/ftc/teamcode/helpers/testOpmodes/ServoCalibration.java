@@ -15,7 +15,7 @@ public class ServoCalibration extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        String[] servoNames = {"twist", "angle", "claw"};
+        String[] servoNames = {"loader"};
         double location = 0;
         waitForStart();
         while (opModeIsActive()) {
